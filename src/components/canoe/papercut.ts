@@ -43,7 +43,6 @@ export const wavePath = (i: number) => `M-20,300 L${crestPoints(i).join(" L")} L
 export const crestPath = (i: number) => `M${crestPoints(i).join(" L")}`;
 /** 0 = sharp, 1 = fully in the fog; only the farthest rows haze. */
 export const hazeOf = (i: number) => clampN((0.45 - i / (layerCount - 1)) / 0.45);
-}
 
 export const clamp = (n: number) => Math.max(0, Math.min(1, n));
 export const easeOut = (n: number) => 1 - Math.pow(1 - clamp(n), 3);
