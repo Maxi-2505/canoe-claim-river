@@ -76,10 +76,10 @@ function WiringSketch() {
 }
 
 const team = [
-  { name: "Mattis Kronenbitter", role: "Product & experience", line: "Business informatics, ex-GTM engineer", initials: "MK" },
-  { name: "Maximilian Kempf", role: "Business case & go-to-market", line: "Ex-Plato sales", initials: "MK" },
-  { name: "Siddesh", role: "Rules engine & API", line: "AI engineer", initials: "S" },
-  { name: "Vineeth", role: "Backend & data", line: "AI engineer", initials: "V" },
+  { name: "Mattis", line: "Business informatics, ex-GTM engineer", initials: "M" },
+  { name: "Maximilian", line: "Ex-Plato sales", initials: "M" },
+  { name: "Siddesh", line: "AI engineer", initials: "S" },
+  { name: "Vineeth", line: "AI engineer", initials: "V" },
 ];
 
 export function LandingPage() {
@@ -232,8 +232,7 @@ export function LandingPage() {
             <div key={i} className="card-calm p-6">
               <div aria-hidden="true" className="flex h-20 w-20 items-center justify-center rounded-full border border-ink/40 bg-[radial-gradient(circle_at_35%_30%,var(--mist),color-mix(in_oklab,var(--stone)_35%,var(--paper)))] font-display text-xl text-ink/70">{m.initials}</div>
               <p className="mt-5 font-display text-xl">{m.name}</p>
-              <p className="eyebrow mt-1">{m.role}</p>
-              <p className="mt-3 text-sm text-ink/80">{m.line}</p>
+              <p className="mt-2 text-sm text-ink/80">{m.line}</p>
             </div>
           ))}
         </div>
