@@ -506,7 +506,7 @@ function ChangeRec({ current, reviewer, pv, onCancel, onRecord }: { current: Rec
       <div role="radiogroup" className="grid grid-cols-3 gap-1 rounded-full border border-stone/30 p-1">
         {RECS.map((r) => (
           <button key={r} role="radio" aria-checked={rec === r} onClick={() => setRec(r)} className={cn("rounded-full px-2 py-1.5 text-xs", rec === r ? "bg-ink text-paper" : "text-stone")}>
-            {REC_SHORT[r]}{r === current && <span className="opacity-60"> ·</span>}
+            <span className={r === current ? "underline decoration-1 underline-offset-4" : ""}>{REC_SHORT[r]}</span>
           </button>
         ))}
       </div>
