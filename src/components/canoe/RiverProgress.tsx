@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { CanoeMark } from "./brand";
 import { useCalmMotion } from "./motion";
 
-export function RiverProgress({ done, total, label }: { done: number; total: number; label?: string | undefined }) {
+export function RiverProgress({ done, total, label, onBack }: { done: number; total: number; label?: string | undefined; onBack?: (() => void) | undefined }) {
   const { t } = useCalmMotion();
   const ratio = total ? Math.min(1, done / total) : 0;
   return (
@@ -20,10 +20,25 @@ export function RiverProgress({ done, total, label }: { done: number; total: num
           animate={{ left: `${ratio * 100}%` }}
           transition={t(600)}
         >
-          <CanoeMark size={26} />
+          {onBack ? (
+            <motion.button
+              type="button"
+              aria-label="Go back one step"
+              title="Drag the canoe back to go back"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.5}
+              dragSnapToOrigin
+              onDragEnd={(_, info) => { if (info.offset.x < -24) onBack(); }}
+              onKeyDown={(e) => { if (e.key === "ArrowLeft") onBack(); }}
+              className="block cursor-grab touch-none active:cursor-grabbing"
+            >
+              <CanoeMark size={26} />
+            </motion.button>
+          ) : <CanoeMark size={26} />}
         </motion.div>
       </div>
-      <p className="mt-1 text-xs text-stone">{label ?? `${done} of ${total} details`}</p>
+      <p className="mt-1 font-mono text-[11px] text-stone">{label ?? `${done} of ${total} details`}{onBack && <span className="hidden sm:inline"> · drag the canoe back to go back</span>}</p>
     </div>
   );
 }

@@ -20,7 +20,7 @@ function Chip({ label, value, source }: { label: string; value: string; source: 
         <Check className="relative size-3" strokeWidth={2.5} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-xs text-stone">{label}</span>
+        <span className="block font-mono text-[11px] text-stone">{label}</span>
         <span className="block truncate text-sm">{value}</span>
       </span>
       {source === "upload" ? <FileText className="mt-1 size-3.5 text-stone" aria-label="From your document" /> : <User className="mt-1 size-3.5 text-stone" aria-label="You told us" />}

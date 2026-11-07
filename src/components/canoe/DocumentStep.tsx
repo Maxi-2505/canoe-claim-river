@@ -21,14 +21,14 @@ function DocThumb({ doc, phase }: { doc: SampleDoc; phase: "scan" | "highlight" 
       <div className="my-3 h-px bg-stone/25" />
       {doc.kind === "quote" ? (
         <>
-          <div className={cn("relative -mx-1 rounded px-1 py-0.5 transition-all duration-300", box && "ring-1 ring-cedar/70")}>
+          <div className={cn("relative -mx-1 rounded px-1 py-0.5 font-mono transition-all duration-300", box && "ring-1 ring-cedar/70")}>
             {doc.items.length === 0 && <div className="text-stone">Repair, all inclusive</div>}
             {doc.items.map((i) => (
               <div key={i.label} className="flex justify-between"><span>{i.label}</span><span>{eur(i.eur)}</span></div>
             ))}
           </div>
           <div className="my-2 h-px bg-stone/25" />
-          <div className={cn("-mx-1 flex justify-between rounded px-1 py-0.5 font-semibold transition-all duration-300", box && "bg-cedar/10 ring-1 ring-cedar")}>
+          <div className={cn("-mx-1 flex justify-between rounded px-1 py-0.5 font-mono font-semibold transition-all duration-300", box && "bg-cedar/10 ring-1 ring-cedar")}>
             <span>Total</span><span>{eur(doc.total)}</span>
           </div>
         </>

@@ -83,6 +83,16 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
     if (prev) { setHistory((h) => h.slice(0, -1)); setEditing({ id: prev, toReview: false }); }
     else if (!missing) setScreen("docs");
   };
+  const goBack = () => {
+    if (screen === "question") return back();
+    if (screen === "docs") return setScreen("start");
+    if (screen === "review") {
+      const prev = history.at(-1);
+      if (prev) { setHistory((h) => h.slice(0, -1)); setEditing({ id: prev, toReview: false }); setScreen("question"); }
+      else if (!missing) setScreen("docs");
+    }
+  };
+  const canGoBack = screen === "question" || screen === "docs" || (screen === "review" && (history.length > 0 || !missing));
 
   useEffect(() => {
     if (screen !== "question") return;
@@ -124,7 +134,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
       </header>
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="mx-auto mt-6 max-w-[560px] lg:mx-0">
-          {screen !== "start" && screen !== "preview" && <RiverProgress done={done} total={total} label={screen === "done" ? "All details in" : undefined} />}
+          {screen !== "start" && screen !== "preview" && <RiverProgress done={done} total={total} label={screen === "done" ? "All details in" : undefined} onBack={canGoBack ? goBack : undefined} />}
         </div>
       </div>
 
@@ -133,22 +143,29 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
           {header}
           <AnimatePresence mode="wait">
             {screen === "start" && (
-              <motion.section key="start" {...advance} className="space-y-6">
+              <motion.section key="start" {...advance} className="space-y-10">
                 <div>
-                  <p className="eyebrow mb-4">Report a claim / about five minutes</p>
-                  <h1 className="question-title">What <em className="text-cedar">happened?</em></h1>
-                  <p className="mt-3 text-sm text-stone">Pick what your claim is about. We collect the facts. We never decide the claim.</p>
+                  <p className="eyebrow mb-5">Canoe / report a claim / about five minutes</p>
+                  <h1 className="font-display text-[44px] font-medium leading-[1.02] tracking-[-0.015em] md:text-[64px]">What <em className="text-cedar">happened?</em></h1>
+                  <p className="mt-5 max-w-md text-base text-stone">Pick what your claim is about. We collect the facts. We never decide the claim.</p>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <button onClick={() => setScreen("docs")} className="answer-btn flex flex-col items-start gap-6 p-5 text-left">
-                    <Car className="size-6 text-cedar" /><span className="font-display text-lg">My car</span>
+                <div className="card-calm px-5">
+                  <p className="eyebrow pb-2 pt-5">Choose one</p>
+                  <button onClick={() => setScreen("docs")} className="group flex w-full items-center gap-4 border-t border-stone/20 py-4 text-left">
+                    <span className="font-mono text-xs text-cedar">01</span>
+                    <Car className="size-5 text-cedar" />
+                    <span className="flex-1 font-display text-2xl">My <em className="text-cedar">car</em></span>
+                    <span className="font-mono text-xs text-stone group-hover:text-ink">start →</span>
                   </button>
-                  {([["home", Home, "My home"], ["health", HeartPulse, "My health"]] as const).map(([k, Icon, label]) => (
-                    <button key={k} onClick={() => { setPreviewLine(k); setScreen("preview"); }} className="answer-btn flex flex-col items-start gap-6 p-5 text-left">
-                      <span className="flex w-full items-start justify-between"><Icon className="size-6 text-stone" /><span className="rounded-full border border-stone/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-stone">Preview</span></span>
-                      <span className="font-display text-lg">{label}</span>
+                  {([["home", Home, "My home", "02"], ["health", HeartPulse, "My health", "03"]] as const).map(([k, Icon, label, n]) => (
+                    <button key={k} onClick={() => { setPreviewLine(k); setScreen("preview"); }} className="group flex w-full items-center gap-4 border-t border-stone/20 py-4 text-left">
+                      <span className="font-mono text-xs text-stone">{n}</span>
+                      <Icon className="size-5 text-stone" />
+                      <span className="flex-1 font-display text-2xl text-ink/80">{label}</span>
+                      <span className="font-mono text-xs italic text-stone">preview</span>
                     </button>
                   ))}
+                  <p className="border-t border-stone/20 py-4 text-sm text-stone">Have a quote or police report? Keep it close. It saves you questions.</p>
                 </div>
               </motion.section>
             )}
@@ -166,7 +183,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
                 <DocumentPicker confirmedIds={confirmedDocIds} onConfirm={onDocument} />
                 <div className="flex flex-wrap items-center gap-4">
                   <button onClick={() => setScreen("question")} className="btn-cedar px-6 py-2.5 text-sm">{confirmedDocIds.length ? "Continue" : "Skip — I'll answer the questions"}</button>
-                  <button onClick={() => setScreen("start")} className="text-sm text-stone hover:text-ink">Back</button>
+                  <button onClick={() => setScreen("start")} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> Back</button>
                 </div>
               </motion.section>
             )}
@@ -197,6 +214,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
                   <h1 className="question-title">Check your claim</h1>
                   <p className="mt-3 text-sm text-stone">Tap any line to change it. Blank is fine — we'll ask later if we need it.</p>
                 </div>
+                <button onClick={goBack} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> Back</button>
                 <ReviewList state={state} onEdit={(id) => { setEditing({ id, toReview: true }); setScreen("question"); }} />
                 <div className="flex items-center gap-4">
                   <button onClick={submit} disabled={submitting} className="btn-cedar px-6 py-2.5 text-sm">{submitting ? "Sending…" : missing ? "Send the update" : "Send my claim"}</button>
@@ -263,16 +281,16 @@ function ReviewList({ state, onEdit }: { state: IntakeState; onEdit: (id: string
         return (
           <button key={q.id} onClick={() => onEdit(q.id)} className="flex w-full items-center gap-3 py-3 text-left">
             <Icon className="size-4 shrink-0 text-stone" aria-label={f?.source === "upload" ? "Read from your document" : "You told us"} />
-            <span className="w-40 shrink-0 text-sm text-stone">{q.short ?? q.label}</span>
-            <span className="min-w-0 flex-1 truncate text-sm">{isSettled(f) ? displayValue(q, f) : <span className="text-stone">—</span>}</span>
-            <span className="text-xs text-stone">Edit</span>
+            <span className="w-40 shrink-0 font-mono text-[13px] text-stone">{q.short ?? q.label}</span>
+            <span className="min-w-0 flex-1 truncate text-right font-mono text-[13px]">{isSettled(f) ? displayValue(q, f) : <span className="italic text-stone">blank</span>}</span>
+            <span className="w-8 text-right text-xs text-stone">Edit</span>
           </button>
         );
       })}
       <div className="flex items-center gap-3 py-3">
         <Building2 className="size-4 shrink-0 text-stone" aria-label="From your insurer" />
-        <span className="w-40 shrink-0 text-sm text-stone">Your cover</span>
-        <span className="text-sm">We'll add this from your policy</span>
+        <span className="w-40 shrink-0 font-mono text-[13px] text-stone">Your cover</span>
+        <span className="flex-1 text-right font-mono text-[13px] italic text-stone">from your policy</span><span className="w-8" />
       </div>
     </div>
   );
