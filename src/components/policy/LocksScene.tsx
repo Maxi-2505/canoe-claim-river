@@ -28,6 +28,7 @@ export interface LocksSceneProps {
   draft: Draft; live: Draft; preview: Preview | null; stale: boolean; runId: number; skipToken: number; glide: number;
   showGhosts: boolean; highlight: string | null; liveLimit: number | null; escalations: number; onLimit: (v: number) => void;
   view?: "v1" | "v2";
+  published?: boolean;
 }
 
 export function LocksScene(p: LocksSceneProps) {
@@ -51,7 +52,7 @@ export function LocksScene(p: LocksSceneProps) {
   const exitOf = (ruleId: string, to: Rec): Exit => {
     if (to === "routine_processing") return { gate: null, to };
     const id = strip(ruleId);
-    let gi = gates.findIndex((g) => g.rule.id === id);
+    let gi = gates.findIndex((g) => strip(g.rule.id) === id);
     if (gi < 0) gi = gates.findIndex((g) => g.rule.outcome === to && !g.removed);
     return { gate: gi >= 0 ? gi : 0, to };
   };
@@ -135,7 +136,7 @@ export function LocksScene(p: LocksSceneProps) {
     : null;
 
   const limit = quoteLimitOf(p.draft.rules);
-  const qi = gates.findIndex((g) => g.rule.id === "R1.quote_over_limit" && !g.removed);
+    const qi = gates.findIndex((g) => strip(g.rule.id) === "R1.quote_over_limit" && !g.removed);
   const toSvgPct = (x: number, y: number) => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` });
 
   return (
@@ -202,7 +203,7 @@ export function LocksScene(p: LocksSceneProps) {
             const tone = g.removed ? "text-stone" : info ? "text-ochre" : "text-ink";
             return (
               <g key={g.rule.id} onMouseEnter={() => setHoverGate(i)} onMouseLeave={() => setHoverGate(null)}
-                onClick={i === qi ? () => setDam((d) => !d) : undefined} style={{ cursor: i === qi ? "pointer" : "default" }}>
+                onClick={!p.published && i === qi ? () => setDam((d) => !d) : undefined} style={{ cursor: !p.published && i === qi ? "pointer" : "default" }}>
                 {g.isNew && lift < -1 && <rect x={x - cardW / 2} y={Y - CARD_H / 2} width={cardW} height={CARD_H} rx={4} fill="none" className="stroke-cedar" strokeOpacity={0.4} strokeDasharray="1 3" />}
                 <g transform={`translate(0 ${lift})`} className={tone}>
                   <rect x={x - cardW / 2} y={Y - CARD_H / 2} width={cardW} height={CARD_H} rx={4} className={cn2(g)} strokeWidth={1} strokeDasharray={g.isNew ? "4 3" : undefined} />
@@ -228,7 +229,7 @@ export function LocksScene(p: LocksSceneProps) {
             const label = rec === "routine_processing" ? "ROUTINE" : rec === "human_review" ? "REVIEW" : "INFO NEEDED";
             const cls = rec === "routine_processing" ? "fill-reed" : rec === "human_review" ? "fill-ink" : "fill-ochre";
             return (
-              <g key={rec} style={{ cursor: "pointer" }} onClick={() => setTerm((t0) => (t0 === rec ? null : rec))} role="button" aria-label={`Highlight ${label}`}>
+              <g key={rec} style={{ cursor: "pointer" }} onClick={() => setTerm((t0) => (t0 === rec ? null : rec))} role="button" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTerm(t0 => t0 === rec ? null : rec); } }} aria-label={`Highlight ${label}`}>
                 <rect x={TERM_X} y={y - 22} width={W - TERM_X - 6} height={44} fill="transparent" />
                 <line x1={TERM_X} x2={TERM_X} y1={y - 14} y2={y + 14} className="stroke-ink" strokeWidth={2} />
                 <text x={TERM_X + 10} y={y - 6} fontSize={10} letterSpacing="0.08em" className={`font-mono ${cls}`} textDecoration={term === rec ? "underline" : undefined}>{label}</text>

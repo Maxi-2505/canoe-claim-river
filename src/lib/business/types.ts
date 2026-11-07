@@ -1,6 +1,6 @@
 import type { ClaimListItem, Rec } from '@/lib/review/types';
 import type { ChangedCase, PolicyDoc, QualityVersion } from '@/lib/policy/types';
-export interface BusinessClaim extends ClaimListItem { recommendation_v1?: Rec }
+export interface BusinessClaim extends ClaimListItem { recommendation_v1?: Rec; rule_v1?: string }
 export interface Recheck { case_id: string; from_version: string; to_version: string; from_recommendation: Rec; to_recommendation: Rec; status: string; created_at: string }
 export interface PolicyChange { version: string; duration_minutes: number; first_preview_at: string | null; published_at: string; open_claims_rechecked: number }
 export interface Impact { latest_version: string; versions: string[]; open_claims: number; closed_claims: number; recheck_total: number; recheck_pending: number; moves: Record<string, number>; rechecks: Recheck[]; policy_changes: PolicyChange[]; settled: { approve: number; decline: number } }

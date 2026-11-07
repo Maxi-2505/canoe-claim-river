@@ -23,7 +23,13 @@ export async function loadBusiness(): Promise<BusinessData> {
     call<Impact>('/api/impact'), call<Quality>('/api/quality'), call<{ claims: BusinessClaim[] }>('/api/claims'),
     call<{ events: AuditEvent[] }>('/api/audit'), getPolicyApi().getPolicy(),
   ]);
-  return { impact, quality, claims: claims.claims, audit: audit.events, policy, mode: 'http' };
+  const enriched = await Promise.all(claims.claims.map(async c => {
+    if (!impact.rechecks.some(r => r.case_id === c.case_id)) return c;
+    const detail = await call<{ decisions: { policy_version: string; rule_id: string }[] }>(`/api/claims/${encodeURIComponent(c.case_id)}`);
+    const old = detail.decisions.find(d => d.policy_version === (impact.rechecks.find(r => r.case_id === c.case_id)?.from_version ?? 'v1'));
+    return { ...c, rule_v1: old?.rule_id };
+  }));
+  return { impact, quality, claims: enriched, audit: audit.events, policy, mode: 'http' };
 }
 export const businessQuery = queryOptions({ queryKey: ['business'], queryFn: loadBusiness, staleTime: 0 });
 export async function importLabels(text: string) {

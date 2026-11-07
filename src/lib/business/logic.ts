@@ -17,7 +17,7 @@ export function publishedPreview(impact: Impact, claims: BusinessClaim[]): Previ
     const retained = c.case_status !== 'open';
     const before = recheck?.from_recommendation ?? c.recommendation_v1 ?? c.recommendation_latest;
     const after = retained ? before : recheck?.to_recommendation ?? c.recommendation_latest;
-    return { case_id: c.case_id, status: c.case_status, from: before, to: after, rule_from: recheck ? '' : c.rule, rule_to: c.rule, changed: !retained && before !== after, retained, summary: c.summary };
+    return { case_id: c.case_id, status: c.case_status, from: before, to: after, rule_from: c.rule_v1 ?? (recheck ? '' : c.rule), rule_to: c.rule, changed: !retained && before !== after, retained, summary: c.summary };
   });
   return { from_version: from, to_version: to, open_claims: impact.open_claims, closed_untouched: impact.closed_claims, changed: impact.recheck_total, moves: impact.moves, rows, warnings: [], draft_quality: { versions: {}, changed_cases: { count: 0, cases: [], regressions: [], fixed: [] } } };
 }
