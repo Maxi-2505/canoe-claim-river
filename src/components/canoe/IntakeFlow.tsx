@@ -1,3 +1,4 @@
+import canoeArt from "@/assets/canoe-engraving.jpg.asset.json";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Building2, Car, FileText, HeartPulse, Home, User } from "lucide-react";
@@ -115,7 +116,8 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
   const done = screen === "done" ? 1 : p.done;
 
   return (
-    <div className="min-h-screen">
+    <div className="relative isolate min-h-screen">
+      <div aria-hidden="true" className="canoe-backdrop" style={{ backgroundImage: `url(${canoeArt.url})` }} />
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 pt-6 md:px-8">
         <Wordmark />
         {(screen === "question" || screen === "docs") && <ClaimFilePill state={state} config={config} />}
@@ -133,8 +135,9 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
             {screen === "start" && (
               <motion.section key="start" {...advance} className="space-y-6">
                 <div>
-                  <h1 className="question-title">What happened?</h1>
-                  <p className="mt-3 text-sm text-stone">Pick what your claim is about. It takes about five minutes.</p>
+                  <p className="eyebrow mb-4">Report a claim / about five minutes</p>
+                  <h1 className="question-title">What <em className="text-cedar">happened?</em></h1>
+                  <p className="mt-3 text-sm text-stone">Pick what your claim is about. We collect the facts. We never decide the claim.</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
                   <button onClick={() => setScreen("docs")} className="answer-btn flex flex-col items-start gap-6 p-5 text-left">
