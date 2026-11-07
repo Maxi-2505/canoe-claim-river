@@ -231,7 +231,7 @@
 .canoe-tool-button, .canoe-locale-select { display: grid; place-items: center; height: 42px; min-width: 42px; border: 1px solid color-mix(in oklab, var(--stone) 35%, transparent); border-radius: 999px; background: var(--paper); color: var(--ink); box-shadow: 0 4px 16px color-mix(in oklab, var(--ink) 12%, transparent); }
 .canoe-tool-button { cursor: pointer; }
 .canoe-locale-select select { appearance: none; height: 100%; width: 100%; padding: 0 10px; border: 0; background: transparent; color: inherit; font: 500 12px var(--font-mono); cursor: pointer; }
-.canoe-chat-launcher { position: fixed; z-index: 41; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 90px; height: 66px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); box-shadow: none; cursor: pointer; }
+.canoe-chat-launcher { position: fixed; z-index: 41; right: 20px; bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 90px; height: 66px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); box-shadow: none; cursor: pointer; }
 .canoe-chat-launcher:focus-visible { outline: 2px solid var(--cedar); outline-offset: 4px; }
 .canoe-chat-logo { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid color-mix(in oklab, var(--stone) 35%, transparent); border-radius: 999px; background: var(--paper); color: var(--ink); box-shadow: 0 4px 16px color-mix(in oklab, var(--ink) 12%, transparent); transform-origin: center; animation: canoe-chat-float 5.5s ease-in-out infinite; user-select: none; }
 .canoe-chat-logo > svg:not(.canoe-chat-wave) { width: 26px; height: 26px; }
@@ -248,7 +248,7 @@
 .papercut-sea--contained { position: absolute; z-index: 0; height: min(36vh, 480px); }
 @media (min-width: 768px) { .papercut-sea--contained { height: min(52vh, 480px); } }
 @media (prefers-reduced-motion: reduce) { .canoe-chat-logo { animation: none; } .canoe-chat-wave path { transition: none; } }
-.canoe-chat-panel { position: fixed; z-index: 42; right: 124px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; width: min(360px, calc(100vw - 32px)); max-height: min(520px, calc(100dvh - 32px)); overflow: hidden; border: 1px solid color-mix(in oklab, var(--stone) 30%, transparent); border-radius: 18px; background: var(--paper); color: var(--ink); box-shadow: 0 14px 50px color-mix(in oklab, var(--ink) 18%, transparent); }
+.canoe-chat-panel { position: fixed; z-index: 42; right: 20px; bottom: 96px; display: flex; flex-direction: column; width: min(360px, calc(100vw - 32px)); max-height: min(520px, calc(100dvh - 128px)); overflow: hidden; border: 1px solid color-mix(in oklab, var(--stone) 30%, transparent); border-radius: 18px; background: var(--paper); color: var(--ink); box-shadow: 0 14px 50px color-mix(in oklab, var(--ink) 18%, transparent); }
 .canoe-chat-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 17px; border-bottom: 1px solid var(--border); }
 .canoe-chat-brand { display: flex; align-items: center; gap: 10px; }
 .canoe-chat-brand > span:last-child { display: flex; flex-direction: column; gap: 2px; }
@@ -270,4 +270,4 @@
 .canoe-chat-form button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--cedar); color: var(--paper); cursor: pointer; }
 .canoe-chat-form button:disabled { opacity: .45; cursor: default; }
 @media (max-width: 600px) { .canoe-chat-panel { right: 12px; } }
-@media (max-width: 480px) { .canoe-site-controls { left: 12px; bottom: 12px; } .canoe-chat-launcher { right: 12px; } }
+@media (max-width: 480px) { .canoe-site-controls { left: 12px; bottom: 12px; } .canoe-chat-launcher { right: 12px; bottom: 12px; } }
