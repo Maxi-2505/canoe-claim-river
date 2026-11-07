@@ -204,8 +204,10 @@
   animation: pencil-drift-near 17s ease-in-out infinite alternate;
 }
 .pencil-canoe {
-  position: absolute; right: 8vw; bottom: 22%; width: min(560px, 52vw);
-  opacity: 0.5;
+  position: absolute; right: 8vw; bottom: 16%; width: min(560px, 52vw);
+  opacity: 0.55;
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 96%);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent 96%);
   animation: pencil-bob 6.5s ease-in-out infinite;
   transform-origin: 50% 85%;
 }
