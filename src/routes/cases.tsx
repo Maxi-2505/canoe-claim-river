@@ -58,11 +58,11 @@ function CasesPage() {
       <p className="mt-1 text-sm text-stone">{data.length} case{data.length === 1 ? "" : "s"}. Recommendations come from the rules engine.</p>
       <HorizonLine className="my-4" />
       <div className="card-calm overflow-x-auto">
-        <table className="w-full text-left text-xs">
+        <table className="w-full text-left font-mono text-xs">
           <thead>
             <tr className="border-b border-stone/25">
               {["case_id", "status", "claim summary", "recommendation", "rule", "policy_version", "missing_fields", "request_status", ""].map((c) => (
-                <th key={c} className="whitespace-nowrap px-3 py-2.5 font-medium text-stone">{c}</th>
+                <th key={c} className="whitespace-nowrap px-3 py-2.5 font-normal text-stone">{c}</th>
               ))}
             </tr>
           </thead>

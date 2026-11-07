@@ -50,10 +50,10 @@ function RowsPage() {
       <p className="mt-1 text-sm text-stone">{data.length} row{data.length === 1 ? "" : "s"}</p>
       <HorizonLine className="my-4" />
       <div className="card-calm overflow-x-auto">
-        <table className="w-full text-left text-xs">
+        <table className="w-full text-left font-mono text-xs">
           <thead>
             <tr className="border-b border-stone/25">
-              {CSV_COLUMNS.map((c) => <th key={c} className="whitespace-nowrap px-3 py-2.5 font-medium text-stone">{c}</th>)}
+              {CSV_COLUMNS.map((c) => <th key={c} className="whitespace-nowrap px-3 py-2.5 font-normal text-stone">{c}</th>)}
             </tr>
           </thead>
           <tbody>
