@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CasesRouteImport } from './routes/cases'
+import { Route as PolicyRouteImport } from './routes/policy'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as RowsRouteImport } from './routes/rows'
 import { Route as ContinueCaseIdRouteImport } from './routes/continue.$caseId'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const CasesRoute = CasesRouteImport.update({
   id: '/cases',
   path: '/cases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PolicyRoute = PolicyRouteImport.update({
+  id: '/policy',
+  path: '/policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReviewRoute = ReviewRouteImport.update({
@@ -56,6 +62,7 @@ const ReviewCaseIdRoute = ReviewCaseIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cases': typeof CasesRoute
+  '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
   '/rows': typeof RowsRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cases': typeof CasesRoute
+  '/policy': typeof PolicyRoute
   '/rows': typeof RowsRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
@@ -74,6 +82,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cases': typeof CasesRoute
+  '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
   '/rows': typeof RowsRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cases'
+    | '/policy'
     | '/review'
     | '/rows'
     | '/continue/$caseId'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/cases'
+    | '/policy'
     | '/rows'
     | '/continue/$caseId'
     | '/review/$caseId'
@@ -102,6 +113,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/cases'
+    | '/policy'
     | '/review'
     | '/rows'
     | '/continue/$caseId'
@@ -112,6 +124,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CasesRoute: typeof CasesRoute
+  PolicyRoute: typeof PolicyRoute
   ReviewRoute: typeof ReviewRouteWithChildren
   RowsRoute: typeof RowsRoute
   ContinueCaseIdRoute: typeof ContinueCaseIdRoute
@@ -131,6 +144,13 @@ declare module '@tanstack/react-router' {
       path: '/cases'
       fullPath: '/cases'
       preLoaderRoute: typeof CasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/policy': {
+      id: '/policy'
+      path: '/policy'
+      fullPath: '/policy'
+      preLoaderRoute: typeof PolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/review': {
@@ -187,6 +207,7 @@ const ReviewRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CasesRoute: CasesRoute,
+  PolicyRoute: PolicyRoute,
   ReviewRoute: ReviewRouteWithChildren,
   RowsRoute: RowsRoute,
   ContinueCaseIdRoute: ContinueCaseIdRoute,

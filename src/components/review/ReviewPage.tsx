@@ -108,6 +108,7 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
           <Wordmark />
           <nav className="hidden gap-4 font-mono text-[11px] uppercase tracking-[0.14em] text-stone sm:flex">
             <Link to="/review" className="text-ink">Review</Link>
+            <Link to="/policy">Policy</Link>
             <Link to="/cases">Cases</Link>
             <Link to="/rows">Rows</Link>
           </nav>
