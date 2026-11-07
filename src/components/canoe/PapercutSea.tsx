@@ -81,7 +81,10 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
 
       // Canoe rides the layer just behind the front layers.
       const base = canoeSpot(now);
-      const spot = w < 700 ? { ...base, x: Math.min(base.x, 0.62) } : base;
+      const spot0 = w < 700 ? { ...base, x: Math.min(base.x, 0.62) } : base;
+      // Keep the canoe where it sat in the shorter scene; the extra height is far-off sea.
+      const h0 = contained ? h : Math.min(innerHeight * 0.46, 460);
+      const spot = { ...spot0, y: 1 - (1 - spot0.y) * (h0 / h) };
       const cw = Math.min(560, w * (w < 700 ? 0.58 : 0.44)) * spot.scale;
       const ch = cw * 0.4;
       const ls = (s * 2 * Math.PI) / 5.3;
@@ -135,7 +138,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
     };
     frame = requestAnimationFrame(render);
     return () => cancelAnimationFrame(frame);
-  }, []);
+  }, [contained]);
 
   return (
     <div ref={sceneRef} className={contained ? "papercut-sea papercut-sea--contained" : "papercut-sea"} aria-hidden="true">
