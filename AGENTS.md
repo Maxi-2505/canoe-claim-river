@@ -33,3 +33,4 @@ use the editor.
 - Questions live in `src/config/<vertical>.json`; the renderer in `src/components/canoe` is generic — add verticals as config, not code.
 - All intake rules (next question, mappings, insurer mock, CSV) are pure functions in `src/lib/intake/logic.ts` with tests beside them; UI must not re-implement them.
 - Writes to `claim_rows`/`fact_log` go only through server functions in `src/lib/claims.functions.ts` (admin client, row built server-side); the browser only reads.
+- Decision columns on claim_rows (recommendation, rule, policy_version, explanation, missing_fields) come from the external rules engine; the app never computes them. Missing-mode updates patch only the listed CSV columns (patchMissingColumns). Why: the engine is the single source of decisions.
