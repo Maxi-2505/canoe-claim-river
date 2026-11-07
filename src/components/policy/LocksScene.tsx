@@ -215,7 +215,7 @@ export function LocksScene(p: LocksSceneProps) {
             return (
               <g key={`t${c.id}`} opacity={dim ? 0.15 : 1}>
                 {p.showGhosts && <path d={toD(c.ghost.pts)} fill="none" className="stroke-stone" strokeOpacity={0.75} strokeDasharray="3 4" strokeWidth={1} />}
-                {raw > 0 && <path d={toD([...c.path.pts.slice(0, pos.i), [pos.x, pos.y]].filter((q) => q[1] < 298))} fill="none" className="stroke-cedar" strokeWidth={1.3} strokeOpacity={0.85} />}
+                {raw > 0 && <path d={toD(([...c.path.pts.slice(0, pos.i), [pos.x, pos.y]] as Pt[]).filter((q) => q[1] < 298))} fill="none" className="stroke-cedar" strokeWidth={1.3} strokeOpacity={0.85} />}
               </g>
             );
           })}
