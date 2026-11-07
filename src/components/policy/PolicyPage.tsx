@@ -328,7 +328,7 @@ function Dashboard({ p, stale, highlight, setHighlight }: { p: Preview; stale: b
         <div className="col-span-6 md:col-span-3"><Num label="Open claims re-run" value={p.open_claims} /></div>
         <div className="col-span-6 md:col-span-3"><Num label="Change" value={p.changed} className="text-cedar" /></div>
         <div className="col-span-6 md:col-span-3"><Num label="Unchanged" value={p.open_claims - p.changed} /></div>
-        <div className="col-span-6 md:col-span-3"><Num label="Closed, protected" value={<span className="inline-flex items-baseline gap-2">{p.closed_untouched}<span className="text-2xl text-stone" aria-hidden>⚓</span></span>} /></div>
+        <div className="col-span-6 md:col-span-3"><Num label="Closed, protected" value={<span className="inline-flex items-baseline gap-2">{p.closed_untouched}<svg viewBox="0 0 24 24" className="size-7 text-stone" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden><circle cx="12" cy="5" r="2" /><path d="M12 7v14M7 11h10M4 15q2 6 8 6t8-6" /></svg></span>} /></div>
 
         <div className="col-span-12 md:col-span-4"><Num label="Straight-through share" value={<>{pct(before, open.length)} <span className="text-stone">→</span> {pct(after, open.length)}</>}>
           <p className="mt-2 text-sm text-stone">{after < before ? "Fewer claims pass without a person." : after > before ? "More claims pass without a person." : "The same share passes without a person."}</p></Num></div>
