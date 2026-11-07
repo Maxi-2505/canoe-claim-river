@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import seaAsset from "@/assets/pencil-sea-tile.jpg.asset.json";
 const waterUrl = seaAsset.url;
 import canoeUrl from "@/assets/graphite-canoe.png";
+import { subscribeSea } from './sea-clock';
+import { decodeSeaImage, rasterSeaLayer } from './sea-raster';
 import {
   SESSION_KEY, canoeSpot, clamp, easeOut, easeOutBack, entryDuration, frontFrom,
   layerCount, layerTop, patternTile, crestPath, hazeOf, rockAngle, waveAmplitude, wavePath,
@@ -16,7 +18,8 @@ function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) =
   const haze = hazeOf(i);
   const fade = haze > 0 ? `linear-gradient(to bottom, rgba(0,0,0,${(1 - haze) * 0.5}) 0%, rgba(0,0,0,${1 - haze * 0.6}) 25%, #000 60%)` : undefined;
   return (
-    <div ref={setRef} className="papercut-layer" style={{ top: `${layerTop(i) * 100}%`, zIndex: i < frontFrom ? i : 20 + i, maskImage: fade, WebkitMaskImage: fade, filter: haze ? `blur(${haze * 1.2}px)` : undefined }}>
+    <div ref={setRef} className="papercut-layer" style={{ top: `${layerTop(i) * 100}%`, zIndex: i < frontFrom ? i : 20 + i, maskImage: fade, WebkitMaskImage: fade }}>
+      <canvas aria-hidden="true" style={{ display: 'none' }} />
       <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="pc-valley" x1="0" y1="0" x2="0" y2="1">
@@ -50,18 +53,24 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const motion = matchMedia("(prefers-reduced-motion: reduce)");
+    let reduce = motion.matches;
     let seen = false;
     try { seen = sessionStorage.getItem(SESSION_KEY) === "1"; sessionStorage.setItem(SESSION_KEY, "1"); } catch { /* ignore */ }
     const animateEntry = !reduce && !seen;
-    const start = performance.now();
+    let start = 0, activeTime = 0, previous = 0;
     const snips = Array.from({ length: SNIPPETS }, () => ({ born: -1e9, vx: 0, vy: 0 }));
-    let lastPitch = 0, frame = 0, sprayed = !animateEntry;
+    let lastPitch = 0, sprayed = !animateEntry;
+    let disposed = false, ready = false, visible = false;
+    let unsubscribe: (() => void) | undefined;
+    let w = scene.clientWidth, h = scene.clientHeight;
 
     const render = (now: number) => {
-      const t = animateEntry ? now - start : entryDuration + 1;
+      if (!start) start = now;
+      if (previous && !document.hidden) activeTime += Math.min(now - previous, 50);
+      previous = now;
+      const t = animateEntry && !reduce ? activeTime : entryDuration + 1;
       const s = reduce ? 0 : now / 1000;
-      const w = scene.clientWidth, h = scene.clientHeight;
 
       layers.forEach((i) => {
         const el = layerRefs.current[i];
@@ -69,14 +78,14 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
         const depth = i / (layerCount - 1);
         const amp = waveAmplitude * (0.25 + depth * 0.75);
         const p1 = 4 + (i * 0.83) % 5, p2 = 6 + (i * 1.37) % 3;
-        const dy = Math.sin((s * 2 * Math.PI) / p1 + i) * amp + Math.sin((s * 2 * Math.PI) / p2 + i * 2.1) * amp * 0.4;
-        const dx = Math.sin((s * 2 * Math.PI) / p2 + i) * amp * 1.6;
+        const dy = reduce ? 0 : Math.sin((s * 2 * Math.PI) / p1 + i) * amp + Math.sin((s * 2 * Math.PI) / p2 + i * 2.1) * amp * 0.4;
+        const dx = reduce ? 0 : Math.sin((s * 2 * Math.PI) / p2 + i) * amp * 1.6;
         const land = easeOutBack((t - i * 90) / 600);
         const rise = (1 - land) * h * 0.8;
         const k = clamp((t - 800) / 1400);
         const heave = i >= layerCount - 3 && k > 0 && k < 1 ? -Math.sin(k * Math.PI) * (6 + (i - layerCount + 3) * 4) : 0;
         el.style.transform = `translate3d(${dx}px, ${dy + rise + heave}px, 0)`;
-        el.style.opacity = String(clamp((t - i * 90) / 200));
+        el.style.opacity = '1';
       });
 
       // Canoe rides the layer just behind the front layers.
@@ -88,7 +97,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
       const cw = Math.min(560, w * (w < 700 ? 0.58 : 0.44), h * 0.95) * spot.scale; // keep the hull inside the front waves on short, wide screens
       const ch = cw * 0.4;
       const ls = (s * 2 * Math.PI) / 5.3;
-      const pitch = Math.sin(ls) * 0.75 + Math.sin((s * 2 * Math.PI) / 6.7 + 1) * 0.25;
+      const pitch = reduce ? 0 : Math.sin(ls) * 0.75 + Math.sin((s * 2 * Math.PI) / 6.7 + 1) * 0.25;
       // Rise: hidden behind the front layers, bow down, then level; spring settle after.
       const k = animateEntry ? easeOut((t - 800) / 1400) : 1;
       const u = animateEntry ? clamp((t - 2200) / 800) : 1;
@@ -97,20 +106,17 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
       const riseY = (1 - k) * ch * 1.15 + (u === 0 && animateEntry ? 0 : spring);
       const tilt = (1 - k) * -8;
       const roll = (1 - k) * 0.12;
-      const bob = Math.sin(ls - 0.4) * waveAmplitude * 0.75 * settle;
+      const bob = reduce ? 0 : Math.sin(ls - 0.4) * waveAmplitude * 0.75 * settle;
       const angle = pitch * rockAngle * settle + tilt;
       if (canoeRef.current) {
         canoeRef.current.style.width = `${cw}px`;
         canoeRef.current.style.height = `${ch}px`;
-        canoeRef.current.style.left = `${spot.x * w - cw / 2}px`;
-        canoeRef.current.style.top = `${spot.y * h - ch * 0.9}px`;
-        canoeRef.current.style.transform = `translate3d(0, ${bob + riseY}px, 0) rotate(${angle}deg) scaleY(${1 - roll})`;
+        canoeRef.current.style.transform = `translate3d(${spot.x * w - cw / 2}px, ${spot.y * h - ch * 0.9 + bob + riseY}px, 0) rotate(${angle}deg) scaleY(${1 - roll})`;
       }
       if (shadowRef.current) {
         const sw = cw * 0.95;
         shadowRef.current.style.width = `${sw}px`;
-        shadowRef.current.style.left = `${spot.x * w - sw / 2}px`;
-        shadowRef.current.style.top = `${spot.y * h + bob * 0.6 - 14}px`;
+        shadowRef.current.style.transform = `translate3d(${spot.x * w - sw / 2}px, ${spot.y * h - 14 + bob * 0.6}px, 0)`;
         shadowRef.current.style.opacity = String(k);
       }
       if (!sprayed && t > 1300) {
@@ -134,10 +140,50 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
         el.style.opacity = String(1 - age / 0.9);
       });
 
-      if (!reduce) frame = requestAnimationFrame(render);
     };
-    frame = requestAnimationFrame(render);
-    return () => cancelAnimationFrame(frame);
+    const update = () => {
+      unsubscribe?.(); unsubscribe = undefined; previous = 0;
+      scene.dataset['active'] = String(ready && visible && !document.hidden && !reduce);
+      if (!ready || !visible || document.hidden) return;
+      if (reduce) render(performance.now());
+      else unsubscribe = subscribeSea(render);
+    };
+    const observer = new IntersectionObserver(entries => {
+      visible = entries.some(entry => entry.isIntersecting); update();
+    });
+    observer.observe(scene);
+    const resize = new ResizeObserver(() => {
+      w = scene.clientWidth; h = scene.clientHeight;
+      if (ready) void prepare();
+    });
+    let generation = 0;
+    const prepare = async () => {
+      const ticket = ++generation;
+      try {
+        const [water] = await Promise.all([decodeSeaImage(waterUrl), decodeSeaImage(canoeUrl)]);
+        await Promise.all(layerRefs.current.map((el, i) => el ? rasterSeaLayer(el, water, hazeOf(i)) : Promise.resolve()));
+        if (disposed || ticket !== generation) return;
+        ready = true; render(performance.now()); scene.dataset['ready'] = 'true'; update();
+      } catch { /* Keep content usable if decorative artwork cannot be decoded. */ }
+    };
+    const onMotion = () => { reduce = motion.matches; update(); };
+    motion.addEventListener('change', onMotion);
+    document.addEventListener('visibilitychange', update);
+    resize.observe(scene);
+    // Two paints first, then idle work: never start animation during hydration.
+    let idle = 0, timer = 0;
+    const paint = requestAnimationFrame(() => {
+      timer = window.setTimeout(() => {
+        if ('requestIdleCallback' in window) idle = window.requestIdleCallback(() => void prepare(), { timeout: 500 });
+        else void prepare();
+      }, 0);
+    });
+    return () => {
+      disposed = true; unsubscribe?.(); observer.disconnect(); resize.disconnect();
+      cancelAnimationFrame(paint); clearTimeout(timer);
+      if (idle) window.cancelIdleCallback(idle);
+      motion.removeEventListener('change', onMotion); document.removeEventListener('visibilitychange', update);
+    };
   }, [contained]);
 
   return (
