@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
-import seaAsset from "@/assets/pencil-sea-texture.jpg.asset.json";
+import seaAsset from "@/assets/pencil-sea-tile.jpg.asset.json";
 const waterUrl = seaAsset.url;
 import canoeUrl from "@/assets/graphite-canoe.png";
 import {
   SESSION_KEY, canoeSpot, clamp, easeOut, easeOutBack, entryDuration, frontFrom,
-  layerCount, layerTop, rockAngle, waveAmplitude, wavePath,
+  layerCount, layerTop, patternTile, rockAngle, waveAmplitude, wavePath,
 } from "./papercut";
 
 const layers = Array.from({ length: layerCount }, (_, i) => i);
@@ -12,16 +12,17 @@ const SNIPPETS = 9;
 
 function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) => void }) {
   const depth = i / (layerCount - 1);
+  const tile = patternTile(i);
   return (
     <div ref={setRef} className="papercut-layer" style={{ top: `${layerTop(i) * 100}%`, zIndex: i < frontFrom ? i : 20 + i }}>
       <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
         <defs>
-          <pattern id={`pc-water-${i}`} patternUnits="userSpaceOnUse" width="1100" height="560" x={-i * 13} y={-i * 9}>
-            <image href={waterUrl} width="1100" height="560" preserveAspectRatio="xMidYMid slice" />
+          <pattern id={`pc-water-${i}`} patternUnits="userSpaceOnUse" width={tile.w} height={tile.h} x={tile.x} y={tile.y}>
+            <image href={waterUrl} width={tile.w} height={tile.h} preserveAspectRatio="none" />
           </pattern>
         </defs>
         <path d={wavePath(i)} fill="var(--paper)" />
-        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={0.45 + depth * 0.5} style={{ filter: `contrast(${0.8 + depth * 0.6})` }} />
+        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={0.5 + depth * 0.45} style={{ filter: `contrast(${0.9 + depth * 0.5})` }} />
       </svg>
     </div>
   );
