@@ -76,8 +76,8 @@ function WiringSketch() {
 }
 
 const team = [
-  { name: "Mattis", line: "Business informatics, ex-GTM engineer", initials: "M" },
-  { name: "Maximilian", line: "Ex-Plato sales", initials: "M" },
+  { name: "Mattis", line: "GTM Engineer", initials: "M" },
+  { name: "Maximilian", line: "Sales", initials: "M" },
   { name: "Siddesh", line: "AI engineer", initials: "S" },
   { name: "Vineeth", line: "AI engineer", initials: "V" },
 ];
