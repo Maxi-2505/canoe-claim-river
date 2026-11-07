@@ -21,8 +21,8 @@ const slotPt = (b: BasinKey, k: number): Pt => { const s = BASINS[b]; return [s.
 interface Path { pts: Pt[]; cum: number[]; len: number; turn: number }
 function mk(pts: Pt[], turnIdx: number): Path {
   const cum = [0];
-  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-  return { pts, cum, len: cum[cum.length - 1] || 1, turn: cum[turnIdx] ?? 0 };
+  for (let i = 1; i < pts.length; i++) { const a = pts[i - 1]!, b = pts[i]!; cum.push(cum[i - 1]! + Math.hypot(b[0] - a[0], b[1] - a[1])); }
+  return { pts, cum, len: cum[cum.length - 1]! || 1, turn: cum[turnIdx] ?? 0 };
 }
 function quad(a: Pt, c: Pt, b: Pt, n = 14): Pt[] {
   const out: Pt[] = [];
@@ -31,8 +31,8 @@ function quad(a: Pt, c: Pt, b: Pt, n = 14): Pt[] {
 }
 function at(p: Path, f: number) {
   const d = f * p.len; let i = 1;
-  while (i < p.pts.length - 1 && p.cum[i] < d) i++;
-  const a = p.pts[i - 1], b = p.pts[i] ?? a, seg = (p.cum[i] - p.cum[i - 1]) || 1, k = Math.min(1, Math.max(0, (d - p.cum[i - 1]) / seg));
+  while (i < p.pts.length - 1 && p.cum[i]! < d) i++;
+  const a = p.pts[i - 1]!, b = p.pts[i] ?? a, c0 = p.cum[i - 1]!, seg = (p.cum[i]! - c0) || 1, k = Math.min(1, Math.max(0, (d - c0) / seg));
   return { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, a: Math.atan2(b[1] - a[1], b[0] - a[0]), i };
 }
 const toD = (pts: Pt[]) => pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join("");

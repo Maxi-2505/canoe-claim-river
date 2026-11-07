@@ -51,7 +51,7 @@ export function PolicyPage() {
   const [viewing, setViewing] = useState<PolicyVersion | null>(null);
   const [result, setResult] = useState<PublishResult | null>(null);
   const [glide, setGlide] = useState(0);
-  const damTimer = useRef<ReturnType<typeof setTimeout>>();
+  const damTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const load = () => api.getPolicy().then((d) => { setDoc(d); setLoadErr(null); return d; }).catch((e) => { setLoadErr(e.message); return null; });
   useEffect(() => { load().then((d) => { if (d) setDraft(toDraft(d.versions.find((v) => v.version === d.latest)!)); }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -188,7 +188,7 @@ function RuleEditor({ draft, live, fields, setDraft, version, liveVersion }: { d
   const removed = live.rules.filter((r) => !draft.rules.some((d) => d.id === r.id));
   const set = (rules: Rule[]) => setDraft({ ...draft, rules });
   const upd = (i: number, r: Rule) => set(draft.rules.map((x, j) => (j === i ? r : x)));
-  const move = (i: number, j: number) => { if (j < 0 || j >= draft.rules.length) return; const rs = [...draft.rules]; const [x] = rs.splice(i, 1); rs.splice(j, 0, x); set(rs); };
+  const move = (i: number, j: number) => { if (j < 0 || j >= draft.rules.length) return; const rs = [...draft.rules]; const [x] = rs.splice(i, 1); if (x) rs.splice(j, 0, x); set(rs); };
   const addRule = () => { let n = 1; while (draft.rules.some((r) => r.id === `R1.custom_${n}`)) n++; set([...draft.rules, { id: `R1.custom_${n}`, outcome: "human_review", reason: "", when: [defaultCond("injury_reported")] }]); };
 
   return (
@@ -269,7 +269,7 @@ function RuleEditor({ draft, live, fields, setDraft, version, liveVersion }: { d
   );
 }
 
-function CondEditor({ c, old, fields, onChange }: { c: Cond; old?: Cond; fields: Record<string, string>; onChange: (c: Cond) => void }) {
+function CondEditor({ c, old, fields, onChange }: { c: Cond; old?: Cond | undefined; fields: Record<string, string>; onChange: (c: Cond) => void }) {
   const ops = opsFor(c.field);
   const valChanged = old && old.field === c.field && JSON.stringify(old.value) !== JSON.stringify(c.value) && old.value != null;
   const sel = "field-input px-2 py-1 text-sm";
@@ -279,8 +279,8 @@ function CondEditor({ c, old, fields, onChange }: { c: Cond; old?: Cond; fields:
         {Object.entries(fields).map(([f, l]) => <option key={f} value={f}>{l}</option>)}
       </select>
       <select value={c.op} onChange={(e) => { const op = e.target.value as Cond["op"]; const multi = op === "in" || op === "not_in";
-        const v = SELECT_OPTIONS[c.field] ? (multi ? (Array.isArray(c.value) ? c.value : [String(c.value ?? SELECT_OPTIONS[c.field][0])]) : (Array.isArray(c.value) ? c.value[0] : c.value)) : c.value;
-        onChange({ ...c, op, value: v }); }} className={sel} aria-label="Operator">
+        const v = SELECT_OPTIONS[c.field] ? (multi ? (Array.isArray(c.value) ? c.value : [String(c.value ?? SELECT_OPTIONS[c.field]![0])]) : (Array.isArray(c.value) ? c.value[0] : c.value)) : c.value;
+        onChange(v === undefined ? { field: c.field, op } : { ...c, op, value: v }); }} className={sel} aria-label="Operator">
         {ops.map((o) => <option key={o} value={o}>{OP_WORDS[o]}</option>)}
       </select>
       {valChanged && <span className="font-mono text-xs text-stone line-through">{valueText(old!)}</span>}
@@ -293,13 +293,13 @@ function CondEditor({ c, old, fields, onChange }: { c: Cond; old?: Cond; fields:
       )}
       {SELECT_OPTIONS[c.field] && (c.op === "in" || c.op === "not_in" ? (
         <span className="inline-flex gap-2">
-          {SELECT_OPTIONS[c.field].map((o) => { const arr = Array.isArray(c.value) ? c.value : []; return (
+          {SELECT_OPTIONS[c.field]!.map((o) => { const arr = Array.isArray(c.value) ? c.value : []; return (
             <label key={o} className="flex items-center gap-1 font-mono text-xs"><input type="checkbox" checked={arr.includes(o)} className="accent-[var(--cedar)]"
               onChange={(e) => onChange({ ...c, value: e.target.checked ? [...arr, o] : arr.filter((x) => x !== o) })} />{o}</label>); })}
         </span>
       ) : (
         <select value={String(c.value ?? "")} onChange={(e) => onChange({ ...c, value: e.target.value })} className={cn(sel, "font-mono text-xs", valChanged && "border-cedar")} aria-label="Value">
-          {SELECT_OPTIONS[c.field].map((o) => <option key={o} value={o}>{o}</option>)}
+          {SELECT_OPTIONS[c.field]!.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
       ))}
     </span>
