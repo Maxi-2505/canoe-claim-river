@@ -27,7 +27,7 @@ function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) =
   );
 }
 
-export function PapercutSea() {
+export function PapercutSea({ contained = false }: { contained?: boolean }) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const canoeRef = useRef<HTMLDivElement>(null);
@@ -117,7 +117,7 @@ export function PapercutSea() {
   }, []);
 
   return (
-    <div ref={sceneRef} className="papercut-sea" aria-hidden="true">
+    <div ref={sceneRef} className={contained ? "papercut-sea papercut-sea--contained" : "papercut-sea"} aria-hidden="true">
       {layers.map((i) => <Layer key={i} i={i} setRef={(el) => { layerRefs.current[i] = el; }} />)}
       <div ref={canoeRef} className="papercut-canoe" style={{ zIndex: frontFrom + 1 }}>
         <img src={canoeUrl} alt="" draggable={false} />
