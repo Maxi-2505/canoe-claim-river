@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CSV_COLUMNS } from "@/lib/intake/types";
@@ -43,7 +43,7 @@ function RowsPage() {
   return (
     <div className="mx-auto max-w-[1400px] px-5 py-6 md:px-8">
       <header className="flex items-center justify-between">
-        <Wordmark />
+        <div className="flex items-center gap-5"><Wordmark /><Link to="/review" className="font-mono text-[11px] uppercase tracking-[0.14em] text-stone hover:text-ink">Review</Link></div>
         <button onClick={exportCsv} className="btn-cedar px-5 py-2 text-sm">Export CSV</button>
       </header>
       <h1 className="font-display mt-8 text-3xl">Claim rows</h1>

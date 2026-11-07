@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -52,7 +52,7 @@ function CasesPage() {
   };
   return (
     <div className="mx-auto max-w-[1400px] px-5 py-6 md:px-8">
-      <header className="flex items-center justify-between"><Wordmark /></header>
+      <header className="flex items-center justify-between"><div className="flex items-center gap-5"><Wordmark /><Link to="/review" className="font-mono text-[11px] uppercase tracking-[0.14em] text-stone hover:text-ink">Review</Link></div></header>
       <p className="eyebrow mt-8">Internal</p>
       <h1 className="font-display mt-2 text-3xl">Cases</h1>
       <p className="mt-1 text-sm text-stone">{data.length} case{data.length === 1 ? "" : "s"}. Recommendations come from the rules engine.</p>

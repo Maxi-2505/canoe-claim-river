@@ -21,6 +21,7 @@
   --color-reed: var(--reed);
   --color-stone: var(--stone);
   --color-mist: var(--mist);
+  --color-ochre: var(--ochre);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -51,6 +52,8 @@
   --reed: oklch(0.52 0.05 120);
   --stone: oklch(0.52 0.015 60);
   --mist: oklch(0.982 0.007 84);
+  /* Internal review pages only: request-information dot. */
+  --ochre: oklch(0.7 0.12 75);
 
   --background: var(--paper);
   --foreground: var(--ink);
