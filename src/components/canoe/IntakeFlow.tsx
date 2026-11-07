@@ -146,7 +146,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
               <motion.section key="start" {...advance} className="space-y-10">
                 <div>
                   <p className="eyebrow mb-5">Canoe / report a claim / about five minutes</p>
-                  <h1 className="font-display text-[44px] font-medium leading-[1.02] tracking-[-0.015em] md:text-[64px]">What <em className="text-cedar">happened?</em></h1>
+                  <h1 className="font-display text-[44px] leading-[1.05] tracking-[-0.02em] md:text-[64px]">What <Accent>happened?</Accent></h1>
                   <p className="mt-5 max-w-md text-base text-stone">Pick what your claim is about. We collect the facts. We never decide the claim.</p>
                 </div>
                 <div className="card-calm px-5">
@@ -154,7 +154,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
                   <button onClick={() => setScreen("docs")} className="group flex w-full items-center gap-4 border-t border-stone/20 py-4 text-left">
                     <span className="font-mono text-xs text-cedar">01</span>
                     <Car className="size-5 text-cedar" />
-                    <span className="flex-1 font-display text-2xl">My <em className="text-cedar">car</em></span>
+                    <span className="flex-1 font-display text-2xl">My <Accent>car</Accent></span>
                     <span className="font-mono text-xs text-stone group-hover:text-ink">start →</span>
                   </button>
                   {([["home", Home, "My home", "02"], ["health", HeartPulse, "My health", "03"]] as const).map(([k, Icon, label, n]) => (

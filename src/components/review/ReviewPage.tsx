@@ -19,7 +19,7 @@ const time = (iso: string) => new Date(iso).toLocaleString("en-GB", { day: "nume
 const hhmm = (iso: string) => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 const reasonText = (rule: string) => REASON[rule] ?? null;
 
-function Italic({ children }: { children: ReactNode }) { return <em className="font-display italic text-cedar">{children}</em>; }
+function Italic({ children }: { children: ReactNode }) { return <Accent>{children}</Accent>; }
 
 function Dot({ rec, closed, className }: { rec: Rec; closed?: boolean; className?: string }) {
   if (closed) return <span className={cn("inline-block size-2.5 shrink-0 rounded-full border border-stone", className)} aria-label="Closed" />;
