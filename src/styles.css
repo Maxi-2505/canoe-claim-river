@@ -184,3 +184,43 @@
   from { transform: translateY(0); }
   to { transform: translateY(var(--scan-distance, 260px)); }
 }
+
+/* Pencil lake backdrop: water drifts, canoe rides the swell */
+.pencil-scene {
+  position: fixed; left: 0; right: 0; bottom: 0; height: min(46vh, 460px);
+  pointer-events: none; z-index: -1; overflow: hidden;
+  mix-blend-mode: multiply; filter: grayscale(1);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 35%);
+  mask-image: linear-gradient(to bottom, transparent, #000 35%);
+}
+.pencil-water {
+  position: absolute; inset: 0 -10% 0 -10%;
+  background-size: cover; background-position: center bottom;
+  opacity: 0.55;
+  animation: pencil-drift 26s ease-in-out infinite alternate;
+}
+.pencil-water--near {
+  opacity: 0.3; transform-origin: bottom;
+  animation: pencil-drift-near 17s ease-in-out infinite alternate;
+}
+.pencil-canoe {
+  position: absolute; right: 8vw; bottom: 22%; width: min(560px, 52vw);
+  opacity: 0.5;
+  animation: pencil-bob 6.5s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
+.pencil-canoe img { width: 100%; height: auto; display: block; }
+@keyframes pencil-drift { from { transform: translateX(-4%); } to { transform: translateX(4%); } }
+@keyframes pencil-drift-near { from { transform: translateX(5%) scaleY(1.02); } to { transform: translateX(-5%) scaleY(0.98); } }
+@keyframes pencil-bob {
+  0%, 100% { transform: translateY(0) rotate(-0.8deg); }
+  25% { transform: translateY(-6px) rotate(0.6deg); }
+  50% { transform: translateY(2px) rotate(1.1deg); }
+  75% { transform: translateY(-3px) rotate(-0.4deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pencil-water, .pencil-canoe { animation: none; }
+}
+@media (prefers-color-scheme: dark) {
+  .pencil-scene { mix-blend-mode: screen; filter: grayscale(1) invert(1); opacity: 0.25; }
+}

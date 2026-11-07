@@ -1,4 +1,4 @@
-import canoeArt from "@/assets/canoe-engraving.jpg.asset.json";
+import { PencilBackdrop } from "./PencilBackdrop";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Building2, Car, FileText, HeartPulse, Home, User } from "lucide-react";
@@ -127,7 +127,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
 
   return (
     <div className="relative isolate min-h-screen">
-      <div aria-hidden="true" className="canoe-backdrop" style={{ backgroundImage: `url(${canoeArt.url})` }} />
+      <PencilBackdrop />
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 pt-6 md:px-8">
         <Wordmark />
         {(screen === "question" || screen === "docs") && <ClaimFilePill state={state} config={config} />}
