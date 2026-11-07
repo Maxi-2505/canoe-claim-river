@@ -4,7 +4,7 @@ const waterUrl = seaAsset.url;
 import canoeUrl from "@/assets/graphite-canoe.png";
 import {
   SESSION_KEY, canoeSpot, clamp, easeOut, easeOutBack, entryDuration, frontFrom,
-  layerCount, layerTop, patternTile, rockAngle, waveAmplitude, wavePath,
+  layerCount, layerTop, patternTile, crestPath, hazeOf, rockAngle, waveAmplitude, wavePath,
 } from "./papercut";
 
 const layers = Array.from({ length: layerCount }, (_, i) => i);
@@ -13,19 +13,28 @@ const SNIPPETS = 9;
 function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) => void }) {
   const depth = i / (layerCount - 1);
   const tile = patternTile(i);
-  // Depth haze: the three farthest layers lose contrast and dissolve upward into the paper.
-  const haze = i < 4 ? (4 - i) / 4 : 0;
-  const fade = haze ? `linear-gradient(to bottom, transparent 0%, rgba(0,0,0,${0.15 * (1 - haze)}) 8%, rgba(0,0,0,${0.55 - haze * 0.25}) 30%, rgba(0,0,0,${1 - haze * 0.35}) 65%)` : undefined;
+  const haze = hazeOf(i);
+  const fade = haze > 0 ? `linear-gradient(to bottom, rgba(0,0,0,${(1 - haze) * 0.5}) 0%, rgba(0,0,0,${1 - haze * 0.6}) 25%, #000 60%)` : undefined;
   return (
     <div ref={setRef} className="papercut-layer" style={{ top: `${layerTop(i) * 100}%`, zIndex: i < frontFrom ? i : 20 + i, maskImage: fade, WebkitMaskImage: fade, filter: haze ? `blur(${haze * 1.2}px)` : undefined }}>
       <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
         <defs>
+          <linearGradient id="pc-valley" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="var(--paper)" stopOpacity="0.35" />
+            <stop offset="0.12" stopColor="var(--paper)" stopOpacity="0" />
+            <stop offset="0.3" stopColor="#1e1914" stopOpacity="0.12" />
+            <stop offset="0.6" stopColor="#1e1914" stopOpacity="0" />
+          </linearGradient>
           <pattern id={`pc-water-${i}`} patternUnits="userSpaceOnUse" width={tile.w} height={tile.h} x={tile.x} y={tile.y}>
             <image href={waterUrl} width={tile.w} height={tile.h} preserveAspectRatio="none" />
           </pattern>
         </defs>
         <path d={wavePath(i)} fill="var(--paper)" />
-        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={(0.5 + depth * 0.45) * (1 - haze * 0.55)} style={{ filter: `contrast(${(0.9 + depth * 0.5) * (1 - haze * 0.4)})` }} />
+        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={(0.35 + depth * 0.6) * (1 - haze * 0.7)} style={{ filter: `contrast(${(0.75 + depth * 0.65) * (1 - haze * 0.4)})` }} />
+        {/* valley: darker trough falling away under the crest of this row */}
+        <path d={wavePath(i)} fill={`url(#pc-valley)`} opacity={0.5 * (1 - haze)} />
+        {/* thin pale highlight along the crest */}
+        <path d={crestPath(i)} fill="none" stroke="var(--paper)" strokeWidth={0.6 + depth * 1.2} opacity={0.55 * (1 - haze * 0.8)} vectorEffect="non-scaling-stroke" />
       </svg>
     </div>
   );
@@ -35,6 +44,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const canoeRef = useRef<HTMLDivElement>(null);
+  const shadowRef = useRef<HTMLDivElement>(null);
   const snipRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   useEffect(() => {
@@ -93,6 +103,13 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
         canoeRef.current.style.top = `${spot.y * h - ch * 0.78}px`;
         canoeRef.current.style.transform = `translate3d(0, ${bob + riseY}px, 0) rotate(${angle}deg) scaleY(${1 - roll})`;
       }
+      if (shadowRef.current) {
+        const sw = cw * 0.95;
+        shadowRef.current.style.width = `${sw}px`;
+        shadowRef.current.style.left = `${spot.x * w - sw / 2}px`;
+        shadowRef.current.style.top = `${spot.y * h + bob * 0.6 - 14}px`;
+        shadowRef.current.style.opacity = String(k);
+      }
       if (!sprayed && t > 1300) {
         sprayed = true;
         snips.forEach((sn, n) => { sn.born = now + n * 70; sn.vx = -30 + Math.random() * cw * 0.5; sn.vy = 60 + Math.random() * 50; });
@@ -123,7 +140,10 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
   return (
     <div ref={sceneRef} className={contained ? "papercut-sea papercut-sea--contained" : "papercut-sea"} aria-hidden="true">
       {layers.map((i) => <Layer key={i} i={i} setRef={(el) => { layerRefs.current[i] = el; }} />)}
-      <div className="papercut-fog" style={{ zIndex: 3 }} />
+      <div className="papercut-fog" style={{ zIndex: 5 }} />
+      <div ref={shadowRef} className="papercut-contact" style={{ zIndex: frontFrom }}>
+        <span className="papercut-ripple" /><span className="papercut-ripple papercut-ripple--2" /><span className="papercut-ripple papercut-ripple--3" />
+      </div>
       <div ref={canoeRef} className="papercut-canoe" style={{ zIndex: frontFrom + 1 }}>
         <img src={canoeUrl} alt="" draggable={false} />
       </div>

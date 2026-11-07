@@ -199,10 +199,10 @@
 
 /* Papercut sea: decorative, behind content, transforms only. */
 .papercut-sea {
-  position: fixed; left: 0; right: 0; bottom: 0; height: min(46vh, 460px);
+  position: fixed; left: 0; right: 0; bottom: 0; height: min(64vh, 640px);
   pointer-events: none; z-index: -1; overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%);
-  mask-image: linear-gradient(to bottom, transparent, #000 30%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%);
+  mask-image: linear-gradient(to bottom, transparent, #000 12%);
 }
 .papercut-layer { position: absolute; left: -40px; right: -40px; bottom: -40px; will-change: transform;
   filter: drop-shadow(0 -3px 6px rgba(30,25,20,0.18)); }
@@ -214,7 +214,7 @@
   background: var(--mist); clip-path: polygon(0 20%, 80% 0, 100% 70%, 30% 100%);
   filter: drop-shadow(0 1px 1px rgba(30,25,20,0.25)); }
 .papercut-drop { border-radius: 50%; clip-path: none; width: 3px; height: 3px; background: color-mix(in oklab, var(--mist) 70%, var(--stone)); }
-.papercut-fog { position: absolute; left: 0; right: 0; top: 0; height: 72%; pointer-events: none;
+.papercut-fog { position: absolute; left: 0; right: 0; top: 0; height: 42%; pointer-events: none;
   background: linear-gradient(to bottom,
     color-mix(in oklab, var(--paper) 100%, transparent) 0%,
     color-mix(in oklab, var(--paper) 96%, transparent) 30%,
@@ -223,6 +223,14 @@
     color-mix(in oklab, var(--paper) 38%, transparent) 78%,
     color-mix(in oklab, var(--paper) 16%, transparent) 89%,
     color-mix(in oklab, var(--paper) 0%, transparent) 100%); }
+.papercut-contact { position: absolute; height: 28px; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(30,25,20,0.28), rgba(30,25,20,0.1) 55%, transparent 75%); }
+.papercut-ripple { position: absolute; left: 50%; top: 50%; width: 60%; height: 40%; border-radius: 50%;
+  border: 1px solid rgba(30,25,20,0.35); box-shadow: 0 -1px 0 color-mix(in oklab, var(--paper) 70%, transparent);
+  transform: translate(-50%, -50%) scale(0.9); animation: papercut-ripple 4.2s ease-out infinite; }
+.papercut-ripple--2 { animation-delay: 1.4s; } .papercut-ripple--3 { animation-delay: 2.8s; }
+@keyframes papercut-ripple { 0% { transform: translate(-50%,-50%) scale(0.9); opacity: 0.7; } 100% { transform: translate(-50%,-50%) scale(1.9, 1.5); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .papercut-ripple { animation: none; opacity: 0.4; } }
 .papercut-grain { position: absolute; inset: 0; z-index: 40; mix-blend-mode: multiply; opacity: 0.12;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 @media (prefers-color-scheme: dark) {

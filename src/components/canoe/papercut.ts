@@ -1,5 +1,5 @@
 // Tunable constants for the papercut sea. Decorative only — no claim state here.
-export const layerCount = 7;
+export const layerCount = 14;
 export const waveAmplitude = 13; // px, front layer bob
 export const rockAngle = 6; // degrees
 export const entryDuration = 3000; // ms
@@ -10,10 +10,11 @@ export type Spot = { x: number; y: number; scale: number };
 export const positions: Spot[] = [{ x: 0.7, y: 0.72, scale: 1 }];
 
 /** Layer i (0 = back) — top edge as a fraction of scene height. */
-export const layerTop = (i: number) => 0.3 + (i / (layerCount - 1)) * 0.45;
+export const layerTop = (i: number) => 0.12 + Math.pow(i / (layerCount - 1), 1.5) * 0.66;
 /** Index of the first layer drawn in front of the canoe. */
-export const frontFrom = layerCount - 2;
+export const frontFrom = layerCount - 3;
 
+const clampN = (n: number) => Math.max(0, Math.min(1, n));
 function seeded(seed: number) {
   let s = seed;
   return () => ((s = (s * 9301 + 49297) % 233280) / 233280);
@@ -21,21 +22,27 @@ function seeded(seed: number) {
 
 /** Pattern tile per layer: keeps the pencil texture near its native 1:1 size and varies the repeat. */
 export function patternTile(i: number) {
-  return { w: 400 + ((i * 97) % 140), h: 270 + ((i * 53) % 80), x: -i * 13, y: -i * 9 };
+  const k = 0.4 + 0.6 * (i / (layerCount - 1)); // farther rows: finer strokes
+  return { w: (400 + ((i * 97) % 140)) * k, h: (270 + ((i * 53) % 80)) * k, x: -i * 13, y: -i * 9 };
 }
 
 /** Hand-cut wavy top edge in a 1000×300 box, filled down to the bottom. */
-export function wavePath(i: number) {
+export function crestPoints(i: number) {
   const rand = seeded(i * 97 + 13);
   const depth = i / (layerCount - 1);
-  const amp = 7 + depth * 22;
-  const wl = 150 - depth * 50;
+  const amp = 3 + depth * 24;
+  const wl = 40 + depth * 80;
   const pts: string[] = [];
   for (let x = -20; x <= 1020; x += 10) {
-    const y = 30 + Math.sin(x / wl + i * 1.7) * amp + Math.sin(x / (wl * 0.37) + i) * amp * 0.3 + (rand() - 0.5) * 1.6;
+    const y = 32 + Math.sin(x / wl + i * 1.7) * amp + Math.sin(x / (wl * 0.37) + i) * amp * 0.3 + (rand() - 0.5) * 1.6;
     pts.push(`${x},${y.toFixed(1)}`);
   }
-  return `M-20,300 L${pts.join(" L")} L1020,300 Z`;
+  return pts;
+}
+export const wavePath = (i: number) => `M-20,300 L${crestPoints(i).join(" L")} L1020,300 Z`;
+export const crestPath = (i: number) => `M${crestPoints(i).join(" L")}`;
+/** 0 = sharp, 1 = fully in the fog; only the farthest rows haze. */
+export const hazeOf = (i: number) => clampN((0.45 - i / (layerCount - 1)) / 0.45);
 }
 
 export const clamp = (n: number) => Math.max(0, Math.min(1, n));
