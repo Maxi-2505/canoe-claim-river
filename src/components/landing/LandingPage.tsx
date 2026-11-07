@@ -90,7 +90,7 @@ export function LandingPage() {
         {/* TODO(hero-boat): hero boat animation — swap in the redrawn canoe asset and its entrance here. */}
         <PencilBackdrop contained />
         <nav className="relative z-10 mx-auto flex max-w-[1120px] items-center justify-between gap-4 px-5 pt-6 md:px-8">
-          <Link to="/"><Wordmark /></Link>
+          <Wordmark />
           <div className="hidden items-center gap-6 md:flex">
             <a href="#how-it-works" className={navLink}>How it works</a>
             <a href="#policy-change" className={navLink}>Policy change</a>
