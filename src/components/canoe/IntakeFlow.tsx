@@ -1,4 +1,5 @@
 import { PencilBackdrop } from "./PencilBackdrop";
+import { Accent } from "./brand";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Building2, Car, FileText, HeartPulse, Home, User } from "lucide-react";

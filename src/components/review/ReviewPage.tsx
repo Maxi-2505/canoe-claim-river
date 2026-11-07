@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Anchor, Building2, FileText, Menu, User, X } from "lucide-react";
-import { Wordmark, CanoeMark } from "@/components/canoe/brand";
+import { Wordmark, CanoeMark, Accent } from "@/components/canoe/brand";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { useCalmMotion } from "@/components/canoe/motion";
 import { getReviewApi, ApiError, type ClaimDetail, type ClaimListItem, type Field, type FieldValue, type Rec } from "@/lib/review/api";
