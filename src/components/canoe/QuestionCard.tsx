@@ -13,7 +13,7 @@ export function QuestionCard({
   q, fact, optional, onAnswer, onDocument, confirmedDocIds,
 }: {
   q: Question;
-  fact?: Fact;
+  fact?: Fact | undefined;
   optional?: boolean;
   onAnswer: (value: string | number | null) => void;
   onDocument: (c: ConfirmedDoc) => void;
@@ -22,7 +22,7 @@ export function QuestionCard({
   const initial = fact ? (fact.status === "dont_know" ? "not_sure" : fact.value == null ? "" : String(fact.value)) : "";
   const [value, setValue] = useState<string>(initial);
   const [showUpload, setShowUpload] = useState(false);
-  const opts = q.type === "tri_state" ? (q.options ?? TRI) : q.options ?? [];
+  const opts: { value: string; label: string; hint?: string }[] = q.type === "tri_state" ? (q.options ?? TRI) : q.options ?? [];
 
   const submit = () => {
     if (q.type === "number") {
@@ -71,7 +71,7 @@ export function QuestionCard({
               <span className="grid size-5 shrink-0 place-items-center rounded border border-stone/40 text-[10px] text-stone">{i + 1}</span>
               <span>
                 <span className="block text-[15px]">{o.label}</span>
-                {"hint" in o && o.hint && <span className="block text-xs text-stone">{o.hint}</span>}
+                {o.hint ? <span className="block text-xs text-stone">{o.hint}</span> : null}
               </span>
             </button>
           ))}

@@ -289,16 +289,17 @@ function PreviewFlow({ line, onExit }: { line: "home" | "health"; onExit: () => 
   const [step, setStep] = useState(0);
   const { advance } = useCalmMotion();
   const steps = PREVIEW[line];
+  const cur = steps[step];
   return (
     <AnimatePresence mode="wait">
-      {step < steps.length ? (
+      {cur ? (
         <motion.div key={step} {...advance} className="space-y-6">
           <div>
-            <h1 className="question-title">{steps[step].label}</h1>
-            <p className="mt-3 text-sm text-stone">{steps[step].help}</p>
+            <h1 className="question-title">{cur.label}</h1>
+            <p className="mt-3 text-sm text-stone">{cur.help}</p>
           </div>
           <div className="grid gap-2">
-            {steps[step].options.map((o) => (
+            {cur.options.map((o) => (
               <button key={o} onClick={() => setStep(step + 1)} className="answer-btn px-4 py-4 text-left">{o}</button>
             ))}
           </div>

@@ -12,7 +12,7 @@ const story = (s: IntakeState) =>
     ["policy_number", "MX-482131"],
     ["other_party", "no"],
     ["injury", "no"],
-  ].reduce((acc, [k, v]) => answer(acc, k, v), s);
+  ].reduce((acc, [k, v]) => answer(acc, k!, v!), s);
 
 function easy() {
   let s = story(emptyState());

@@ -20,7 +20,7 @@ const claimQuery = (caseId: string) => queryOptions({
 });
 
 export const Route = createFileRoute("/continue/$caseId")({
-  validateSearch: (s: Record<string, unknown>) => ({ missing: typeof s.missing === "string" ? s.missing : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({ missing: typeof s["missing"] === "string" ? (s["missing"] as string) : undefined }),
   head: ({ params }) => ({
     meta: [
       { title: `Continue claim ${params.caseId} — Canoe` },

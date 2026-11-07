@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export interface ConfirmedDoc {
   kind: "quote" | "police_report";
   extracted: { amount?: number; itemized?: boolean; sampleId: string };
-  edited?: { amount?: number };
+  edited?: { amount?: number } | undefined;
 }
 
 function DocThumb({ doc, phase }: { doc: SampleDoc; phase: "scan" | "highlight" | "confirm" }) {

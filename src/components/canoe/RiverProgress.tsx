@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { CanoeMark } from "./brand";
 import { useCalmMotion } from "./motion";
 
-export function RiverProgress({ done, total, label }: { done: number; total: number; label?: string }) {
+export function RiverProgress({ done, total, label }: { done: number; total: number; label?: string | undefined }) {
   const { t } = useCalmMotion();
   const ratio = total ? Math.min(1, done / total) : 0;
   return (

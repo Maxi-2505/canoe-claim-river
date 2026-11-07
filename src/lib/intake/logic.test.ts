@@ -21,7 +21,7 @@ describe("question flow", () => {
   it("keeps hidden answers but ignores them in the row", () => {
     let s = a(base(), [["is_electric", "yes"], ["battery_affected", "yes"]]);
     s = answer(s, "what_happened", "theft");
-    expect(s.facts.battery_affected.value).toBe("yes");
+    expect(s.facts["battery_affected"]?.value).toBe("yes");
     expect(buildRow("X", s, c).repair_type).toBe("");
   });
   it("missing mode asks only listed fields", () => {
