@@ -1,4 +1,5 @@
 const images = new Map<string, Promise<HTMLImageElement>>();
+const tiles = new WeakMap<HTMLImageElement, string>();
 export function decodeSeaImage(url: string) {
   let cached = images.get(url);
   if (!cached) {
@@ -17,14 +18,20 @@ export async function rasterSeaLayer(el: HTMLDivElement, water: HTMLImageElement
   if (!svg || !canvas) return;
   const width = el.clientWidth, height = el.clientHeight;
   const dpr = Math.min(devicePixelRatio || 1, 1.5);
-  const tile = document.createElement('canvas'); tile.width = water.naturalWidth; tile.height = water.naturalHeight;
-  const tileContext = tile.getContext('2d'); if (!tileContext) return;
-  tileContext.drawImage(water, 0, 0);
+  let tileUrl = tiles.get(water);
+  if (!tileUrl) {
+    const tile = document.createElement('canvas'); tile.width = water.naturalWidth; tile.height = water.naturalHeight;
+    const tileContext = tile.getContext('2d'); if (!tileContext) return;
+    tileContext.drawImage(water, 0, 0);
+    tileUrl = tile.toDataURL(); tiles.set(water, tileUrl);
+  }
   const copy = svg.cloneNode(true) as SVGSVGElement;
+  copy.style.removeProperty('display');
   copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   copy.setAttribute('width', String(width)); copy.setAttribute('height', String(height));
   const paper = getComputedStyle(el).getPropertyValue('--paper').trim();
-  copy.querySelectorAll('image').forEach(image => image.setAttribute('href', tile.toDataURL()));
+  const decodedTile = tileUrl;
+  copy.querySelectorAll('image').forEach(image => image.setAttribute('href', decodedTile));
   const source = new XMLSerializer().serializeToString(copy).replaceAll('var(--paper)', paper);
   const url = URL.createObjectURL(new Blob([source], { type: 'image/svg+xml' }));
   try {

@@ -111,16 +111,12 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
       if (canoeRef.current) {
         canoeRef.current.style.width = `${cw}px`;
         canoeRef.current.style.height = `${ch}px`;
-        canoeRef.current.style.left = `${spot.x * w - cw / 2}px`;
-        canoeRef.current.style.top = `${spot.y * h - ch * 0.9}px`;
-        canoeRef.current.style.transform = `translate3d(0, ${bob + riseY}px, 0) rotate(${angle}deg) scaleY(${1 - roll})`;
+        canoeRef.current.style.transform = `translate3d(${spot.x * w - cw / 2}px, ${spot.y * h - ch * 0.9 + bob + riseY}px, 0) rotate(${angle}deg) scaleY(${1 - roll})`;
       }
       if (shadowRef.current) {
         const sw = cw * 0.95;
         shadowRef.current.style.width = `${sw}px`;
-        shadowRef.current.style.left = `${spot.x * w - sw / 2}px`;
-        shadowRef.current.style.top = `${spot.y * h - 14}px`;
-        shadowRef.current.style.transform = `translate3d(0, ${bob * 0.6}px, 0)`;
+        shadowRef.current.style.transform = `translate3d(${spot.x * w - sw / 2}px, ${spot.y * h - 14 + bob * 0.6}px, 0)`;
         shadowRef.current.style.opacity = String(k);
       }
       if (!sprayed && t > 1300) {

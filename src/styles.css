@@ -200,7 +200,7 @@
 .papercut-layer canvas { width: 100%; height: 100%; }
 .papercut-sea:not([data-active="true"]) .papercut-ripple { animation-play-state: paused; }
 .papercut-layer svg { width: 100%; height: 100%; display: block; }
-.papercut-canoe { position: absolute; transform-origin: 50% 78%; will-change: transform;
+.papercut-canoe { position: absolute; left: 0; top: 0; transform-origin: 50% 78%; will-change: transform;
   filter: drop-shadow(0 0 1px var(--mist)) drop-shadow(0 0 1px var(--mist)) drop-shadow(0 -2px 6px rgba(30,25,20,0.2)); }
 .papercut-canoe > img { transform: rotate(-3.5deg); transform-origin: 50% 50%; position: absolute; inset: 0; width: 100%; height: 100%; }
 .papercut-snip { position: absolute; left: 0; top: 0; width: 5px; height: 4px; opacity: 0;
@@ -216,7 +216,7 @@
     color-mix(in oklab, var(--paper) 38%, transparent) 78%,
     color-mix(in oklab, var(--paper) 16%, transparent) 89%,
     color-mix(in oklab, var(--paper) 0%, transparent) 100%); }
-.papercut-contact { position: absolute; height: 28px; pointer-events: none; opacity: 0;
+.papercut-contact { position: absolute; left: 0; top: 0; height: 28px; pointer-events: none; opacity: 0;
   background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(30,25,20,0.28), rgba(30,25,20,0.1) 55%, transparent 75%); }
 .papercut-ripple { position: absolute; left: 50%; top: 50%; width: 60%; height: 40%; border-radius: 50%;
   border: 1px solid rgba(30,25,20,0.35); box-shadow: 0 -1px 0 color-mix(in oklab, var(--paper) 70%, transparent);
@@ -225,7 +225,7 @@
 @keyframes papercut-ripple { 0% { transform: translate(-50%,-50%) scale(0.9); opacity: 0.7; } 100% { transform: translate(-50%,-50%) scale(1.9, 1.5); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .papercut-ripple { animation: none; opacity: 0.4; } }
 .papercut-grain { position: absolute; inset: 0; z-index: 40; opacity: 0.12;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  background-image: url("./assets/sea-grain.png"); }
 .dark .papercut-sea { filter: grayscale(1) invert(1); opacity: 0; }
 .dark .papercut-sea[data-ready="true"] { opacity: 0.25; }
 
