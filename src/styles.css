@@ -199,7 +199,7 @@
 
 /* Pencil lake canvas: the foreground and page paper stay untouched. */
 .pencil-scene {
-  position: fixed; left: 0; right: 0; bottom: 0; height: min(46vh, 460px);
+  position: fixed; left: 0; right: 0; bottom: 0; width: 100%; height: min(46vh, 460px);
   pointer-events: none; z-index: -1; overflow: hidden;
   mix-blend-mode: multiply;
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 35%);

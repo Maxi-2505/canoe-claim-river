@@ -30,8 +30,9 @@ function pencilStrokes(image: HTMLImageElement, boat: boolean): Stroke[] {
     for (let x = 2; x < buffer.width - 2; x += 2) {
       const at = (y * buffer.width + x) * 4;
       const above = at - buffer.width * 4;
-      const edge = Math.abs(pixels[at] - pixels[above]) > (boat ? 15 : 12);
-      if (pixels[at + 3] > 200 && (edge || (boat && pixels[at] < 65))) {
+      const tone = pixels[at] ?? 255;
+      const edge = Math.abs(tone - (pixels[above] ?? 255)) > (boat ? 15 : 12);
+      if ((pixels[at + 3] ?? 0) > 200 && (edge || (boat && tone < 65))) {
         points.push(x / buffer.width, y / buffer.height);
       } else finish();
       if (points.length > 60) finish();
@@ -47,13 +48,14 @@ function sketch(ctx: CanvasRenderingContext2D, strokes: Stroke[], progress: numb
   ctx.lineWidth = 0.65;
   for (let i = 0; i < count; i++) {
     const s = strokes[i];
+    if (!s) continue;
     ctx.globalAlpha = s.shade;
     ctx.beginPath();
     const partial = i === count - 1 ? clamp(strokes.length * progress - i) : 1;
     const end = Math.max(2, Math.floor(s.points.length * partial / 2) * 2);
     for (let j = 0; j < end; j += 2) {
-      const px = x + s.points[j] * w;
-      const py = y + s.points[j + 1] * h + Math.sin(j * 2.7 + i) * 0.18;
+      const px = x + (s.points[j] ?? 0) * w;
+      const py = y + (s.points[j + 1] ?? 0) * h + Math.sin(j * 2.7 + i) * 0.18;
       if (j === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.stroke();
@@ -150,7 +152,7 @@ export function PencilWaterBackground() {
           ctx.stroke();
         }
         ctx.globalAlpha = 1;
-        canvas.dataset.phase = intro < 1 ? "sketching" : "waves";
+        canvas.dataset['phase'] = intro < 1 ? "sketching" : "waves";
         if (!media.matches) frame = requestAnimationFrame(render);
       };
       frame = requestAnimationFrame(render);
