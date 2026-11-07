@@ -11,7 +11,7 @@ function httpApi(base: string, token?: string): ReviewApi {
       res = await fetch(`${base.replace(/\/$/, "")}${path}`, {
         method: init?.method ?? "GET",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: init ? JSON.stringify(init.body) : undefined,
+        body: init ? JSON.stringify(init.body) : null,
       });
     } catch { throw new ApiError("We can't reach the review service.", 0); }
     const json = await res.json().catch(() => ({}));
@@ -34,9 +34,9 @@ let instance: ReviewApi | null = null;
 /** `http` when VITE_API_URL is set, otherwise the in-memory `mock` built from claim_rows. */
 export function getReviewApi(): ReviewApi {
   if (instance) return instance;
-  const url = import.meta.env.VITE_API_URL as string | undefined;
+  const url = import.meta.env['VITE_API_URL'] as string | undefined;
   instance = url
-    ? httpApi(url, import.meta.env.VITE_API_TOKEN as string | undefined)
+    ? httpApi(url, import.meta.env['VITE_API_TOKEN'] as string | undefined)
     : mockApi(async () => {
         const { data, error } = await supabase.from("claim_rows").select("*").or("case_id.like.DEV-%,case_id.like.PRA-%").order("case_id");
         if (error) throw new ApiError("We couldn't load the cases.", 500);

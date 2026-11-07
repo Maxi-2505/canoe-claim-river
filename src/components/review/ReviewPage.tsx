@@ -94,7 +94,7 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
       else if (k === "a" && cur.effective_recommendation !== "request_information") document.querySelector<HTMLButtonElement>('[data-settle="approve"]')?.click();
       else if (k === "d" && cur.effective_recommendation === "human_review") document.querySelector<HTMLButtonElement>('[data-settle="decline"]')?.click();
       else if (k === "c") uiRef.current.setUi((u) => ({ ...u, changing: true }));
-      else if (k === "e" && cur.editable) uiRef.current.setUi((u) => ({ ...u, editing: FIELD_GROUPS[0][1][0] }));
+      else if (k === "e" && cur.editable) uiRef.current.setUi((u) => ({ ...u, editing: FIELD_GROUPS[0]?.[1][0] ?? null }));
       else return;
       e.preventDefault();
     };
@@ -381,7 +381,7 @@ function FactRow({ f, triggered, edit, editable, editing, mock, onEdit, onCancel
   );
 }
 
-type Entry = { key: string; at: string; title: string; body?: string; anchor?: boolean };
+type Entry = { key: string; at: string; title: string; body?: string | undefined; anchor?: boolean };
 function History({ c, saved }: { c: ClaimDetail; saved: string | null }) {
   const { reduce } = useCalmMotion();
   const [all, setAll] = useState(false);
