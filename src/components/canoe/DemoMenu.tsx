@@ -17,14 +17,14 @@ const story = (s: IntakeState) =>
 function easy() {
   let s = story(emptyState());
   s = answer(s, "is_electric", "no");
-  s = applyDocument(s, "quote", { amount: 1240, itemized: true, sampleId: "quote-a" } as never);
-  s = applyDocument(s, "police_report", { sampleId: "report-c" } as never);
+  s = applyDocument(s, "quote", { amount: 1240, itemized: true, sampleId: "quote-a" });
+  s = applyDocument(s, "police_report", { sampleId: "report-c" });
   return s;
 }
 function incomplete() {
   let s = story(emptyState());
   s = answer(s, "is_electric", "no");
-  s = applyDocument(s, "quote", { amount: 1240, itemized: true, sampleId: "quote-a" } as never);
+  s = applyDocument(s, "quote", { amount: 1240, itemized: true, sampleId: "quote-a" });
   s = answer(s, "has_report", "no");
   return s;
 }
@@ -33,7 +33,7 @@ function electric() {
   s = answer(s, "description", "A car reversed into my front left wing in a car park. It's an electric car.");
   s = answer(s, "is_electric", "yes");
   s = answer(s, "battery_affected", "yes");
-  s = applyDocument(s, "quote", { amount: 1850, itemized: true, sampleId: "quote-b" } as never);
+  s = applyDocument(s, "quote", { amount: 1850, itemized: true, sampleId: "quote-b" });
   s = answer(s, "has_report", "no");
   return s;
 }

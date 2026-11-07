@@ -1,5 +1,5 @@
 import type {
-  ClaimRow, CsvColumn, Fact, FormConfig, IntakeState, Mode, Question,
+  ClaimRow, CsvColumn, Fact, FormConfig, IntakeState, Mode, Question, UploadEvidence,
 } from "./types";
 import { CSV_COLUMNS } from "./types";
 
@@ -172,7 +172,7 @@ export function answer(state: IntakeState, id: string, value: string | number | 
 export function applyDocument(
   state: IntakeState,
   kind: "quote" | "police_report",
-  extracted: { amount?: number; itemized?: boolean },
+  extracted: UploadEvidence,
   edited?: { amount?: number },
 ): IntakeState {
   let s: IntakeState = { ...state, uploads: { ...state.uploads, [kind]: extracted } };
