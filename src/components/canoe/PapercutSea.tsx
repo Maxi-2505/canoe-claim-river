@@ -161,7 +161,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
       if (ready) void prepare();
     });
     let generation = 0;
-    async function prepare() {
+    const prepare = async () => {
       const ticket = ++generation;
       try {
         const [water] = await Promise.all([decodeSeaImage(waterUrl), decodeSeaImage(canoeUrl)]);
@@ -169,7 +169,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
         if (disposed || ticket !== generation) return;
         ready = true; render(performance.now()); scene.dataset['ready'] = 'true'; update();
       } catch { /* Keep content usable if decorative artwork cannot be decoded. */ }
-    }
+    };
     const onMotion = () => { reduce = motion.matches; update(); };
     motion.addEventListener('change', onMotion);
     document.addEventListener('visibilitychange', update);
