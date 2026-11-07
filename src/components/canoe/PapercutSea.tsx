@@ -4,7 +4,7 @@ const waterUrl = seaAsset.url;
 import canoeUrl from "@/assets/graphite-canoe.png";
 import {
   SESSION_KEY, canoeSpot, clamp, easeOut, easeOutBack, entryDuration, frontFrom,
-  layerCount, layerTop, rockAngle, waveAmplitude, wavePath,
+  layerCount, layerTop, patternTile, rockAngle, waveAmplitude, wavePath,
 } from "./papercut";
 
 const layers = Array.from({ length: layerCount }, (_, i) => i);

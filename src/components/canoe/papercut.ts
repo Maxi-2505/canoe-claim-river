@@ -19,6 +19,11 @@ function seeded(seed: number) {
   return () => ((s = (s * 9301 + 49297) % 233280) / 233280);
 }
 
+/** Pattern tile per layer: keeps the pencil texture near its native 1:1 size and varies the repeat. */
+export function patternTile(i: number) {
+  return { w: 400 + ((i * 97) % 140), h: 270 + ((i * 53) % 80), x: -i * 13, y: -i * 9 };
+}
+
 /** Hand-cut wavy top edge in a 1000×300 box, filled down to the bottom. */
 export function wavePath(i: number) {
   const rand = seeded(i * 97 + 13);
