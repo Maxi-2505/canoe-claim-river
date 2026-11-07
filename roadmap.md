@@ -7,4 +7,4 @@
 # Background performance
 - [x] Measure initial and idle frames before changes.
 - [x] Decode and cache artwork, share and pause animation, preserve scene geometry.
-- [ ] Verify desktop/phone, reduced motion, tests, build and after measurements.
+- [x] Verify desktop/phone, reduced motion, tests, build and after measurements.
