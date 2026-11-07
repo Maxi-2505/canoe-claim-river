@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
 /** Accent word: oxblood, upright, with a thin hand-drawn wavy underline — a quiet nod to the river. */
@@ -35,12 +36,17 @@ export function CanoeMark({ size = 28, className }: { size?: number; className?:
   );
 }
 
-export function Wordmark({ size = 26 }: { size?: number }) {
+/** The wordmark is the link home: clicking it anywhere returns to the main page. */
+export function Wordmark({ size = 26, className }: { size?: number; className?: string }) {
   return (
-    <span className="inline-flex items-center gap-2">
+    <Link
+      to="/"
+      aria-label="Canoe — go to the main page"
+      className={cn("inline-flex items-center gap-2 transition-opacity hover:opacity-70", className)}
+    >
       <CanoeMark size={size} />
       <span className="font-display text-xl text-ink">Canoe</span>
-    </span>
+    </Link>
   );
 }
 
