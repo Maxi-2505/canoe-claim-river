@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 /* Decision replay for one case. Presentation only: the winning rule and terminal always come
    from the recorded decision (or the preview row); trace results are shown as recorded. */
 
-const W = 1200, H = 440, SPINE = 150, X0 = 48, GX0 = 150, GX1 = 940, TERM_X = 1040, R = 16;
-const RAIL: Record<Rec, number> = { routine_processing: SPINE, human_review: 290, request_information: 360 };
+const W = 1200, H = 400, SPINE = 150, X0 = 48, GX0 = 150, GX1 = 940, TERM_X = 1040, R = 16;
+const RAIL: Record<Rec, number> = { routine_processing: SPINE, human_review: 280, request_information: 345 };
 const TERM_LABEL: Record<Rec, string> = { routine_processing: "ROUTINE", human_review: "REVIEW", request_information: "INFO NEEDED" };
 const TERM_CLS: Record<Rec, string> = { routine_processing: "fill-reed", human_review: "fill-ink", request_information: "fill-ochre" };
 const strip = (id: string) => id.replace(/^v\d+:/, "");
@@ -154,9 +154,9 @@ function Diagram({ route, fieldValue, runKey, paused, sel, setSel, closed }: {
       </defs>
       <rect width={W} height={H} className="fill-paper" /><rect width={W} height={H} fill="url(#rgrid)" />
 
-      <g className="font-mono" fontSize={10} letterSpacing="0.08em">
-        <text x={X0} y={SPINE - 64} className="fill-ink">{route.source === "proposed" ? `PROPOSED ${route.version.toUpperCase()} · PREVIEW ONLY` : `RECORDED · POLICY ${route.version.toUpperCase()}`}</text>
-        {closed && <><Lock x={X0} y={SPINE - 52} /><text x={X0 + 16} y={SPINE - 42} className="fill-stone">CLOSED · ORIGINAL DECISION PRESERVED · NOT RE-RUN</text></>}
+      <g className="font-mono" fontSize={11} letterSpacing="0.08em">
+        <text x={X0} y={30} className="fill-ink">{route.source === "proposed" ? `PROPOSED ${route.version.toUpperCase()} · PREVIEW ONLY` : `RECORDED · POLICY ${route.version.toUpperCase()}`}</text>
+        {closed && <><Lock x={X0} y={40} /><text x={X0 + 16} y={50} className="fill-stone">CLOSED · ORIGINAL DECISION PRESERVED · NOT RE-RUN</text></>}
         <line x1={X0} x2={TERM_X} y1={SPINE} y2={SPINE} className="stroke-stone" strokeOpacity={0.3} strokeDasharray="2 4" />
         <line x1={GX0} x2={TERM_X} y1={RAIL.human_review} y2={RAIL.human_review} className="stroke-ink" strokeOpacity={0.16} strokeDasharray="2 4" />
         <line x1={GX0} x2={TERM_X} y1={RAIL.request_information} y2={RAIL.request_information} className="stroke-ochre" strokeOpacity={0.3} strokeDasharray="2 4" />
@@ -197,9 +197,9 @@ function Diagram({ route, fieldValue, runKey, paused, sel, setSel, closed }: {
             {g.evalState === "passed" && !g.winner && lit
               ? <path d={`M${x - 4.5} ${SPINE + 0.5} q2 1.5 3 3.5 q2.5 -5 6.5 -8`} fill="none" className="stroke-reed" strokeWidth={1.6} strokeLinecap="round" />
               : <text x={x} y={SPINE + 4} textAnchor="middle" fontSize={11} className={cn("font-mono", g.winner ? "fill-cedar" : "fill-stone")}>{lit ? glyph : ""}</text>}
-            <text x={x} y={up ? ly - 26 : ly} textAnchor="middle" fontSize={10} className="fill-stone font-mono">{String(i + 1).padStart(2, "0")} · {g.id.split(".")[0]}</text>
-            <text x={x} y={up ? ly - 12 : ly + 14} textAnchor="middle" fontSize={12} className={g.winner && lit ? "fill-cedar" : tone === "ochre" ? "fill-ochre" : "fill-ink"}>{l1}</text>
-            {l2 && <text x={x} y={up ? ly + 2 : ly + 28} textAnchor="middle" fontSize={12} className={g.winner && lit ? "fill-cedar" : tone === "ochre" ? "fill-ochre" : "fill-ink"}>{l2}</text>}
+            <text x={x} y={up ? ly - 26 : ly} textAnchor="middle" fontSize={11} className="fill-stone font-mono">{String(i + 1).padStart(2, "0")} · {g.id.split(".")[0]}</text>
+            <text x={x} y={up ? ly - 12 : ly + 14} textAnchor="middle" fontSize={13.5} className={g.winner && lit ? "fill-cedar" : tone === "ochre" ? "fill-ochre" : "fill-ink"}>{l1}</text>
+            {l2 && <text x={x} y={up ? ly + 2 : ly + 28} textAnchor="middle" fontSize={13.5} className={g.winner && lit ? "fill-cedar" : tone === "ochre" ? "fill-ochre" : "fill-ink"}>{l2}</text>}
           </motion.g>
         );
       })}
