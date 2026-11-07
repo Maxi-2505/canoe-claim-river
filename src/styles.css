@@ -191,12 +191,14 @@
 /* Papercut sea: decorative, behind content, transforms only. */
 .papercut-sea {
   position: fixed; left: 0; right: 0; bottom: 0; height: min(64vh, 640px);
-  pointer-events: none; z-index: -1; overflow: hidden;
+  pointer-events: none; z-index: -1; overflow: hidden; opacity: 0; transition: opacity 400ms;
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%);
   mask-image: linear-gradient(to bottom, transparent, #000 12%);
 }
-.papercut-layer { position: absolute; left: -40px; right: -40px; bottom: -40px; will-change: transform;
-  filter: drop-shadow(0 -3px 6px rgba(30,25,20,0.18)); }
+.papercut-sea[data-ready="true"] { opacity: 1; }
+.papercut-layer { position: absolute; left: -40px; right: -40px; bottom: -40px; will-change: transform; }
+.papercut-layer canvas { width: 100%; height: 100%; }
+.papercut-sea:not([data-active="true"]) .papercut-ripple { animation-play-state: paused; }
 .papercut-layer svg { width: 100%; height: 100%; display: block; }
 .papercut-canoe { position: absolute; transform-origin: 50% 78%; will-change: transform;
   filter: drop-shadow(0 0 1px var(--mist)) drop-shadow(0 0 1px var(--mist)) drop-shadow(0 -2px 6px rgba(30,25,20,0.2)); }
@@ -222,9 +224,10 @@
 .papercut-ripple--2 { animation-delay: 1.4s; } .papercut-ripple--3 { animation-delay: 2.8s; }
 @keyframes papercut-ripple { 0% { transform: translate(-50%,-50%) scale(0.9); opacity: 0.7; } 100% { transform: translate(-50%,-50%) scale(1.9, 1.5); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .papercut-ripple { animation: none; opacity: 0.4; } }
-.papercut-grain { position: absolute; inset: 0; z-index: 40; mix-blend-mode: multiply; opacity: 0.12;
+.papercut-grain { position: absolute; inset: 0; z-index: 40; opacity: 0.12;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-.dark .papercut-sea { filter: grayscale(1) invert(1); opacity: 0.25; }
+.dark .papercut-sea { filter: grayscale(1) invert(1); opacity: 0; }
+.dark .papercut-sea[data-ready="true"] { opacity: 0.25; }
 
 /* Floating site tools. All styling is scoped to these additions. */
 .canoe-site-controls { position: fixed; z-index: 40; left: 20px; bottom: 20px; display: flex; gap: 7px; }
