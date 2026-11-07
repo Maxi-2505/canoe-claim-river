@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BusinessRouteImport } from './routes/business'
 import { Route as ClaimRouteImport } from './routes/claim'
 import { Route as PolicyRouteImport } from './routes/policy'
 import { Route as ReviewRouteImport } from './routes/review'
@@ -20,6 +21,11 @@ import { Route as ReviewCaseIdRouteImport } from './routes/review.$caseId'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClaimRoute = ClaimRouteImport.update({
@@ -55,6 +61,7 @@ const ReviewCaseIdRoute = ReviewCaseIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/business': typeof BusinessRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/business': typeof BusinessRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
@@ -73,6 +81,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/business': typeof BusinessRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
@@ -84,6 +93,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/business'
     | '/claim'
     | '/policy'
     | '/review'
@@ -93,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/business'
     | '/claim'
     | '/policy'
     | '/continue/$caseId'
@@ -101,6 +112,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/business'
     | '/claim'
     | '/policy'
     | '/review'
@@ -111,6 +123,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BusinessRoute: typeof BusinessRoute
   ClaimRoute: typeof ClaimRoute
   PolicyRoute: typeof PolicyRoute
   ReviewRoute: typeof ReviewRouteWithChildren
@@ -124,6 +137,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/claim': {
@@ -186,6 +206,7 @@ const ReviewRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BusinessRoute: BusinessRoute,
   ClaimRoute: ClaimRoute,
   PolicyRoute: PolicyRoute,
   ReviewRoute: ReviewRouteWithChildren,
