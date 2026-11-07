@@ -10,7 +10,7 @@ const TRI = [
 ];
 
 export function QuestionCard({
-  q, fact, optional, onAnswer, onDocument, confirmedDocIds,
+  q, fact, optional, onAnswer, onDocument, confirmedDocIds, quoteTotal,
 }: {
   q: Question;
   fact?: Fact | undefined;
@@ -18,6 +18,7 @@ export function QuestionCard({
   onAnswer: (value: string | number | null) => void;
   onDocument: (c: ConfirmedDoc) => void;
   confirmedDocIds: string[];
+  quoteTotal?: number | undefined;
 }) {
   const initial = fact ? (fact.status === "dont_know" ? "not_sure" : fact.value == null ? "" : String(fact.value)) : "";
   const [value, setValue] = useState<string>(initial);
@@ -95,9 +96,17 @@ export function QuestionCard({
 
       {q.upload_on_yes && value === "yes" && (
         showUpload ? (
-          <DocumentPicker only={q.upload_on_yes} confirmedIds={confirmedDocIds} onConfirm={onDocument} />
+          <DocumentPicker only={q.upload_on_yes} confirmedIds={confirmedDocIds} onConfirm={onDocument} quoteTotal={quoteTotal} />
         ) : (
           <button onClick={() => setShowUpload(true)} className="text-sm underline underline-offset-4">Add it now — we'll read it for you</button>
+        )
+      )}
+
+      {q.type === "number" && q.extractable_from && (
+        showUpload ? (
+          <DocumentPicker only={q.extractable_from} confirmedIds={confirmedDocIds} onConfirm={onDocument} quoteTotal={quoteTotal} />
+        ) : (
+          <button onClick={() => setShowUpload(true)} className="text-sm underline underline-offset-4">Or add the quote — we'll read it for you</button>
         )
       )}
 

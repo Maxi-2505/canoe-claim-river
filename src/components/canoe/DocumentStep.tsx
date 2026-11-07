@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Check, FileText, Upload } from "lucide-react";
-import { SAMPLES, eur, type SampleDoc } from "./samples";
+import { SAMPLES, eur, withTotal, type SampleDoc } from "./samples";
 import { useCalmMotion } from "./motion";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ function DocThumb({ doc, phase }: { doc: SampleDoc; phase: "scan" | "highlight" 
       {doc.kind === "quote" ? (
         <>
           <div className={cn("relative -mx-1 rounded px-1 py-0.5 transition-all duration-300", box && "ring-1 ring-cedar/70")}>
+            {doc.items.length === 0 && <div className="text-stone">Repair, all inclusive</div>}
             {doc.items.map((i) => (
               <div key={i.label} className="flex justify-between"><span>{i.label}</span><span>{eur(i.eur)}</span></div>
             ))}
@@ -64,7 +65,7 @@ function Processor({ doc, onConfirm, onDiscard }: { doc: SampleDoc; onConfirm: (
     if (doc.kind === "quote") {
       const n = Number(amount);
       const edited = editing && Number.isFinite(n) && n !== doc.total ? { amount: n } : undefined;
-      onConfirm({ kind: "quote", extracted: { amount: doc.total, itemized: true, sampleId: doc.id }, edited });
+      onConfirm({ kind: "quote", extracted: { amount: doc.total, itemized: doc.itemized !== false, sampleId: doc.id }, edited });
     } else onConfirm({ kind: "police_report", extracted: { sampleId: doc.id }, });
   };
   return (
@@ -75,7 +76,7 @@ function Processor({ doc, onConfirm, onDiscard }: { doc: SampleDoc; onConfirm: (
           <motion.div key="c" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={t(240)} className="space-y-3">
             <p className="text-sm">
               <span className="text-stone">We found: </span>
-              {doc.kind === "quote" ? <>total {eur(doc.total)} · itemized quote <Check className="inline size-3.5 text-reed" /></> : <>police report {doc.reference} <Check className="inline size-3.5 text-reed" /></>}
+              {doc.kind === "quote" ? <>total {eur(doc.total)} · {doc.itemized === false ? "no line items" : <>itemized quote <Check className="inline size-3.5 text-reed" /></>}</> : <>police report {doc.reference} <Check className="inline size-3.5 text-reed" /></>}
             </p>
             {editing && doc.kind === "quote" && (
               <label className="block text-sm">
@@ -97,12 +98,12 @@ function Processor({ doc, onConfirm, onDiscard }: { doc: SampleDoc; onConfirm: (
   );
 }
 
-export function DocumentPicker({ only, confirmedIds, onConfirm }: { only?: "quote" | "police_report"; confirmedIds: string[]; onConfirm: (c: ConfirmedDoc) => void }) {
+export function DocumentPicker({ only, confirmedIds, onConfirm, quoteTotal }: { only?: "quote" | "police_report"; confirmedIds: string[]; onConfirm: (c: ConfirmedDoc) => void; quoteTotal?: number | undefined }) {
   const [active, setActive] = useState<SampleDoc | null>(null);
   const [unreadable, setUnreadable] = useState<string | null>(null);
   const [drag, setDrag] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const samples = SAMPLES.filter((s) => !only || s.kind === only);
+  const samples = SAMPLES.filter((s) => !only || s.kind === only).map((s) => withTotal(s, quoteTotal));
   const onFiles = (files: FileList | null) => {
     if (files?.[0]) { setUnreadable(files[0].name.slice(0, 80)); setActive(null); }
   };
@@ -129,7 +130,7 @@ export function DocumentPicker({ only, confirmedIds, onConfirm }: { only?: "quot
             return (
               <button key={s.id} disabled={done} onClick={() => { setUnreadable(null); setActive(s); }} className="answer-btn flex items-center gap-3 px-4 py-3 text-left text-sm disabled:opacity-60">
                 <FileText className="size-4 shrink-0 text-stone" />
-                <span className="flex-1">{s.kind === "quote" ? `Workshop quote — itemized, total ${eur(s.total)}` : "Police / incident report"}</span>
+                <span className="flex-1">{s.kind === "quote" ? (s.itemized === false ? "Workshop quote — total only, no line items" : `Workshop quote — itemized, total ${eur(s.total)}`) : "Police / incident report"}</span>
                 {done && <Check className="size-4 text-reed" />}
               </button>
             );

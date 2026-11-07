@@ -104,3 +104,33 @@ describe("csv", () => {
     expect(toCsv([buildRow("F", a(base(), [["other_party", "no"]]), c)]).split("\n")[1]).toBe("F,open,Scrape,True,motor_own_damage,,,,,,False,False,False");
   });
 });
+
+describe("missing mode on imported cases", () => {
+  it("accepts DEV, PRA and FORM ids", async () => {
+    const { CASE_ID_RE } = await import("./logic");
+    expect(["DEV-002", "PRA-012", "FORM-0001"].every((i) => CASE_ID_RE.test(i))).toBe(true);
+    expect(CASE_ID_RE.test("XYZ-1")).toBe(false);
+  });
+  it("parses ; and , lists", async () => {
+    const { parseMissing } = await import("./logic");
+    expect(parseMissing("incident_report_present;itemized_quote_present")).toEqual(["incident_report_present", "itemized_quote_present"]);
+    expect(parseMissing("quote_eur")).toEqual(["quote_eur"]);
+  });
+  it("patches only the missing column", async () => {
+    const { patchMissingColumns, stateFromStoredRow } = await import("./logic");
+    let s = openMissing(stateFromStoredRow({ claim_type: "motor_own_damage" }), c, ["incident_report_present"]);
+    s = answer(s, "has_report", "yes");
+    expect(patchMissingColumns(s, c, ["incident_report_present"])).toEqual({ incident_report_present: "True" });
+  });
+  it("patches quote_eur from a typed amount on an imported case", async () => {
+    const { patchMissingColumns, stateFromStoredRow } = await import("./logic");
+    expect(nextQuestion(openMissing(stateFromStoredRow({ claim_type: "motor_own_damage" }), c, ["quote_eur"]), c, { kind: "missing", missing: ["quote_eur"] })?.id).toBe("quote_amount");
+    const s = answer(stateFromStoredRow({ claim_type: "motor_own_damage" }), "quote_amount", 640);
+    expect(patchMissingColumns(s, c, ["quote_eur"])).toEqual({ quote_eur: "640" });
+  });
+  it("total-only quote sets itemized False", async () => {
+    const { patchMissingColumns } = await import("./logic");
+    const s = applyDocument(emptyState(), "quote", { amount: 890, itemized: false, sampleId: "quote-t" });
+    expect(patchMissingColumns(s, c, ["itemized_quote_present"])).toEqual({ itemized_quote_present: "False" });
+  });
+});
