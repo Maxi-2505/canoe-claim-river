@@ -12,7 +12,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
-  --font-display: "Fraunces", Georgia, serif;
+  --font-display: "EB Garamond", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --font-sans: "Inter", system-ui, sans-serif;
   --color-paper: var(--paper);
   --color-ink: var(--ink);
@@ -44,12 +45,12 @@
 
 :root {
   --radius: 16px;
-  --paper: oklch(0.959 0.010 87.5);
-  --ink: oklch(0.259 0.031 209.6);
-  --cedar: oklch(0.603 0.138 46.8);
-  --reed: oklch(0.549 0.057 142.3);
-  --stone: oklch(0.645 0.007 160);
-  --mist: oklch(0.913 0.014 88.7);
+  --paper: oklch(0.954 0.013 84);
+  --ink: oklch(0.205 0.012 50);
+  --cedar: oklch(0.455 0.145 32);
+  --reed: oklch(0.52 0.05 120);
+  --stone: oklch(0.52 0.015 60);
+  --mist: oklch(0.982 0.007 84);
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -73,18 +74,18 @@
 }
 
 .dark {
-  --paper: oklch(0.207 0.017 209);
-  --ink: oklch(0.923 0.013 86.8);
-  --cedar: oklch(0.671 0.136 44.4);
-  --mist: oklch(0.263 0.024 209.1);
+  --paper: oklch(0.2 0.01 50);
+  --ink: oklch(0.94 0.013 84);
+  --cedar: oklch(0.62 0.14 32);
+  --mist: oklch(0.25 0.012 50);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --paper: oklch(0.207 0.017 209);
-    --ink: oklch(0.923 0.013 86.8);
-    --cedar: oklch(0.671 0.136 44.4);
-    --mist: oklch(0.263 0.024 209.1);
+    --paper: oklch(0.2 0.01 50);
+    --ink: oklch(0.94 0.013 84);
+    --cedar: oklch(0.62 0.14 32);
+    --mist: oklch(0.25 0.012 50);
   }
 }
 
@@ -96,26 +97,45 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-size: 15.5px;
-    background-image:
-      radial-gradient(color-mix(in oklab, var(--stone) 9%, transparent) 0.6px, transparent 0.7px);
-    background-size: 5px 5px;
   }
   :focus-visible { outline: 2px solid var(--cedar); outline-offset: 2px; }
 }
 
 @utility font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.015em;
-  font-optical-sizing: auto;
+  letter-spacing: -0.005em;
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+
+@utility canoe-backdrop {
+  position: fixed;
+  inset: auto 0 0 auto;
+  width: min(1100px, 95vw);
+  aspect-ratio: 1775 / 1130;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+  background-size: cover;
+  -webkit-mask-image: radial-gradient(ellipse at 70% 60%, #000 35%, transparent 75%);
+  mask-image: radial-gradient(ellipse at 70% 60%, #000 35%, transparent 75%);
+  @media (prefers-color-scheme: dark) { mix-blend-mode: screen; filter: invert(1); opacity: 0.12; }
 }
 
 @utility question-title {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
-  font-size: 26px;
-  line-height: 1.15;
-  font-weight: 450;
-  @media (min-width: 768px) { font-size: 34px; }
+  letter-spacing: -0.01em;
+  font-size: 32px;
+  line-height: 1.08;
+  font-weight: 500;
+  @media (min-width: 768px) { font-size: 44px; }
 }
 
 @utility card-calm {
@@ -140,6 +160,7 @@
   background: var(--cedar);
   color: var(--paper);
   border-radius: 999px;
+  font-weight: 500;
   transition: filter 200ms, opacity 200ms;
   &:hover { filter: brightness(1.06); }
   &:disabled { opacity: 0.4; }
