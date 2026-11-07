@@ -62,7 +62,7 @@
       "vertical": "motor",
       "section": "story",
       "label": "What is your policy number?",
-      "help": "You'll find it on your insurance card or your last letter from us.",
+      "help": "You'll find it on your insurance card — we need it to check your cover.",
       "type": "text",
       "source": "customer",
       "short": "Policy number"
@@ -75,7 +75,10 @@
       "help": "This tells us whether anyone else needs to be contacted.",
       "type": "tri_state",
       "source": "customer",
-      "short": "Someone else involved"
+      "short": "Someone else involved",
+      "also_for": [
+        "liability_disputed"
+      ]
     },
     {
       "id": "other_party_agrees",
@@ -196,7 +199,7 @@
       "vertical": "motor",
       "section": "documents",
       "label": "Do you have a police or incident report?",
-      "help": "Only if one was made — many claims don't need one.",
+      "help": "We need an incident report to process your claim — add it now if you have it.",
       "type": "tri_state",
       "options": [
         {

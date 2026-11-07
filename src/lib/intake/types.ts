@@ -15,6 +15,8 @@ export interface Question {
   type: QuestionType;
   options?: QuestionOption[];
   field?: string;
+  /** CSV fields this question feeds without mapping to them directly (asked in missing mode). */
+  also_for?: string[];
   mapping?: "identity" | "round" | "repair_type" | Record<string, string>;
   source: "customer" | "system";
   show_if?: ShowIf;

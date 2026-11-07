@@ -42,9 +42,21 @@ export function orderedQuestions(config: FormConfig) {
     .map((x) => x.q);
 }
 
+function matchesMissing(q: Question, missing: string[]) {
+  return missing.includes(q.id) || (!!q.field && missing.includes(q.field)) || !!q.also_for?.some((f) => missing.includes(f));
+}
+
 function inMissing(q: Question, mode: Mode) {
   if (mode.kind !== "missing") return true;
-  return mode.missing.includes(q.id) || (!!q.field && mode.missing.includes(q.field));
+  return matchesMissing(q, mode.missing);
+}
+
+/** liability_disputed: nobody else involved → False; else other side agrees (inverted); unsure/unanswered → blank. */
+export function deriveLiability(state: IntakeState, config: FormConfig): string {
+  const other = knownValue(state, "other_party");
+  if (other === "no") return "False";
+  if (other !== "yes") return "";
+  return triBool(state, config.questions.find((q) => q.id === "other_party_agrees"), config);
 }
 
 /** Questions that are still ahead of the customer, in order. */
@@ -140,7 +152,7 @@ export function buildRow(caseId: string, state: IntakeState, config: FormConfig)
     incident_report_present: triBool(state, q("has_report"), config),
     itemized_quote_present: triBool(state, q("has_quote"), config),
     injury_reported: triBool(state, q("injury"), config),
-    liability_disputed: triBool(state, q("other_party_agrees"), config),
+    liability_disputed: deriveLiability(state, config),
     duplicate_flag: sys.duplicate_flag,
     evidence_conflict: sys.evidence_conflict,
   };
@@ -232,7 +244,7 @@ export function stateFromLog(entries: { field: string; value: string; status: st
 export function openMissing(state: IntakeState, config: FormConfig, missing: string[]): IntakeState {
   const facts = { ...state.facts };
   for (const q of config.questions) {
-    if (missing.includes(q.id) || (q.field && missing.includes(q.field))) delete facts[q.id];
+    if (matchesMissing(q, missing)) delete facts[q.id];
   }
   return { ...state, facts };
 }
