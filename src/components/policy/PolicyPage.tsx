@@ -9,12 +9,12 @@ import { getPolicyApi, type Draft, type PolicyDoc, type PolicyVersion, type Prev
 import { demoDraft, DEMO_TITLE, toDraft, withLimit } from "@/lib/policy/mock";
 import { defaultCond, describeDiff, OP_WORDS, opsFor, quoteLimitOf, SELECT_OPTIONS, valueText } from "@/lib/policy/text";
 import { cn } from "@/lib/utils";
+import { isNewDraft } from "@/lib/business/logic";
+import { Button } from "@/components/ui/button";
 
 const key = (d: Draft) => JSON.stringify(d);
 const two = (n: number) => String(n).padStart(2, "0");
-const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "—");
 const nextV = (v: string) => `v${Number(v.slice(1)) + 1}`;
-const REC_FROM_KEY = (s: string) => s.split(" -> ") as [string, string];
 
 function useAuthor(): [string, (s: string) => void] {
   const [name, setName] = useState("Jury");
@@ -56,7 +56,7 @@ export function PolicyPage() {
   const damTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const load = () => api.getPolicy().then((d) => { setDoc(d); setLoadErr(null); return d; }).catch((e) => { setLoadErr(e.message); return null; });
-  useEffect(() => { load().then((d) => { if (d) setDraft(toDraft(d.versions.find((v) => v.version === d.latest)!)); }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load().then((d) => { const v = d?.versions.find((v) => v.version === d.latest); if (v) setDraft(toDraft(v)); }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const liveV = doc?.versions.find((v) => v.version === doc.latest);
   const live = useMemo(() => (liveV ? toDraft(liveV) : null), [liveV]);
@@ -64,11 +64,12 @@ export function PolicyPage() {
   if (!doc || !draft || !live || !liveV) return <Shell><p className="mt-10 font-mono text-xs text-stone">Loading policy…</p></Shell>;
 
   const draftV = nextV(doc.latest);
-  const drafting = key(draft) !== key(live) || draft.title !== live.title;
+  const drafting = isNewDraft(draft, live);
   const fresh = !!preview && previewKey === key(draft);
   const stale = !!preview && !fresh && !damPending;
 
   const runPreview = async (d: Draft, newRun: boolean) => {
+    if (!isNewDraft(d, live)) return;
     setBusy(true); setSimErr(null);
     try {
       const p = await api.preview(d);
@@ -108,10 +109,11 @@ export function PolicyPage() {
 
       <div className="mt-12 space-y-14">
         <Step n={1} title="Change">
-          <RuleEditor draft={draft} live={live} fields={doc.fields} setDraft={setDraft} version={draftV} liveVersion={doc.latest} />
+          <RuleEditor draft={draft} live={live} fields={doc.fields} setDraft={setDraft} version={draftV} liveVersion={doc.latest} mock={api.mode === "mock"} />
         </Step>
 
         <Step n={2} title="Simulate" aside={api.mode === "mock" && <span className="font-mono text-[11px] text-stone">demo data · 26 cases</span>}>
+          {!drafting ? <p className="text-stone">Change a rule to simulate its effect. The last published change ({doc.versions.at(-2)?.version ?? "v1"} → {doc.latest}) is in <Link to="/business" search={{ tab: "impact" }} className="text-cedar underline underline-offset-2">Business → Policy impact.</Link></p> : <>
           <div role="radiogroup" aria-label="Simulation view" className="mb-3 inline-flex rounded-full border border-stone/30 p-0.5 font-mono text-[11px] uppercase tracking-[0.08em]">
             {(["all", "case"] as const).map((k) => (
               <button key={k} role="radio" aria-checked={simMode === k} onClick={() => setSimMode(k)}
@@ -127,7 +129,7 @@ export function PolicyPage() {
             )}
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <button className="btn-cedar px-5 py-2 text-sm" disabled={busy} onClick={() => runPreview(draft, true)}>{stale ? "Simulate again" : "Simulate"}</button>
+            <button className="btn-cedar px-5 py-2 text-sm" disabled={busy || !drafting} onClick={() => runPreview(draft, true)}>{stale ? "Simulate again" : "Simulate"}</button>
             {simMode === "all" && <>
             <button className="btn-quiet px-4 py-2 font-mono text-sm" disabled={!fresh} aria-pressed={view === "v1"} onClick={() => setView((v) => (v === "v1" ? "v2" : "v1"))}>{view === "v1" ? "v1 ⇄ v2 · showing v1" : "v1 ⇄ v2"}</button>
             <button className="btn-quiet px-4 py-2 text-sm" disabled={!preview} onClick={() => setSkip((s) => s + 1)}>Skip animation</button>
@@ -136,20 +138,27 @@ export function PolicyPage() {
             </>}
           </div>
           {simErr && <p className="mt-3 text-sm text-cedar">{simErr}</p>}
+          {preview && <div className={cn("mt-6", stale && "opacity-40")}>
+            <p className="font-display text-xl">{preview.changed} open claims would change. {preview.closed_untouched} closed claims stay as decided.</p>
+            <div className="mt-3 grid grid-cols-3 gap-4 font-mono text-xs">
+              <p><span className="block font-display text-3xl text-cedar">{preview.changed}</span>Changes</p>
+              <p><span className="block font-display text-3xl">{preview.open_claims - preview.changed}</span>Unchanged</p>
+              <p><span className="block font-display text-3xl">{preview.closed_untouched}</span>Closed protected</p>
+            </div>
+          </div>}
+          <Link to="/business" search={{ tab: "impact" }} className="mt-4 inline-block text-sm text-cedar underline underline-offset-2">See the full impact in Business →</Link>
+          </>}
         </Step>
 
-        <Step n={3} title="Check">
-          {preview ? <Dashboard p={preview} stale={stale} highlight={highlight} setHighlight={setHighlight} /> : <p className="text-stone">Change a rule, then simulate.</p>}
-        </Step>
-
-        <Step n={4} title="Release">
+        <Step n={3} title="Release">
           <Release draft={draft} version={draftV} fresh={fresh} drafting={drafting} preview={preview} result={result}
             onPublish={async (b) => {
               const r = await api.publish({ draft, ...b });
               setGlide((g) => g + 1);
               const d = await load();
               setResult(r);
-              if (d) { const nd = toDraft(d.versions.find((v) => v.version === d.latest)!); setDraft(nd); setPreviewKey(key(nd)); }
+              const latest = d?.versions.find((v) => v.version === d.latest);
+              if (latest) { const nd = toDraft(latest); setDraft(nd); setPreview(null); setPreviewKey(""); }
               return r;
             }} />
         </Step>
@@ -167,6 +176,7 @@ function Shell({ children }: { children: ReactNode }) {
           <nav className="hidden gap-4 font-mono text-[11px] uppercase tracking-[0.14em] text-stone sm:flex">
             <Link to="/review" className="hover:text-ink">Review</Link>
             <Link to="/policy" className="text-ink">Policy</Link>
+            <Link to="/business" className="hover:text-ink">Business</Link>
           </nav>
         </div>
       </header>
@@ -191,7 +201,7 @@ function ReadOnly({ v, fields, onClose }: { v: PolicyVersion; fields: Record<str
 }
 
 /* ---------------- 01 CHANGE ---------------- */
-function RuleEditor({ draft, live, fields, setDraft, version, liveVersion }: { draft: Draft; live: Draft; fields: Record<string, string>; setDraft: (d: Draft) => void; version: string; liveVersion: string }) {
+function RuleEditor({ draft, live, fields, setDraft, version, liveVersion, mock }: { draft: Draft; live: Draft; fields: Record<string, string>; setDraft: (d: Draft) => void; version: string; liveVersion: string; mock: boolean }) {
   const [json, setJson] = useState<string | null>(null);
   const [jsonErr, setJsonErr] = useState<string | null>(null);
   const drag = useRef<number | null>(null);
@@ -207,7 +217,7 @@ function RuleEditor({ draft, live, fields, setDraft, version, liveVersion }: { d
       <p className="font-display text-xl text-ink">{describeDiff(live, draft, version, fields)}</p>
       {draft.title === DEMO_TITLE && <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.08em] text-cedar">Demo change (replace with the official v2)</p>}
       <div className="mt-4 flex flex-wrap gap-2">
-        <button className="btn-quiet px-4 py-1.5 text-sm" onClick={() => setDraft(demoDraft())}>Load demo change</button>
+        {mock && <Button variant="outline" className="btn-quiet px-4 py-1.5 text-sm" onClick={() => setDraft(demoDraft())}>Load demo change</Button>}
         <button className="btn-quiet px-4 py-1.5 text-sm" onClick={() => setDraft(JSON.parse(JSON.stringify(live)))}>Reset to {liveVersion}</button>
         <button className="btn-quiet px-4 py-1.5 text-sm" onClick={() => { setJson(json == null ? JSON.stringify(draft, null, 2) : null); setJsonErr(null); }}>{json == null ? "Edit as JSON" : "Close JSON"}</button>
       </div>
@@ -290,11 +300,11 @@ function CondEditor({ c, old, fields, onChange }: { c: Cond; old?: Cond | undefi
         {Object.entries(fields).map(([f, l]) => <option key={f} value={f}>{l}</option>)}
       </select>
       <select value={c.op} onChange={(e) => { const op = e.target.value as Cond["op"]; const multi = op === "in" || op === "not_in";
-        const v = SELECT_OPTIONS[c.field] ? (multi ? (Array.isArray(c.value) ? c.value : [String(c.value ?? SELECT_OPTIONS[c.field]![0])]) : (Array.isArray(c.value) ? c.value[0] : c.value)) : c.value;
+        const v = SELECT_OPTIONS[c.field] ? (multi ? (Array.isArray(c.value) ? c.value : [String(c.value ?? SELECT_OPTIONS[c.field]?.[0])]) : (Array.isArray(c.value) ? c.value[0] : c.value)) : c.value;
         onChange(v === undefined ? { field: c.field, op } : { ...c, op, value: v }); }} className={sel} aria-label="Operator">
         {ops.map((o) => <option key={o} value={o}>{OP_WORDS[o]}</option>)}
       </select>
-      {valChanged && <span className="font-mono text-xs text-stone line-through">{valueText(old!)}</span>}
+      {valChanged && <span className="font-mono text-xs text-stone line-through">{old ? valueText(old) : ""}</span>}
       {valChanged && <span className="text-stone">→</span>}
       {c.field === "quote_eur" && (
         <span className={cn("inline-flex items-center rounded-xl border pl-2", valChanged ? "border-cedar" : "border-stone/30")}>
@@ -304,110 +314,16 @@ function CondEditor({ c, old, fields, onChange }: { c: Cond; old?: Cond | undefi
       )}
       {SELECT_OPTIONS[c.field] && (c.op === "in" || c.op === "not_in" ? (
         <span className="inline-flex gap-2">
-          {SELECT_OPTIONS[c.field]!.map((o) => { const arr = Array.isArray(c.value) ? c.value : []; return (
+          {SELECT_OPTIONS[c.field]?.map((o) => { const arr = Array.isArray(c.value) ? c.value : []; return (
             <label key={o} className="flex items-center gap-1 font-mono text-xs"><input type="checkbox" checked={arr.includes(o)} className="accent-[var(--cedar)]"
               onChange={(e) => onChange({ ...c, value: e.target.checked ? [...arr, o] : arr.filter((x) => x !== o) })} />{o}</label>); })}
         </span>
       ) : (
         <select value={String(c.value ?? "")} onChange={(e) => onChange({ ...c, value: e.target.value })} className={cn(sel, "font-mono text-xs", valChanged && "border-cedar")} aria-label="Value">
-          {SELECT_OPTIONS[c.field]!.map((o) => <option key={o} value={o}>{o}</option>)}
+          {SELECT_OPTIONS[c.field]?.map((o) => <option key={o} value={o}>{o}</option>)}
         </select>
       ))}
     </span>
-  );
-}
-
-/* ---------------- 03 CHECK ---------------- */
-function Num({ label, value, className, children }: { label: string; value: ReactNode; className?: string; children?: ReactNode }) {
-  return <div className="card-calm p-5"><p className="eyebrow">{label}</p><p className={cn("mt-2 font-display text-5xl leading-none", className)}>{value}</p>{children}</div>;
-}
-function Dashboard({ p, stale, highlight, setHighlight }: { p: Preview; stale: boolean; highlight: string | null; setHighlight: (s: string | null) => void }) {
-  const open = p.rows.filter((r) => !r.retained);
-  const changed = open.filter((r) => r.changed);
-  const before = open.filter((r) => r.from === "routine_processing").length, after = open.filter((r) => r.to === "routine_processing").length;
-  const toRoutine = Object.entries(p.moves).filter(([k]) => k.endsWith("-> routine_processing")).reduce((s, [, n]) => s + n, 0);
-  const verdict = `${p.changed} open claim${p.changed === 1 ? "" : "s"} would change. ${p.closed_untouched} closed claim${p.closed_untouched === 1 ? "" : "s"} stay as decided. ${toRoutine ? `${toRoutine} would become routine that weren't.` : "Nothing becomes routine that wasn't."}`;
-  const byRule: Record<string, number> = {};
-  for (const r of changed) { const id = r.rule_to.replace(/^v\d+:/, ""); byRule[id] = (byRule[id] ?? 0) + 1; }
-  const maxMove = Math.max(1, ...Object.values(p.moves));
-  const vFrom = p.draft_quality.versions[p.from_version] ?? {}, vTo = p.draft_quality.versions[p.to_version] ?? {};
-  const cc = p.draft_quality.changed_cases;
-  return (
-    <div className={cn("transition-opacity", stale && "opacity-40")}>
-      <p className="font-display text-2xl">{verdict}</p>
-      <div className="mt-6 grid grid-cols-12 gap-4">
-        <div className="col-span-6 md:col-span-3"><Num label="Open claims re-run" value={p.open_claims} /></div>
-        <div className="col-span-6 md:col-span-3"><Num label="Change" value={p.changed} className="text-cedar" /></div>
-        <div className="col-span-6 md:col-span-3"><Num label="Unchanged" value={p.open_claims - p.changed} /></div>
-        <div className="col-span-6 md:col-span-3"><Num label="Closed, protected" value={<span className="inline-flex items-baseline gap-2">{p.closed_untouched}<svg viewBox="0 0 24 24" className="size-7 text-stone" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden><circle cx="12" cy="5" r="2" /><path d="M12 7v14M7 11h10M4 15q2 6 8 6t8-6" /></svg></span>} /></div>
-
-        <div className="col-span-12 md:col-span-4"><Num label="Straight-through share" value={<>{pct(before, open.length)} <span className="text-stone">→</span> {pct(after, open.length)}</>}>
-          <p className="mt-2 text-sm text-stone">{after < before ? "Fewer claims pass without a person." : after > before ? "More claims pass without a person." : "The same share passes without a person."}</p></Num></div>
-
-        <div className="card-calm col-span-12 p-5 md:col-span-4">
-          <p className="eyebrow">Moves</p>
-          <ul className="mt-3 space-y-2">
-            {Object.entries(p.moves).map(([k, n]) => { const [a, b] = REC_FROM_KEY(k); const on = highlight === k; return (
-              <li key={k}><button onClick={() => setHighlight(on ? null : k)} className={cn("w-full text-left", on && "text-cedar")} aria-pressed={on}>
-                <span className="flex items-baseline justify-between"><span><RecommendationLabel recommendation={a} /> → <RecommendationLabel recommendation={b} /></span><span className="font-display text-xl">{n}</span></span>
-                <span className="mt-1 block h-px bg-ink/60" style={{ width: `${(n / maxMove) * 100}%`, ...(on ? { background: "var(--cedar)" } : {}) }} />
-              </button></li>); })}
-            {!Object.keys(p.moves).length && <li className="text-sm text-stone">No moves.</li>}
-          </ul>
-          {!!Object.keys(p.moves).length && <p className="mt-3 text-xs text-stone">Click a move to find its canoes.</p>}
-        </div>
-
-        <div className="card-calm col-span-12 p-5 md:col-span-4">
-          <p className="eyebrow">By rule</p>
-          <ul className="mt-3 space-y-1.5 font-mono text-sm">{Object.entries(byRule).map(([id, n]) => <li key={id} className="flex justify-between"><span>{id}</span><span className="font-display text-xl">{n}</span></li>)}</ul>
-          {!changed.length && <p className="text-sm text-stone">No rule changed a claim.</p>}
-        </div>
-
-        <div className="card-calm col-span-12 p-5 md:col-span-6">
-          <p className="eyebrow">Quality on labelled cases</p>
-          <table className="mt-3 w-full text-sm">
-            <thead><tr className="text-left font-mono text-[11px] uppercase tracking-[0.08em] text-stone"><th className="pb-2 font-normal"></th><th className="pb-2 font-normal">{p.from_version}</th><th className="pb-2 font-normal">{p.to_version} draft</th></tr></thead>
-            <tbody>
-              {([["Correct", (v: typeof vFrom) => v.correct != null ? `${v.correct} / ${v.n}` : null, ""], ["Wrong routine", (v: typeof vFrom) => v.incorrect_routine, "text-cedar font-semibold"], ["Unnecessary escalations", (v: typeof vFrom) => v.unnecessary_human_review, ""]] as const).map(([l, g, cls]) => (
-                <tr key={l} className="border-t border-stone/20"><td className={cn("py-2", cls)}>{l === "Wrong routine" ? <span className="recommendation-label">Wrong routine</span> : l}</td><td className={cn("py-2 font-display text-xl", cls)}>{g(vFrom) ?? "—"}</td><td className={cn("py-2 font-display text-xl", cls)}>{g(vTo) ?? "—"}</td></tr>
-              ))}
-            </tbody>
-          </table>
-          {vTo.note && <p className="mt-3 text-sm text-stone">No labels for {p.to_version} yet — import expected_{p.to_version} to measure it.</p>}
-        </div>
-
-        <div className="card-calm col-span-12 p-5 md:col-span-6">
-          <p className="eyebrow">Changed labelled cases · {cc.count}</p>
-          <ul className="mt-3 space-y-2 text-sm">
-            {cc.cases.map((c) => (
-              <li key={c.case_id} className="flex flex-wrap items-baseline justify-between gap-2 border-t border-stone/20 pt-2">
-                <span className="font-mono">{c.case_id} <RecommendationLabel recommendation={c.from} /> → <RecommendationLabel recommendation={c.to} /></span>
-                <span className="font-mono text-xs text-stone">before: {c.correct_before == null ? "unknown" : c.correct_before ? "correct" : "wrong"} · after: {c.correct_after == null ? "unknown" : c.correct_after ? "correct" : "wrong"}</span>
-              </li>
-            ))}
-            {!cc.cases.length && <li className="text-stone">None.</li>}
-          </ul>
-        </div>
-
-        <div className="card-calm col-span-12 p-5">
-          <p className="eyebrow">Changed cases</p>
-          <table className="mt-3 w-full text-sm">
-            <thead><tr className="text-left font-mono text-[11px] uppercase tracking-[0.08em] text-stone"><th className="pb-2 font-normal">Case</th><th className="pb-2 font-normal">From → to</th><th className="pb-2 font-normal">Rule</th><th className="pb-2 font-normal">Summary</th><th /></tr></thead>
-            <tbody>{changed.map((r) => (
-              <tr key={r.case_id} className="border-t border-stone/20">
-                <td className="py-2 font-mono">{r.case_id}</td>
-                <td className="py-2"><RecommendationLabel recommendation={r.from} /> → <RecommendationLabel recommendation={r.to} /></td>
-                <td className="py-2 font-mono text-xs">{r.rule_to}</td>
-                <td className="py-2 text-stone">{r.summary}</td>
-                <td className="py-2 text-right"><Link to="/review/$caseId" params={{ caseId: r.case_id }} className="text-cedar underline underline-offset-2">Open in review</Link></td>
-              </tr>))}
-              {!changed.length && <tr><td colSpan={5} className="py-2 text-stone">No open claim changes.</td></tr>}
-            </tbody>
-          </table>
-          {p.warnings.map((w, i) => <p key={i} className="mt-3 text-sm text-stone">Note: {w}</p>)}
-        </div>
-      </div>
-    </div>
   );
 }
 

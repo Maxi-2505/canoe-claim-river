@@ -107,6 +107,7 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
           <nav className="hidden gap-4 font-mono text-[11px] uppercase tracking-[0.14em] text-stone sm:flex">
             <Link to="/review" className="text-ink">Review</Link>
             <Link to="/policy">Policy</Link>
+            <Link to="/business">Business</Link>
           </nav>
         </div>
         <label className="flex items-center gap-2 text-xs text-stone">
