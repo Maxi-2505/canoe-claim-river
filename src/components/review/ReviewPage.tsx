@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Anchor, Building2, FileText, Menu, User, X } from "lucide-react";
-import { Wordmark, CanoeMark } from "@/components/canoe/brand";
+import { Wordmark, CanoeMark, Accent } from "@/components/canoe/brand";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { useCalmMotion } from "@/components/canoe/motion";
 import { getReviewApi, ApiError, type ClaimDetail, type ClaimListItem, type Field, type FieldValue, type Rec } from "@/lib/review/api";
@@ -19,7 +19,7 @@ const time = (iso: string) => new Date(iso).toLocaleString("en-GB", { day: "nume
 const hhmm = (iso: string) => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 const reasonText = (rule: string) => REASON[rule] ?? null;
 
-function Italic({ children }: { children: ReactNode }) { return <em className="font-display italic text-cedar">{children}</em>; }
+function Italic({ children }: { children: ReactNode }) { return <Accent>{children}</Accent>; }
 
 function Dot({ rec, closed, className }: { rec: Rec; closed?: boolean; className?: string }) {
   if (closed) return <span className={cn("inline-block size-2.5 shrink-0 rounded-full border border-stone", className)} aria-label="Closed" />;

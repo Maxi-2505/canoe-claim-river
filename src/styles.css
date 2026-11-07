@@ -12,9 +12,9 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
-  --font-display: "EB Garamond", Georgia, serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --font-sans: "Geist", system-ui, sans-serif;
   --color-paper: var(--paper);
   --color-ink: var(--ink);
   --color-cedar: var(--cedar);
@@ -106,7 +106,8 @@
 
 @utility font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.005em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 @utility eyebrow {
@@ -134,10 +135,10 @@
 
 @utility question-title {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   font-size: 32px;
-  line-height: 1.08;
-  font-weight: 500;
+  line-height: 1.05;
+  font-weight: 600;
   @media (min-width: 768px) { font-size: 44px; }
 }
 
