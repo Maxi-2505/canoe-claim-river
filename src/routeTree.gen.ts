@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CasesRouteImport } from './routes/cases'
+import { Route as ClaimRouteImport } from './routes/claim'
 import { Route as PolicyRouteImport } from './routes/policy'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as RowsRouteImport } from './routes/rows'
@@ -26,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
 const CasesRoute = CasesRouteImport.update({
   id: '/cases',
   path: '/cases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClaimRoute = ClaimRouteImport.update({
+  id: '/claim',
+  path: '/claim',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PolicyRoute = PolicyRouteImport.update({
@@ -62,6 +68,7 @@ const ReviewCaseIdRoute = ReviewCaseIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cases': typeof CasesRoute
+  '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
   '/rows': typeof RowsRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cases': typeof CasesRoute
+  '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/rows': typeof RowsRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
@@ -82,6 +90,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cases': typeof CasesRoute
+  '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
   '/rows': typeof RowsRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cases'
+    | '/claim'
     | '/policy'
     | '/review'
     | '/rows'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/cases'
+    | '/claim'
     | '/policy'
     | '/rows'
     | '/continue/$caseId'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/cases'
+    | '/claim'
     | '/policy'
     | '/review'
     | '/rows'
@@ -124,6 +136,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CasesRoute: typeof CasesRoute
+  ClaimRoute: typeof ClaimRoute
   PolicyRoute: typeof PolicyRoute
   ReviewRoute: typeof ReviewRouteWithChildren
   RowsRoute: typeof RowsRoute
@@ -144,6 +157,13 @@ declare module '@tanstack/react-router' {
       path: '/cases'
       fullPath: '/cases'
       preLoaderRoute: typeof CasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/claim': {
+      id: '/claim'
+      path: '/claim'
+      fullPath: '/claim'
+      preLoaderRoute: typeof ClaimRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/policy': {
@@ -207,6 +227,7 @@ const ReviewRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CasesRoute: CasesRoute,
+  ClaimRoute: ClaimRoute,
   PolicyRoute: PolicyRoute,
   ReviewRoute: ReviewRouteWithChildren,
   RowsRoute: RowsRoute,

@@ -39,4 +39,4 @@ use the editor.
 - PencilBackdrop renders PapercutSea (DOM layers + one rAF loop writing transforms/opacity); tunables, resting positions and sailTo live in papercut.ts. Why: isolates decorative motion from intake state and lets later steps move the canoe.
 - The policy page (/policy) has no decision logic: all data goes through `src/lib/policy/api.ts` (http when VITE_API_URL is set, else an in-memory mock with canned previews in `src/lib/policy/mock.ts`). Why: the Python engine owns rule evaluation; the mock only replays known demo results.
 - The policy Simulate scene (LocksScene) is a wiring diagram built only from preview rows: v1 and v2 wire paths share one segment structure so they can morph. Why: smooth "what changed" view without any decision logic.
-- The pencil lake backdrop renders only on the customer intake; internal pages stay on plain paper. Why: it overlapped internal cards.
+- The pencil lake backdrop renders only on customer pages: the intake (/claim, fixed) and the landing hero + closing (contained per section); internal pages stay on plain paper. Why: it overlapped cards and text.
