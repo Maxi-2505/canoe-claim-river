@@ -1,290 +1,299 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
-import waterUrl from "@/assets/graphite-water.jpg";
 import { RecommendationLabel } from "@/components/canoe/RecommendationLabel";
 import { PADDLE } from "@/components/canoe/motion";
 import { euro, gateLabel, quoteLimitOf } from "@/lib/policy/text";
-import type { Draft, Preview, PreviewRow, Rec } from "@/lib/policy/types";
+import type { Draft, Preview, PreviewRow, Rec, Rule } from "@/lib/policy/types";
 
-const W = 1200, H = 400, RT = 112, RB = 172, X0 = 140, X1 = 1050;
-type Pt = [number, number];
-type BasinKey = "review" | "info" | "open";
-const BASINS: Record<BasinKey, { x0: number; x1: number; y0: number; cols: number; dx: number; dy: number; sx: number; sy: number }> = {
-  review: { x0: 250, x1: 610, y0: 300, cols: 10, dx: 34, dy: 15, sx: 272, sy: 318 },
-  info: { x0: 720, x1: 980, y0: 300, cols: 7, dx: 34, dy: 15, sx: 742, sy: 318 },
-  open: { x0: 1062, x1: 1192, y0: 110, cols: 3, dx: 38, dy: 15, sx: 1084, sy: 122 },
-};
-const slotPt = (b: BasinKey, k: number): Pt => { const s = BASINS[b]; return [s.sx + (k % s.cols) * s.dx, s.sy + Math.floor(k / s.cols) * s.dy]; };
+/* Wiring diagram: one wire per open claim, rules as gate cards on the bus. Presentation only. */
+const W = 1200, H = 520, BUS_Y = 150, X0 = 40, GX0 = 230, GX1 = 990, TERM_X = 1070, R = 14, PITCH = 2.5;
+const RAIL: Record<Rec, number> = { routine_processing: BUS_Y, human_review: 330, request_information: 410 };
+const CARD_H = 52, ROW = 34;
+const cy = (i: number) => BUS_Y + (i % 2 ? ROW : -ROW);
 
-/* ---------- geometry ---------- */
-interface Path { pts: Pt[]; cum: number[]; len: number; turn: number }
-function mk(pts: Pt[], turnIdx: number): Path {
-  const cum = [0];
-  for (let i = 1; i < pts.length; i++) { const a = pts[i - 1]!, b = pts[i]!; cum.push(cum[i - 1]! + Math.hypot(b[0] - a[0], b[1] - a[1])); }
-  return { pts, cum, len: cum[cum.length - 1]! || 1, turn: cum[turnIdx] ?? 0 };
-}
-function quad(a: Pt, c: Pt, b: Pt, n = 14): Pt[] {
-  const out: Pt[] = [];
-  for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t; out.push([u * u * a[0] + 2 * u * t * c[0] + t * t * b[0], u * u * a[1] + 2 * u * t * c[1] + t * t * b[1]]); }
-  return out;
-}
-function at(p: Path, f: number) {
-  const d = f * p.len; let i = 1;
-  while (i < p.pts.length - 1 && p.cum[i]! < d) i++;
-  const a = p.pts[i - 1]!, b = p.pts[i] ?? a, c0 = p.cum[i - 1]!, seg = (p.cum[i]! - c0) || 1, k = Math.min(1, Math.max(0, (d - c0) / seg));
-  return { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, a: Math.atan2(b[1] - a[1], b[0] - a[0]), i };
-}
-const toD = (pts: Pt[]) => pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join("");
 function bezier(x1: number, y1: number, x2: number, y2: number) {
   const cx = (t: number, a: number, b: number) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
   return (x: number) => { let lo = 0, hi = 1; for (let i = 0; i < 22; i++) { const m = (lo + hi) / 2; if (cx(m, x1, x2) < x) lo = m; else hi = m; } return cx((lo + hi) / 2, y1, y2); };
 }
 const ease = bezier(...(PADDLE as unknown as [number, number, number, number]));
-function rng(seed: number) { return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-function strokes(seed: number, x0: number, x1: number, y0: number, y1: number, n: number) {
-  const r = rng(seed); const out: { d: string; o: number; w: number }[] = [];
-  for (let i = 0; i < n; i++) {
-    const y = y0 + r() * (y1 - y0), a = x0 + r() * (x1 - x0) * 0.8, len = 30 + r() * 140, b = Math.min(x1, a + len), amp = 1 + r() * 2.5;
-    out.push({ d: `M${a.toFixed(1)} ${y.toFixed(1)} Q${((a + b) / 2).toFixed(1)} ${(y - amp).toFixed(1)} ${b.toFixed(1)} ${(y + r() * 1.5).toFixed(1)}`, o: 0.12 + r() * 0.3, w: 0.5 + r() * 0.8 });
-  }
-  return out;
-}
+const strip = (id: string) => id.replace(/^v\d+:/, "");
+const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
-/* ---------- routing ---------- */
-interface Dest { basin: BasinKey; gate: number | null }
-function destOf(rule: string, to: Rec, draft: Draft): Dest {
-  const id = rule.replace(/^v\d+:/, "");
-  const gi = draft.rules.findIndex((r) => r.id === id);
-  if (to === "routine_processing") return { basin: "open", gate: null };
-  const basin: BasinKey = to === "human_review" ? "review" : "info";
-  if (gi >= 0) return { basin, gate: gi };
-  const fb = draft.rules.findIndex((r) => r.outcome === to);
-  return { basin, gate: fb >= 0 ? fb : 0 };
-}
-const sameDest = (a: Dest, b: Dest) => a.basin === b.basin && a.gate === b.gate;
-function route(start: Pt[], lane: number, dest: Dest, slot: Pt, gx: (i: number) => number): Path {
-  const pts = [...start];
-  if (dest.gate != null && dest.basin !== "open") {
-    const x = gx(dest.gate); pts.push([x, lane]); const turn = pts.length - 1;
-    const b = BASINS[dest.basin]; const nx = Math.min(b.x1 - 20, Math.max(b.x0 + 20, x));
-    pts.push(...quad([x, lane], [x + 14, RB + 50], [nx, b.y0], 18), ...quad([nx, b.y0], [nx, slot[1]], slot, 8));
-    return mk(pts, turn);
-  }
-  pts.push([X1, lane]); const turn = pts.length - 1;
-  pts.push(...quad([X1, lane], [slot[0] - 20, lane], slot, 10));
-  return mk(pts, turn);
-}
-const harbourPt = (i: number): Pt => [32 + (i % 4) * 26, 118 + Math.floor(i / 4) * 10.5];
-const laneOf = (i: number) => 142 + ((i % 5) - 2) * 9;
-const startPts = (i: number): Pt[] => { const h = harbourPt(i), l = laneOf(i); return [h, ...quad(h, [h[0] + 40, l], [X0, l], 10)]; };
-
-interface Canoe { id: string; idx: number; row: PreviewRow; path: Path; ghost: Path; start: number; dur: number; dest: Dest; slot: number }
+interface Gate { rule: Rule; old: Rule | null; isNew: boolean; removed: boolean }
+interface Exit { gate: number | null; to: Rec }
+interface Wire { row: PreviewRow; bus: number; d: { v1: string; v2: string }; exit: { v1: Exit; v2: Exit }; arriveX: { v1: number; v2: number } }
 
 export interface LocksSceneProps {
   draft: Draft; live: Draft; preview: Preview | null; stale: boolean; runId: number; skipToken: number; glide: number;
   showGhosts: boolean; highlight: string | null; liveLimit: number | null; escalations: number; onLimit: (v: number) => void;
+  view?: "v1" | "v2";
 }
 
 export function LocksScene(p: LocksSceneProps) {
   const reduce = !!useReducedMotion();
   const navigate = useNavigate();
-  const rules = p.draft.rules;
-  const gx = (i: number) => (rules.length <= 1 ? 600 : 210 + (i * 780) / (rules.length - 1));
-  const canoes = useRef(new Map<string, Canoe>());
-  const slots = useRef<Record<BasinKey, (string | null)[]>>({ review: [], info: [], open: [] });
-  const lastRun = useRef(0);
-  const [, setTick] = useState(0);
-  const raf = useRef(0);
-  const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
-  const [dam, setDam] = useState(false);
-  const liveIds = useMemo(() => new Set(p.live.rules.map((r) => r.id)), [p.live]);
-  const waterStrokes = useMemo(() => strokes(7, X0 - 30, X1 + 60, RT + 3, RB - 3, 90), []);
-  const bankStrokes = useMemo(() => [...strokes(11, 0, W, RT - 4, RT + 2, 30), ...strokes(13, 0, W, RB - 2, RB + 4, 30)], []);
+  const view = p.view ?? "v2";
 
-  const alloc = (b: BasinKey, id: string) => { const s = slots.current[b]; let k = s.indexOf(null); if (k < 0) k = s.length; s[k] = id; return k; };
-  const free = (b: BasinKey, k: number) => { slots.current[b][k] = null; };
+  // Gate list: draft order, removed live rules kept at their old position.
+  const gates = useMemo<Gate[]>(() => {
+    const liveById = new Map(p.live.rules.map((r) => [r.id, r]));
+    const ids = new Set(p.draft.rules.map((r) => r.id));
+    const out: Gate[] = p.draft.rules.map((r) => ({ rule: r, old: liveById.get(r.id) ?? null, isNew: !liveById.has(r.id), removed: false }));
+    p.live.rules.forEach((r, i) => { if (!ids.has(r.id)) out.splice(Math.min(i, out.length), 0, { rule: r, old: r, isNew: false, removed: true }); });
+    return out;
+  }, [p.draft, p.live]);
+  const n = gates.length;
+  const spacing = n <= 1 ? 0 : (GX1 - GX0) / (n - 1);
+  const cardW = Math.min(124, n <= 2 ? 124 : 2 * spacing - 12);
+  const gx = (i: number) => (n <= 1 ? (GX0 + GX1) / 2 : GX0 + i * spacing);
 
-  const kick = () => {
-    cancelAnimationFrame(raf.current);
-    const loop = () => {
-      setTick((t) => t + 1);
-      const end = Math.max(0, ...[...canoes.current.values()].map((c) => c.start + c.dur)) + 1000;
-      if (performance.now() < end) raf.current = requestAnimationFrame(loop);
-    };
-    raf.current = requestAnimationFrame(loop);
+  const exitOf = (ruleId: string, to: Rec): Exit => {
+    if (to === "routine_processing") return { gate: null, to };
+    const id = strip(ruleId);
+    let gi = gates.findIndex((g) => g.rule.id === id);
+    if (gi < 0) gi = gates.findIndex((g) => g.rule.outcome === to && !g.removed);
+    return { gate: gi >= 0 ? gi : 0, to };
   };
-  useEffect(() => () => cancelAnimationFrame(raf.current), []);
 
-  // Build or reroute canoes when a run starts or the preview changes.
+  const open = useMemo(() => p.preview?.rows.filter((r) => !r.retained) ?? [], [p.preview]);
+  const closed = p.preview?.rows.filter((r) => r.retained) ?? [];
+
+  const wires = useMemo<Wire[]>(() => {
+    const ex = open.map((row) => ({ row, v1: exitOf(row.rule_from, row.from), v2: exitOf(row.rule_to, row.to) }));
+    // Stable bus order (v1 exit): earlier exits sit lower on the bus so drops don't cross.
+    const rank = (e: Exit) => (e.gate == null ? -1 : e.gate);
+    const order = [...ex].sort((a, b) => rank(a.v1) - rank(b.v1) || a.row.case_id.localeCompare(b.row.case_id));
+    const m = order.length, top = BUS_Y - ((m - 1) * PITCH) / 2;
+    const busIdx = new Map(order.map((e, i) => [e.row.case_id, i]));
+    const build = (key: "v1" | "v2") => {
+      const res = new Map<string, { d: string; ax: number }>();
+      const groups = new Map<string, typeof ex>();
+      ex.forEach((e) => { const g = `${e[key].gate}|${e[key].to}`; groups.set(g, [...(groups.get(g) ?? []), e]); });
+      const railMembers: Record<string, typeof ex> = { human_review: [], request_information: [] };
+      ex.forEach((e) => { if (e[key].to !== "routine_processing") railMembers[e[key].to]!.push(e); });
+      const railY = new Map<string, number>();
+      Object.entries(railMembers).forEach(([to, list]) => {
+        const s = [...list].sort((a, b) => (b[key].gate! - a[key].gate!) || busIdx.get(a.row.case_id)! - busIdx.get(b.row.case_id)!);
+        const base = RAIL[to as Rec] - ((s.length - 1) * PITCH) / 2;
+        s.forEach((e, k) => railY.set(e.row.case_id, base + k * PITCH));
+      });
+      ex.forEach((e) => {
+        const y = top + busIdx.get(e.row.case_id)! * PITCH, x = e[key];
+        if (x.gate == null) {
+          res.set(e.row.case_id, { d: `M${X0} ${y} L${TERM_X - 40} ${y} Q${TERM_X - 26} ${y} ${TERM_X - 26} ${y} L${TERM_X - 26} ${y} Q${TERM_X - 26} ${y} ${TERM_X - 12} ${y} L${TERM_X} ${y}`, ax: TERM_X });
+          return;
+        }
+        const grp = groups.get(`${x.gate}|${x.to}`)!.sort((a, b) => busIdx.get(a.row.case_id)! - busIdx.get(b.row.case_id)!);
+        const k = grp.indexOf(e), dx = gx(x.gate) + (k - (grp.length - 1) / 2) * PITCH, ry = railY.get(e.row.case_id)!;
+        res.set(e.row.case_id, { d: `M${X0} ${y} L${dx - R} ${y} Q${dx} ${y} ${dx} ${y + R} L${dx} ${ry - R} Q${dx} ${ry} ${dx + R} ${ry} L${TERM_X} ${ry}`, ax: gx(x.gate) });
+      });
+      return res;
+    };
+    const a = build("v1"), b = build("v2");
+    return ex.map((e) => ({ row: e.row, bus: busIdx.get(e.row.case_id)!, exit: { v1: e.v1, v2: e.v2 },
+      d: { v1: a.get(e.row.case_id)!.d, v2: b.get(e.row.case_id)!.d }, arriveX: { v1: a.get(e.row.case_id)!.ax, v2: b.get(e.row.case_id)!.ax } }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, gates, cardW]);
+
+  /* ---------- timeline ---------- */
+  const [t, setT] = useState(99);
+  const raf = useRef(0);
   useEffect(() => {
     if (!p.preview || p.runId === 0) return;
-    const now = performance.now();
-    const open = p.preview.rows.filter((r) => !r.retained);
-    if (p.runId !== lastRun.current) {
-      lastRun.current = p.runId;
-      canoes.current.clear(); slots.current = { review: [], info: [], open: [] };
-      open.forEach((row, i) => {
-        const dest = destOf(row.rule_to, row.to, p.draft); const slot = alloc(dest.basin, row.case_id);
-        const gd = destOf(row.rule_from, row.from, p.draft);
-        canoes.current.set(row.case_id, {
-          id: row.case_id, idx: i, row, dest, slot,
-          path: route(startPts(i), laneOf(i), dest, slotPt(dest.basin, slot), gx),
-          ghost: route(startPts(i), laneOf(i), gd, slotPt(gd.basin, 0), gx),
-          start: reduce ? -1e9 : now + 650 + i * 40, dur: 2600,
-        });
-      });
-    } else {
-      open.forEach((row, i) => {
-        const c = canoes.current.get(row.case_id); const dest = destOf(row.rule_to, row.to, p.draft);
-        if (!c) return;
-        c.row = row;
-        if (sameDest(c.dest, dest)) return;
-        const from = slotPt(c.dest.basin, c.slot); const backX = c.dest.gate != null && c.dest.basin !== "open" ? gx(c.dest.gate) : X1;
-        free(c.dest.basin, c.slot); const slot = alloc(dest.basin, row.case_id); const l = laneOf(i);
-        c.path = route([from, ...quad(from, [from[0], l + 20], [backX, l], 10)], l, dest, slotPt(dest.basin, slot), gx);
-        c.dest = dest; c.slot = slot; c.start = reduce ? -1e9 : now; c.dur = 1500;
-      });
-    }
-    kick();
+    cancelAnimationFrame(raf.current);
+    if (reduce) { setT(99); return; }
+    const t0 = performance.now();
+    const loop = () => { const s = (performance.now() - t0) / 1000; setT(s); if (s < 4) raf.current = requestAnimationFrame(loop); };
+    setT(0); raf.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [p.preview, p.runId]);
+  }, [p.runId]);
+  useEffect(() => { if (p.skipToken) { cancelAnimationFrame(raf.current); setT(99); } }, [p.skipToken]);
+  const ran = !!p.preview && p.runId > 0;
+  const dropT = ran ? clamp(t / 0.6) : 0;
+  const scanP = ran ? ease(clamp((t - 0.6) / 2.4)) : 0;
+  const scanX = X0 + scanP * (TERM_X + 20 - X0);
+  const done = ran && t >= 3;
 
-  useEffect(() => { if (p.skipToken) { canoes.current.forEach((c) => { c.start = -1e9; }); kick(); } }, [p.skipToken]); // eslint-disable-line react-hooks/exhaustive-deps
+  /* ---------- counts ---------- */
+  const catches = (gi: number, key: "v1" | "v2") => wires.filter((w) => w.exit[key].gate === gi && w.exit[key].to !== "routine_processing");
+  const totals = (key: "v1" | "v2") => { const c: Record<Rec, number> = { routine_processing: 0, human_review: 0, request_information: 0 }; wires.forEach((w) => c[w.exit[key].to]++); return c; };
+  const tot = totals(view), tot1 = totals("v1");
+  const arrived = (to: Rec) => wires.filter((w) => w.exit[view].to === to && w.arriveX[view] <= scanX).length;
 
-  const now = performance.now();
-  const list = [...canoes.current.values()];
-  const docked: Record<BasinKey, number> = { review: 0, info: 0, open: 0 };
-  const closed = p.preview?.rows.filter((r) => r.retained) ?? [];
-  const limit = quoteLimitOf(rules);
-  const qi = rules.findIndex((r) => r.id === "R1.quote_over_limit");
+  /* ---------- highlight ---------- */
+  const [hoverGate, setHoverGate] = useState<number | null>(null);
+  const [hoverWire, setHoverWire] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [term, setTerm] = useState<Rec | null>(null);
+  const [dam, setDam] = useState(false);
+  useEffect(() => { setTerm(null); }, [p.highlight]);
+  const active: Set<string> | null = hoverWire ? new Set([hoverWire.id])
+    : hoverGate != null ? new Set(catches(hoverGate, view).map((w) => w.row.case_id))
+    : term ? new Set(wires.filter((w) => w.exit[view].to === term).map((w) => w.row.case_id))
+    : p.highlight ? new Set(wires.filter((w) => w.row.changed && `${w.row.from} -> ${w.row.to}` === p.highlight).map((w) => w.row.case_id))
+    : null;
+
+  const limit = quoteLimitOf(p.draft.rules);
+  const qi = gates.findIndex((g) => g.rule.id === "R1.quote_over_limit" && !g.removed);
+  const toSvgPct = (x: number, y: number) => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` });
 
   return (
     <div className="relative">
       <div className={p.stale ? "opacity-40 grayscale transition-opacity duration-300" : "transition-opacity duration-300"}>
-        <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full select-none" role="img" aria-label="Simulation: claims sail through the rule gates">
+        <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full select-none" role="img" aria-label="Wiring diagram: each claim is a wire that exits at the rule that catches it">
           <defs>
-            <clipPath id="river"><path d={`M${X0 - 40} ${RT} L${X1 + 10} ${RT} Q${X1 + 60} ${RT - 20} ${W} ${RT - 20} L${W} 240 Q${X1 + 60} 230 ${X1 + 10} ${RB} L${X0 - 40} ${RB} Z`} /></clipPath>
+            <pattern id="grid" width={24} height={24} patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" className="stroke-stone" strokeOpacity={0.06} strokeWidth={1} /></pattern>
+            <clipPath id="scan"><rect x={0} y={0} width={done ? W : scanX} height={H} /></clipPath>
           </defs>
-          {/* harbour + river + open water */}
-          <g clipPath="url(#river)"><image href={waterUrl} x={0} y={60} width={W} height={220} preserveAspectRatio="xMidYMid slice" opacity={0.35} style={{ mixBlendMode: "multiply" }} /></g>
-          <g className="text-stone" stroke="currentColor" fill="none" strokeLinecap="round">
-            {bankStrokes.map((s, i) => <path key={i} d={s.d} strokeOpacity={s.o + 0.15} strokeWidth={s.w} />)}
-            {waterStrokes.map((s, i) => <path key={`w${i}`} d={s.d} strokeOpacity={s.o * 0.8} strokeWidth={s.w} />)}
-            <path d={`M10 98 Q70 92 130 100 L134 186 Q70 192 12 186 Z`} strokeOpacity={0.5} strokeDasharray="2 3" />
-            <path d={`M10 296 Q80 288 160 298 L162 386 Q80 392 12 384 Z`} strokeOpacity={0.45} strokeDasharray="2 3" />
-            {(["review", "info"] as const).map((b) => { const s = BASINS[b]; return <path key={b} d={`M${s.x0} ${s.y0} Q${(s.x0 + s.x1) / 2} ${s.y0 - 8} ${s.x1} ${s.y0} Q${s.x1 + 10} 350 ${s.x1 - 10} 385 Q${(s.x0 + s.x1) / 2} 394 ${s.x0 + 10} 385 Q${s.x0 - 10} 350 ${s.x0} ${s.y0} Z`} strokeOpacity={0.55} />; })}
-            {rules.map((r, i) => { const b = BASINS[r.outcome === "human_review" ? "review" : "info"]; const x = gx(i); const nx = Math.min(b.x1 - 20, Math.max(b.x0 + 20, x));
-              return <g key={`ch${r.id}`} strokeOpacity={0.35}><path d={`M${x - 5} ${RB} Q${x + 9} ${RB + 50} ${nx - 6} ${b.y0}`} /><path d={`M${x + 5} ${RB} Q${x + 19} ${RB + 50} ${nx + 6} ${b.y0}`} /></g>; })}
+          <rect width={W} height={H} className="fill-paper" />
+          <rect width={W} height={H} fill="url(#grid)" />
+
+          {/* rails */}
+          <g className="font-mono" fontSize={10} letterSpacing="0.08em">
+            <text x={X0 - 20} y={BUS_Y - 40} className="fill-ink">{ran ? `${wires.length} open claims` : "open claims"}</text>
+            <line x1={X0} x2={TERM_X} y1={BUS_Y} y2={BUS_Y} className="stroke-stone" strokeOpacity={0.25} strokeDasharray="2 4" />
+            <line x1={GX0} x2={TERM_X} y1={RAIL.human_review} y2={RAIL.human_review} className="stroke-ink" strokeOpacity={0.18} strokeDasharray="2 4" />
+            <line x1={GX0} x2={TERM_X} y1={RAIL.request_information} y2={RAIL.request_information} className="stroke-ochre" strokeOpacity={0.3} strokeDasharray="2 4" />
+            <text x={GX0 - 8} y={RAIL.human_review + 3} textAnchor="end" className="fill-stone">REVIEW RAIL</text>
+            <text x={GX0 - 8} y={RAIL.request_information + 3} textAnchor="end" className="fill-stone">INFO RAIL</text>
           </g>
-          <g className="font-mono" fill="currentColor">
-            <text x={14} y={90} className="text-stone" fontSize={9} letterSpacing="0.12em">NEW CLAIMS</text>
-            <text x={1066} y={96} className="text-stone" fontSize={9} letterSpacing="0.12em">OPEN WATER</text>
-            <text x={18} y={290} className="text-stone" fontSize={9} letterSpacing="0.12em">HARBOUR · CLOSED</text>
+
+          {/* ghosts */}
+          {p.showGhosts && done && view === "v2" && wires.filter((w) => w.row.changed).map((w) => (
+            <motion.path key={`g${w.row.case_id}`} d={w.d.v1} fill="none" className="stroke-cedar" strokeWidth={1.2} strokeDasharray="3 4"
+              initial={{ opacity: 0 }} animate={{ opacity: active && !active.has(w.row.case_id) ? 0.05 : 0.3 }} transition={{ duration: 0.5 }} />
+          ))}
+
+          {/* wires */}
+          <g clipPath="url(#scan)">
+            {wires.map((w) => {
+              const dim = active && !active.has(w.row.case_id);
+              const on = active?.has(w.row.case_id);
+              return (
+                <g key={w.row.case_id}>
+                  {w.row.changed && done && !reduce && (
+                    <motion.path d={w.d[view]} fill="none" className="stroke-cedar" strokeWidth={5} initial={{ opacity: 0 }} animate={{ opacity: [0, 0.35, 0] }} transition={{ duration: 1.1, ease: PADDLE }} style={{ filter: "blur(2px)" }} />
+                  )}
+                  <motion.path initial={false} animate={{ d: w.d[view] }} transition={{ duration: reduce ? 0 : 0.8, ease: PADDLE }}
+                    fill="none" className={w.row.changed ? "stroke-cedar" : "stroke-ink"} strokeWidth={on ? 2.2 : w.row.changed ? 1.6 : 1}
+                    strokeOpacity={dim ? 0.15 : w.row.changed || on ? 1 : 0.45} strokeLinecap="round" />
+                  <motion.path initial={false} animate={{ d: w.d[view] }} transition={{ duration: reduce ? 0 : 0.8, ease: PADDLE }}
+                    fill="none" stroke="transparent" strokeWidth={4} style={{ cursor: "pointer" }}
+                    onMouseMove={(e) => { const r = (e.currentTarget.ownerSVGElement as SVGSVGElement).getBoundingClientRect(); setHoverWire({ id: w.row.case_id, x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * H }); }}
+                    onMouseLeave={() => setHoverWire(null)}
+                    onClick={() => navigate({ to: "/review/$caseId", params: { caseId: w.row.case_id } })} />
+                </g>
+              );
+            })}
           </g>
+          {ran && !done && <line x1={scanX} x2={scanX} y1={60} y2={440} className="stroke-cedar" strokeOpacity={0.5} strokeWidth={1} />}
 
           {/* gates */}
-          {rules.map((r, i) => {
-            const x = gx(i), isNew = !liveIds.has(r.id), info = r.outcome === "request_information";
-            const liveRule = p.live.rules.find((l) => l.id === r.id);
-            const oldQ = liveRule?.when[0]?.value, newQ = r.when[0]?.value;
-            const plaque = r.id === "R1.quote_over_limit" && typeof oldQ === "number" && typeof newQ === "number" && oldQ !== newQ ? `${euro(oldQ)} → ${euro(newQ)}` : null;
-            const ly = i % 2 ? 58 : 82;
+          {gates.map((g, i) => {
+            const x = gx(i), Y = cy(i), info = g.rule.outcome === "request_information";
+            const c2 = catches(i, "v2").length, c1 = catches(i, "v1").length;
+            const lift = g.isNew ? (1 - ease(dropT)) * -78 : 0;
+            const oldQ = g.old?.when.find((c) => c.field === "quote_eur")?.value, newQ = g.rule.when.find((c) => c.field === "quote_eur")?.value;
+            const flip = ease(dropT);
+            const oldLabel = g.old ? gateLabel(g.old, {}) : null, newLabel = gateLabel(g.rule, {});
+            const changedVal = !g.isNew && !g.removed && oldLabel !== newLabel;
+            const counter = !ran ? "" : g.removed ? `catches ${c1} (removed)` : g.isNew ? `catches ${c2} (new)` : c1 !== c2 ? `catches ${c1} → ${c2}` : `catches ${view === "v1" ? c1 : c2}`;
+            const tone = g.removed ? "text-stone" : info ? "text-ochre" : "text-ink";
             return (
-              <motion.g key={`${p.runId}-${r.id}`} initial={isNew && !reduce && p.runId ? { y: -90, opacity: 0 } : false} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, ease: PADDLE }}
-                className={info ? "text-ochre" : "text-ink"} onClick={r.id === "R1.quote_over_limit" ? () => setDam((d) => !d) : undefined}
-                style={{ cursor: r.id === "R1.quote_over_limit" ? "pointer" : undefined }}>
-                <line x1={x} x2={x} y1={ly + 6} y2={RT - 6} stroke="currentColor" strokeOpacity={0.25} strokeDasharray="1 2" />
-                <line x1={x - 3} x2={x - 3} y1={RT - 8} y2={RB + 6} stroke="currentColor" strokeWidth={1.6} />
-                <line x1={x + 3} x2={x + 3} y1={RT - 8} y2={RB + 6} stroke="currentColor" strokeWidth={1.6} />
-                {[0, 1, 2, 3, 4].map((k) => <line key={k} x1={x - 3} x2={x + 3} y1={RT + 4 + k * 12} y2={RT + 10 + k * 12} stroke="currentColor" strokeWidth={0.7} strokeOpacity={0.6} />)}
-                <text x={x} y={ly - 10} textAnchor="middle" fontSize={10} fill="currentColor" className="font-mono" letterSpacing="0.04em">{gateLabel(r, {})}</text>
-                <text x={x} y={ly} textAnchor="middle" fontSize={7.5} className="fill-stone font-mono">{r.id}</text>
-                {isNew && <g className="text-cedar"><text x={x} y={ly - 22} textAnchor="middle" fontSize={8.5} fill="currentColor" className="font-mono" textDecoration="underline">new</text></g>}
-                {plaque && <g><rect x={x - 46} y={RB + 10} width={92} height={14} rx={2} className="fill-paper stroke-cedar" strokeWidth={0.8} /><text x={x} y={RB + 20} textAnchor="middle" fontSize={8.5} className="fill-cedar font-mono">{plaque}</text></g>}
-                {r.id === "R1.quote_over_limit" && <rect x={x - 40} y={ly - 20} width={80} height={RB - ly + 26} fill="transparent" role="button" aria-label="Open the dam" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setDam((d) => !d); }} />}
-              </motion.g>
-            );
-          })}
-
-          {/* ghosts + trails */}
-          {list.map((c) => {
-            if (!c.row.changed) return null;
-            const raw = Math.min(1, Math.max(0, (now - c.start) / c.dur)); const f = ease(raw); const pos = at(c.path, f);
-            const dim = p.highlight && `${c.row.from} -> ${c.row.to}` !== p.highlight;
-            return (
-              <g key={`t${c.id}`} opacity={dim ? 0.15 : 1}>
-                {p.showGhosts && <path d={toD(c.ghost.pts)} fill="none" className="stroke-stone" strokeOpacity={0.75} strokeDasharray="3 4" strokeWidth={1} />}
-                {raw > 0 && <path d={toD(([...c.path.pts.slice(0, pos.i), [pos.x, pos.y]] as Pt[]).filter((q) => q[1] < 298))} fill="none" className="stroke-cedar" strokeWidth={1.3} strokeOpacity={0.85} />}
+              <g key={g.rule.id} onMouseEnter={() => setHoverGate(i)} onMouseLeave={() => setHoverGate(null)}
+                onClick={i === qi ? () => setDam((d) => !d) : undefined} style={{ cursor: i === qi ? "pointer" : "default" }}>
+                {g.isNew && lift < -1 && <rect x={x - cardW / 2} y={Y - CARD_H / 2} width={cardW} height={CARD_H} rx={4} fill="none" className="stroke-cedar" strokeOpacity={0.4} strokeDasharray="1 3" />}
+                <g transform={`translate(0 ${lift})`} className={tone}>
+                  <rect x={x - cardW / 2} y={Y - CARD_H / 2} width={cardW} height={CARD_H} rx={4} className={cn2(g)} strokeWidth={1} strokeDasharray={g.isNew ? "4 3" : undefined} />
+                  <text x={x - cardW / 2 + 8} y={Y - 10} fontSize={9.5} className="font-mono" fill="currentColor" textDecoration={g.removed ? "line-through" : undefined}>{fit(g.rule.id, Math.floor((cardW - (g.isNew || g.removed ? 50 : 16)) / 5.8))}</text>
+                  {changedVal && typeof oldQ === "number" && typeof newQ === "number" ? (
+                    <text x={x - cardW / 2 + 8} y={Y + 6} fontSize={10.5} fill="currentColor">Quote &gt; <tspan className="fill-stone" textDecoration="line-through">{euro(oldQ)}</tspan> <tspan className="fill-cedar" opacity={ran ? flip : 0.35}>{euro(newQ)}</tspan></text>
+                  ) : changedVal ? (
+                    <text x={x - cardW / 2 + 8} y={Y + 6} fontSize={10.5} fill="currentColor"><tspan className="fill-stone" textDecoration="line-through">{oldLabel}</tspan> <tspan className="fill-cedar">{newLabel}</tspan></text>
+                  ) : (
+                    <text x={x - cardW / 2 + 8} y={Y + 6} fontSize={13} fill="currentColor" textDecoration={g.removed ? "line-through" : undefined}>{newLabel}</text>
+                  )}
+                  <text x={x - cardW / 2 + 8} y={Y + 20} fontSize={9.5} className="fill-stone font-mono">{counter}</text>
+                  {g.isNew && <text x={x + cardW / 2 - 6} y={Y - 10} textAnchor="end" fontSize={9} className="fill-cedar font-mono" textDecoration="underline">new</text>}
+                  {g.removed && <text x={x + cardW / 2 - 6} y={Y - 10} textAnchor="end" fontSize={9} className="fill-stone font-mono" textDecoration="underline">removed</text>}
+                </g>
               </g>
             );
           })}
 
-          {/* canoes */}
-          <motion.g animate={{ x: p.glide ? 10 : 0 }} transition={{ duration: 1.2, ease: PADDLE }}>
-            {list.map((c) => {
-              const raw = Math.min(1, Math.max(0, (now - c.start) / c.dur)); const f = ease(raw); const pos = at(c.path, f);
-              if (raw >= 1) docked[c.dest.basin]++;
-              const tf = c.path.turn / c.path.len, wake = f > tf && f < tf + 0.12 ? (f - tf) / 0.12 : null;
-              const dockAge = raw >= 1 ? now - (c.start + c.dur) : -1;
-              const ang = raw >= 1 || raw === 0 ? 0 : Math.max(-0.7, Math.min(0.7, pos.a)) * (180 / Math.PI);
-              const dim = p.highlight && !(c.row.changed && `${c.row.from} -> ${c.row.to}` === p.highlight);
-              return (
-                <g key={c.id} opacity={dim ? 0.2 : 1}>
-                  {wake != null && <path d={`M${pos.x - 10} ${pos.y + 4} q5 ${3 + wake * 4} 10 0 M${pos.x - 2} ${pos.y + 6} q6 ${2 + wake * 5} 12 0`} fill="none" className="stroke-stone" strokeOpacity={0.6 * (1 - wake)} strokeWidth={0.8} />}
-                  {c.row.changed && dockAge >= 0 && dockAge < 900 && <circle cx={pos.x} cy={pos.y} r={4 + (dockAge / 900) * 16} fill="none" className="stroke-cedar" strokeOpacity={1 - dockAge / 900} />}
-                  <g transform={`translate(${pos.x} ${pos.y}) rotate(${ang})`} style={{ cursor: "pointer" }}
-                    onMouseEnter={() => setHover({ id: c.id, x: pos.x, y: pos.y })} onMouseLeave={() => setHover(null)}
-                    onClick={() => navigate({ to: "/review/$caseId", params: { caseId: c.id } })}>
-                    <rect x={-15} y={-7} width={30} height={14} fill="transparent" />
-                    <path d="M-13 -1 Q0 7 13 -1 Q0 2.2 -13 -1 Z" className={c.row.changed ? "fill-paper stroke-cedar" : "fill-paper stroke-ink"} strokeWidth={c.row.changed ? 1.4 : 1} strokeLinejoin="round" />
-                    <path d="M-9 0.6 Q0 4 9 0.6" fill="none" className="stroke-stone" strokeWidth={0.5} />
-                  </g>
-                </g>
-              );
-            })}
-          </motion.g>
+          {/* terminals */}
+          {(["routine_processing", "human_review", "request_information"] as Rec[]).map((rec) => {
+            const y = RAIL[rec], count = done || !ran ? tot[rec] : arrived(rec), delta = tot[rec] - tot1[rec];
+            const label = rec === "routine_processing" ? "ROUTINE" : rec === "human_review" ? "REVIEW" : "INFO NEEDED";
+            const cls = rec === "routine_processing" ? "fill-reed" : rec === "human_review" ? "fill-ink" : "fill-ochre";
+            return (
+              <g key={rec} style={{ cursor: "pointer" }} onClick={() => setTerm((t0) => (t0 === rec ? null : rec))} role="button" aria-label={`Highlight ${label}`}>
+                <rect x={TERM_X} y={y - 22} width={W - TERM_X - 6} height={44} fill="transparent" />
+                <line x1={TERM_X} x2={TERM_X} y1={y - 14} y2={y + 14} className="stroke-ink" strokeWidth={2} />
+                <text x={TERM_X + 10} y={y - 6} fontSize={10} letterSpacing="0.08em" className={`font-mono ${cls}`} textDecoration={term === rec ? "underline" : undefined}>{label}</text>
+                <text x={TERM_X + 10} y={y + 16} fontSize={24} fontWeight={600} className="font-display fill-ink">{ran ? count : "—"}</text>
+                {ran && view === "v2" && <text x={TERM_X + 52} y={y + 14} fontSize={11} className={`font-mono ${delta ? "fill-cedar" : "fill-stone"}`}>{delta > 0 ? `+${delta}` : delta < 0 ? `−${-delta}` : "±0"}</text>}
+              </g>
+            );
+          })}
 
-          {/* closed, moored */}
-          {closed.map((r, i) => { const x = 36 + i * 50, y = 340; return (
-            <g key={r.case_id} transform={`translate(${x} ${y})`} style={{ cursor: "pointer" }} onMouseEnter={() => setHover({ id: r.case_id, x, y })} onMouseLeave={() => setHover(null)}
-              onClick={() => navigate({ to: "/review/$caseId", params: { caseId: r.case_id } })}>
-              <path d="M-13 -1 Q0 7 13 -1 Q0 2.2 -13 -1 Z" className="fill-paper stroke-stone" strokeWidth={1} />
-              <path d="M16 -6 L16 8 M12 -3 L20 -3 M11 5 Q16 11 21 5" fill="none" className="stroke-stone" strokeWidth={0.9} strokeLinecap="round" />
+          {/* closed strip */}
+          <line x1={0} x2={W} y1={458} y2={458} className="stroke-stone" strokeOpacity={0.2} />
+          {closed.map((r, i) => { const y = 478 + i * 8; return (
+            <g key={r.case_id} style={{ cursor: "pointer" }} onClick={() => navigate({ to: "/review/$caseId", params: { caseId: r.case_id } })}>
+              <line x1={X0} x2={X0 + 60} y1={y} y2={y} className="stroke-stone" strokeWidth={1} />
             </g>); })}
-          <text x={18} y={374} fontSize={9} className="fill-stone">Closed decisions stay as they are.</text>
-
-          {/* counters */}
-          <g className="font-mono" fontSize={10} letterSpacing="0.08em">
-            <text x={BASINS.review.x0 + 10} y={296} className="fill-ink">REVIEW <tspan className="font-display" fontSize={16}>{docked.review}</tspan></text>
-            <text x={BASINS.info.x0 + 10} y={296} className="fill-ochre">INFO NEEDED <tspan className="font-display" fontSize={16}>{docked.info}</tspan></text>
-            <text x={1066} y={232} className="fill-reed">ROUTINE <tspan className="font-display" fontSize={16}>{docked.open}</tspan></text>
-          </g>
+          {closed.length > 0 && (
+            <g className="stroke-stone" fill="none" strokeWidth={1}>
+              <rect x={X0 + 64} y={478} width={10} height={8} rx={1} />
+              <path d={`M${X0 + 66} 478 V474 a3 3 0 0 1 6 0 V478`} />
+              <text x={X0 + 84} y={486} fontSize={11} className="fill-stone stroke-none font-mono">{closed.map((r) => r.case_id).join(" · ")} — closed, not re-run, kept as decided.</text>
+            </g>
+          )}
+          <text x={W - 20} y={H - 14} textAnchor="end" fontSize={10} className="fill-stone font-mono">{ran ? `showing ${view}` : ""}</text>
         </svg>
-        {!p.preview && <p className="pointer-events-none absolute inset-x-0 top-[62%] text-center font-display text-xl text-stone">Change a rule, then simulate.</p>}
+        {!p.preview && <p className="pointer-events-none absolute inset-x-0 top-[50%] text-center font-display text-xl text-stone">Change a rule, then simulate.</p>}
       </div>
-      {p.stale && <p className="absolute inset-x-0 top-[62%] text-center font-display text-xl text-ink">You changed the draft. Simulate again.</p>}
+      {p.stale && <p className="absolute inset-x-0 top-[50%] text-center font-display text-xl text-ink">You changed the draft. Simulate again.</p>}
 
-      {hover && (() => {
-        const row = p.preview?.rows.find((r) => r.case_id === hover.id); if (!row) return null;
+      {hoverWire && (() => {
+        const w = wires.find((x) => x.row.case_id === hoverWire.id); if (!w) return null;
+        const rule = view === "v1" ? w.row.rule_from : w.row.rule_to;
         return (
-          <div className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border bg-paper px-2.5 py-1.5 font-mono text-[11px] shadow-sm" style={{ left: `${(hover.x / W) * 100}%`, top: `${((hover.y - 10) / H) * 100}%` }}>
-            <span className="text-ink">{row.case_id}</span> · <RecommendationLabel recommendation={row.from} /> → <RecommendationLabel recommendation={row.to} closed={row.retained} /> · <span className="text-stone">{row.rule_to}</span>
+          <div className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-lg border bg-paper px-2.5 py-1.5 font-mono text-[11px] shadow-sm" style={toSvgPct(hoverWire.x, hoverWire.y)}>
+            <span className="text-ink">{w.row.case_id}</span> · <RecommendationLabel recommendation={w.row.from} /> → <RecommendationLabel recommendation={w.row.to} /> · <span className="text-stone">{rule}</span>
+          </div>
+        );
+      })()}
+      {hoverGate != null && ran && !hoverWire && (() => {
+        const ids = catches(hoverGate, view).map((w) => w.row.case_id);
+        return (
+          <div className="pointer-events-none absolute z-10 max-w-64 -translate-x-1/2 rounded-lg border bg-paper px-2.5 py-1.5 font-mono text-[11px] shadow-sm" style={toSvgPct(gx(hoverGate), hoverGate % 2 ? cy(hoverGate) + CARD_H / 2 + 8 : cy(hoverGate) - CARD_H / 2 - 30)}>
+            {ids.length ? ids.join(" · ") : <span className="text-stone">catches none</span>}
           </div>
         );
       })()}
 
       {dam && qi >= 0 && limit != null && (
-        <div className="absolute z-20 w-72 -translate-x-1/2 rounded-xl border bg-paper p-4 shadow-md" style={{ left: `${Math.min(80, Math.max(20, (gx(qi) / W) * 100))}%`, top: "50%" }}>
-          <div className="flex items-baseline justify-between"><p className="eyebrow">The dam</p><button className="text-xs text-stone hover:text-ink" onClick={() => setDam(false)}>Close</button></div>
+        <div className="absolute z-20 w-72 -translate-x-1/2 rounded-xl border bg-paper p-4 shadow-md" style={toSvgPct(Math.min(W - 180, Math.max(180, gx(qi))), cy(qi) + CARD_H / 2 + 14)}>
+          <div className="flex items-baseline justify-between"><p className="eyebrow">Quote limit</p><button className="text-xs text-stone hover:text-ink" onClick={() => setDam(false)}>Close</button></div>
           <p className="mt-1 font-display text-2xl">Quote &gt; {euro(limit)}</p>
           {p.liveLimit != null && p.liveLimit !== limit && <p className="font-mono text-[11px] text-stone">live: {euro(p.liveLimit)}</p>}
           <input type="range" min={800} max={2000} step={100} value={limit} onChange={(e) => p.onLimit(Number(e.target.value))} className="mt-3 w-full accent-[var(--cedar)]" aria-label="Quote limit" />
           <div className="flex justify-between font-mono text-[10px] text-stone"><span>€800</span><span>€2,000</span></div>
-          <p className="mt-3 font-mono text-[11px] text-ink">Escalations: {p.escalations} · Review time ≈ {p.escalations} × 9 min = {p.escalations * 9} min</p>
+          <p className="mt-3 font-mono text-[11px] text-ink">Escalations {p.escalations} · review time ≈ {p.escalations} × 9 min = {p.escalations * 9} min</p>
           <p className="mt-1 text-xs text-stone">This edits the draft only.</p>
         </div>
       )}
     </div>
   );
 }
+
+function cn2(g: Gate) {
+  if (g.removed) return "fill-paper stroke-stone";
+  if (g.isNew) return "fill-paper stroke-cedar";
+  return "fill-paper stroke-current";
+}
+
+const fit = (s: string, n: number) => (s.length > n ? s.slice(0, Math.max(3, n - 1)) + "…" : s);

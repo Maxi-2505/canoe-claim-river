@@ -1,6 +1,6 @@
-import { PencilWaterBackground } from "./PencilWaterBackground";
+import { PapercutSea } from "./PapercutSea";
 
-/** Pencil lake with a canoe that rides the swell. Decorative only. */
+/** Papercut lake with a canoe riding between the layers. Decorative only. */
 export function PencilBackdrop() {
-  return <PencilWaterBackground />;
+  return <PapercutSea />;
 }
