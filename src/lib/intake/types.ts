@@ -10,6 +10,7 @@ export interface Question {
   vertical: string;
   section: string;
   label: string;
+  short?: string;
   help: string;
   type: QuestionType;
   options?: QuestionOption[];
