@@ -120,6 +120,21 @@ export function PencilWaterBackground() {
           ctx.drawImage(water, dx - 70, dy - 18, width + 140, height + 36); ctx.restore();
         }
         ctx.globalAlpha = 1;
+        // Construction lines appear first, before the detailed pencil marks.
+        if (intro < 0.4) {
+          ctx.strokeStyle = ink;
+          ctx.globalAlpha = 0.2 * (1 - ease((intro - 0.2) / 0.2));
+          ctx.lineWidth = 0.6;
+          for (let row = 0; row < 8; row++) {
+            ctx.beginPath();
+            for (let x = 0; x < width * clamp(intro / 0.1); x += 8) {
+              const y = height * (0.18 + row * 0.1) + Math.sin(x / (32 + row * 4) + row) * (2 + row);
+              if (!x) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
+        }
         if (intro < 0.95) sketch(ctx, waterLines, waveProgress, -20, 0, width + 40, height, ink);
         // Reflection is split into drifting strips, not a rigid mirrored copy.
         const waterline = by + bh * 0.86 + bob;
@@ -139,6 +154,23 @@ export function PencilWaterBackground() {
         ctx.drawImage(boat, -bw / 2, -bh * 0.86, bw, bh);
         ctx.globalAlpha = 1;
         if (intro < 0.58) sketch(ctx, boatLines, clamp((intro - 0.08) / 0.35), -bw / 2, -bh * 0.86, bw, bh, ink);
+        // Draw the contact shadow along this canoe's asymmetrical lower hull.
+        ctx.globalAlpha = reflection * 0.8;
+        ctx.strokeStyle = ink; ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(-bw * 0.37, -bh * 0.29);
+        ctx.bezierCurveTo(-bw * 0.18, -bh * 0.12, bw * 0.18, bh * 0.08, bw * 0.39, bh * 0.08);
+        ctx.quadraticCurveTo(bw * 0.45, bh * 0.03, bw * 0.455, -bh * 0.03);
+        ctx.stroke();
+        ctx.strokeStyle = paper; ctx.lineWidth = 1.3;
+        ctx.globalAlpha = reflection * 0.65;
+        ctx.beginPath();
+        for (let x = -bw * 0.3; x < bw * 0.44; x += 3) {
+          const u = (x + bw * 0.3) / (bw * 0.74);
+          const y = -bh * 0.18 + bh * 0.29 * Math.sin(u * Math.PI / 2) + Math.sin(x * 0.1 + time * 2) * 1.5;
+          if (x === -bw * 0.3) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
         ctx.restore();
         // Contact strokes and highlights overlap the lower hull at the waterline.
         ctx.globalAlpha = reflection;
