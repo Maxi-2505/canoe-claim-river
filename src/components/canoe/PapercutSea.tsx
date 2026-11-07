@@ -103,7 +103,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
         canoeRef.current.style.width = `${cw}px`;
         canoeRef.current.style.height = `${ch}px`;
         canoeRef.current.style.left = `${spot.x * w - cw / 2}px`;
-        canoeRef.current.style.top = `${spot.y * h - ch * 0.78}px`;
+        canoeRef.current.style.top = `${spot.y * h - ch * 0.9}px`;
         canoeRef.current.style.transform = `translate3d(0, ${bob + riseY}px, 0) rotate(${angle}deg) scaleY(${1 - roll})`;
       }
       if (shadowRef.current) {
