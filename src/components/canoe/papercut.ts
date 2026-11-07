@@ -8,7 +8,7 @@ export const SESSION_KEY = "canoe-papercut-entered";
 
 export type Spot = { x: number; y: number; scale: number };
 /** Resting spots as fractions of the scene: x = canoe centre, y = waterline. */
-export const positions: Spot[] = [{ x: 0.7, y: 0.6, scale: 1 }];
+export const positions: Spot[] = [{ x: 0.7, y: 0.72, scale: 1 }];
 
 /** Layer i (0 = back) — top edge as a fraction of scene height. */
 export const layerTop = (i: number) => 0.3 + (i / (layerCount - 1)) * 0.45;

@@ -15,12 +15,12 @@ function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) =
     <div ref={setRef} className="papercut-layer" style={{ top: `${layerTop(i) * 100}%`, zIndex: i < frontFrom ? i : 20 + i }}>
       <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
         <defs>
-          <pattern id={`pc-water-${i}`} patternUnits="userSpaceOnUse" width="1000" height="500" x={-i * 137} y={-i * 41}>
-            <image href={waterUrl} width="1000" height="500" preserveAspectRatio="xMidYMid slice" />
+          <pattern id={`pc-water-${i}`} patternUnits="userSpaceOnUse" width="1100" height="560" x={-i * 13} y={-i * 9}>
+            <image href={waterUrl} width="1100" height="560" preserveAspectRatio="xMidYMid slice" />
           </pattern>
         </defs>
         <path d={wavePath(i)} fill="var(--paper)" />
-        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={0.25 + depth * 0.6} style={{ filter: `contrast(${0.8 + depth * 0.6})` }} />
+        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={0.15 + depth * 0.5} style={{ filter: `contrast(${0.8 + depth * 0.6})` }} />
         <path d={wavePath(i)} fill="none" stroke="var(--mist)" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
       </svg>
     </div>
@@ -69,8 +69,9 @@ export function PapercutSea() {
       });
 
       // Canoe rides the layer just behind the front layers.
-      const spot = canoeSpot(now);
-      const cw = Math.min(560, w * (w < 700 ? 0.72 : 0.46)) * spot.scale;
+      const base = canoeSpot(now);
+      const spot = w < 700 ? { ...base, x: Math.min(base.x, 0.62) } : base;
+      const cw = Math.min(560, w * (w < 700 ? 0.58 : 0.44)) * spot.scale;
       const ch = cw * 0.4;
       const ls = (s * 2 * Math.PI) / 5.3;
       const pitch = Math.sin(ls) * 0.75 + Math.sin((s * 2 * Math.PI) / 6.7 + 1) * 0.25;
