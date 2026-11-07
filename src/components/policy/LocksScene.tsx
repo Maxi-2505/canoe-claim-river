@@ -202,7 +202,7 @@ export function LocksScene(p: LocksSceneProps) {
                 <text x={x} y={ly} textAnchor="middle" fontSize={7.5} className="fill-stone font-mono">{r.id}</text>
                 {isNew && <g className="text-cedar"><text x={x} y={ly - 22} textAnchor="middle" fontSize={8.5} fill="currentColor" className="font-mono" textDecoration="underline">new</text></g>}
                 {plaque && <g><rect x={x - 46} y={ly - 36} width={92} height={14} rx={2} className="fill-paper stroke-cedar" strokeWidth={0.8} /><text x={x} y={ly - 26} textAnchor="middle" fontSize={8.5} className="fill-cedar font-mono">{plaque}</text></g>}
-                {r.id === "R1.quote_over_limit" && <rect x={x - 40} y={ly - 20} width={80} height={RB - ly + 26} fill="transparent" />}
+                {r.id === "R1.quote_over_limit" && <rect x={x - 40} y={ly - 20} width={80} height={RB - ly + 26} fill="transparent" role="button" aria-label="Open the dam" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setDam((d) => !d); }} />}
               </motion.g>
             );
           })}
