@@ -14,13 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      claim_rows: {
+        Row: {
+          case_id: string
+          case_status: string
+          claim_summary: string
+          claim_type: string
+          created_at: string
+          duplicate_flag: string
+          evidence_conflict: string
+          incident_report_present: string
+          injury_reported: string
+          itemized_quote_present: string
+          liability_disputed: string
+          policy_active_on_incident: string
+          quote_eur: string
+          repair_type: string
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          case_status?: string
+          claim_summary?: string
+          claim_type?: string
+          created_at?: string
+          duplicate_flag?: string
+          evidence_conflict?: string
+          incident_report_present?: string
+          injury_reported?: string
+          itemized_quote_present?: string
+          liability_disputed?: string
+          policy_active_on_incident?: string
+          quote_eur?: string
+          repair_type?: string
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          case_status?: string
+          claim_summary?: string
+          claim_type?: string
+          created_at?: string
+          duplicate_flag?: string
+          evidence_conflict?: string
+          incident_report_present?: string
+          injury_reported?: string
+          itemized_quote_present?: string
+          liability_disputed?: string
+          policy_active_on_incident?: string
+          quote_eur?: string
+          repair_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fact_log: {
+        Row: {
+          case_id: string
+          field: string
+          form_version: string
+          id: number
+          policy_version: string
+          source: string
+          status: string
+          timestamp: string
+          value: string
+        }
+        Insert: {
+          case_id: string
+          field: string
+          form_version: string
+          id?: number
+          policy_version: string
+          source: string
+          status: string
+          timestamp?: string
+          value?: string
+        }
+        Update: {
+          case_id?: string
+          field?: string
+          form_version?: string
+          id?: number
+          policy_version?: string
+          source?: string
+          status?: string
+          timestamp?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fact_log_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "claim_rows"
+            referencedColumns: ["case_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      next_case_id: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
