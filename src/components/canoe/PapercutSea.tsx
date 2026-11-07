@@ -85,7 +85,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
       // Keep the canoe where it sat in the shorter scene; the extra height is far-off sea.
       const h0 = contained ? h : Math.min(innerHeight * 0.46, 460);
       const spot = { ...spot0, y: 1 - (1 - spot0.y) * (h0 / h) };
-      const cw = Math.min(560, w * (w < 700 ? 0.58 : 0.44)) * spot.scale;
+      const cw = Math.min(560, w * (w < 700 ? 0.58 : 0.44), h * 0.95) * spot.scale; // keep the hull inside the front waves on short, wide screens
       const ch = cw * 0.4;
       const ls = (s * 2 * Math.PI) / 5.3;
       const pitch = Math.sin(ls) * 0.75 + Math.sin((s * 2 * Math.PI) / 6.7 + 1) * 0.25;
