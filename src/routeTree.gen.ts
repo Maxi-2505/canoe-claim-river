@@ -10,11 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CasesRouteImport } from './routes/cases'
 import { Route as ClaimRouteImport } from './routes/claim'
 import { Route as PolicyRouteImport } from './routes/policy'
 import { Route as ReviewRouteImport } from './routes/review'
-import { Route as RowsRouteImport } from './routes/rows'
 import { Route as ContinueCaseIdRouteImport } from './routes/continue.$caseId'
 import { Route as ReviewIndexRouteImport } from './routes/review.index'
 import { Route as ReviewCaseIdRouteImport } from './routes/review.$caseId'
@@ -22,11 +20,6 @@ import { Route as ReviewCaseIdRouteImport } from './routes/review.$caseId'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CasesRoute = CasesRouteImport.update({
-  id: '/cases',
-  path: '/cases',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClaimRoute = ClaimRouteImport.update({
@@ -42,11 +35,6 @@ const PolicyRoute = PolicyRouteImport.update({
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RowsRoute = RowsRouteImport.update({
-  id: '/rows',
-  path: '/rows',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContinueCaseIdRoute = ContinueCaseIdRouteImport.update({
@@ -67,21 +55,17 @@ const ReviewCaseIdRoute = ReviewCaseIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/cases': typeof CasesRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
-  '/rows': typeof RowsRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
   '/review/': typeof ReviewIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/cases': typeof CasesRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
-  '/rows': typeof RowsRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
   '/review': typeof ReviewIndexRoute
@@ -89,11 +73,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/cases': typeof CasesRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
-  '/rows': typeof RowsRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
   '/review/': typeof ReviewIndexRoute
@@ -102,32 +84,26 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/cases'
     | '/claim'
     | '/policy'
     | '/review'
-    | '/rows'
     | '/continue/$caseId'
     | '/review/$caseId'
     | '/review/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/cases'
     | '/claim'
     | '/policy'
-    | '/rows'
     | '/continue/$caseId'
     | '/review/$caseId'
     | '/review'
   id:
     | '__root__'
     | '/'
-    | '/cases'
     | '/claim'
     | '/policy'
     | '/review'
-    | '/rows'
     | '/continue/$caseId'
     | '/review/$caseId'
     | '/review/'
@@ -135,11 +111,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CasesRoute: typeof CasesRoute
   ClaimRoute: typeof ClaimRoute
   PolicyRoute: typeof PolicyRoute
   ReviewRoute: typeof ReviewRouteWithChildren
-  RowsRoute: typeof RowsRoute
   ContinueCaseIdRoute: typeof ContinueCaseIdRoute
 }
 
@@ -150,13 +124,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cases': {
-      id: '/cases'
-      path: '/cases'
-      fullPath: '/cases'
-      preLoaderRoute: typeof CasesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/claim': {
@@ -178,13 +145,6 @@ declare module '@tanstack/react-router' {
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rows': {
-      id: '/rows'
-      path: '/rows'
-      fullPath: '/rows'
-      preLoaderRoute: typeof RowsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/continue/$caseId': {
@@ -226,11 +186,9 @@ const ReviewRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CasesRoute: CasesRoute,
   ClaimRoute: ClaimRoute,
   PolicyRoute: PolicyRoute,
   ReviewRoute: ReviewRouteWithChildren,
-  RowsRoute: RowsRoute,
   ContinueCaseIdRoute: ContinueCaseIdRoute,
 }
 export const routeTree = rootRouteImport

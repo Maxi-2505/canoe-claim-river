@@ -167,8 +167,6 @@ function Shell({ children }: { children: ReactNode }) {
           <nav className="hidden gap-4 font-mono text-[11px] uppercase tracking-[0.14em] text-stone sm:flex">
             <Link to="/review" className="hover:text-ink">Review</Link>
             <Link to="/policy" className="text-ink">Policy</Link>
-            <Link to="/cases" className="hover:text-ink">Cases</Link>
-            <Link to="/rows" className="hover:text-ink">Rows</Link>
           </nav>
         </div>
       </header>
