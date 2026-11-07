@@ -42,7 +42,7 @@ const outcomeWord = (o: RuleOutcome) => (o === "human_review" ? "review" : "info
 function condPhrase(c: Cond, fields: Record<string, string>): string {
   const label = fields[c.field] ?? c.field;
   if (c.op === "is_true") return label;
-  if (c.op === "eq" && typeof c.value === "string" && VALUE_WORDS[c.value]) return VALUE_WORDS[c.value];
+  if (c.op === "eq" && typeof c.value === "string") { const w = VALUE_WORDS[c.value]; if (w) return w; }
   return `${label} ${OP_WORDS[c.op]} ${valueText(c)}`.trim();
 }
 
