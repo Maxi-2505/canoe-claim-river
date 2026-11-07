@@ -9,6 +9,7 @@ import { useCalmMotion } from "@/components/canoe/motion";
 import { getReviewApi, ApiError, type ClaimDetail, type ClaimListItem, type Field, type FieldValue, type Rec } from "@/lib/review/api";
 import { FIELD_GROUPS, REASON, REC_LABEL, REC_SHORT, RULE_FIELD, euro, formatValue, inTab, isOpen, sortQueue, type Tab } from "@/lib/review/labels";
 import { cn } from "@/lib/utils";
+import { RecommendationLabel } from "@/components/canoe/RecommendationLabel";
 
 const RECS: Rec[] = ["routine_processing", "request_information", "human_review"];
 const CATEGORIES = ["Evidence contradicts data", "Fact captured wrong", "Rule doesn't fit this case", "New information received", "Other"];
@@ -20,12 +21,6 @@ const hhmm = (iso: string) => new Date(iso).toLocaleTimeString("en-GB", { hour: 
 const reasonText = (rule: string) => REASON[rule] ?? null;
 
 function Italic({ children }: { children: ReactNode }) { return <Accent>{children}</Accent>; }
-
-function Dot({ rec, closed, className }: { rec: Rec; closed?: boolean; className?: string }) {
-  if (closed) return <span className={cn("inline-block size-2.5 shrink-0 rounded-full border border-stone", className)} aria-label="Closed" />;
-  const c = rec === "human_review" ? "bg-ink" : rec === "request_information" ? "bg-ochre" : "bg-reed";
-  return <span className={cn("inline-block size-2.5 shrink-0 rounded-full", c, className)} aria-label={REC_LABEL[rec]} />;
-}
 
 function useReviewer(): [string, (s: string) => void] {
   const [name, setName] = useState("Jury");
@@ -196,11 +191,11 @@ function QueueRow({ r, active, onOpen }: { r: ClaimListItem; active: boolean; on
   const reason = reasonText(r.rule);
   return (
     <motion.div layout initial={false} exit={{ opacity: 0, height: 0, marginTop: 0 }} transition={t(320)} className="overflow-hidden">
-      <button onClick={onOpen} className={cn("answer-btn block w-full px-3 py-2.5 text-left", active && "border-cedar")} data-selected={active}>
+      <button onClick={onOpen} className={cn("answer-btn relative block w-full overflow-hidden px-3 py-2.5 text-left", active && "before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-cedar")} data-selected={active}>
         <div className="flex items-center gap-2">
-          <Dot rec={r.effective_recommendation} closed={closed} />
           <span className="font-mono text-xs">{r.case_id}</span>
-          <span className="ml-auto font-mono text-xs text-stone">{euro(r.quote_eur)}</span>
+          <span className="font-mono text-xs text-stone">{euro(r.quote_eur)}</span>
+          <RecommendationLabel recommendation={r.effective_recommendation} closed={closed} className="ml-auto" />
         </div>
         <p className="mt-1 truncate text-[13px]">{reason ?? <span className="font-mono text-xs">{r.rule}</span>}</p>
         <div className="mt-1 flex flex-wrap gap-1">
@@ -212,7 +207,7 @@ function QueueRow({ r, active, onOpen }: { r: ClaimListItem; active: boolean; on
     </motion.div>
   );
 }
-function Tag({ children }: { children: ReactNode }) { return <span className="rounded-full border border-stone/35 px-1.5 py-px font-mono text-[10px] text-stone">{children}</span>; }
+function Tag({ children }: { children: ReactNode }) { return <span className="border-b border-stone font-mono text-[10px] lowercase text-stone">{children}</span>; }
 
 function Stations({ at, anchored }: { at: number; anchored: boolean }) {
   const { t, reduce } = useCalmMotion();
@@ -222,7 +217,7 @@ function Stations({ at, anchored }: { at: number; anchored: boolean }) {
       <div className="relative h-7">
         <div className="absolute inset-x-0 top-1/2 h-px bg-stone/40" />
         <motion.div className="absolute left-0 top-1/2 h-px bg-cedar" initial={false} animate={{ width: `${pct}%` }} transition={t(600)} />
-        {STATIONS.map((s, i) => <span key={s} className={cn("absolute top-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full", i <= at ? "bg-cedar" : "bg-stone/50")} style={{ left: `${(i / 3) * 100}%` }} />)}
+        {STATIONS.map((s, i) => <span key={s} className={cn("absolute top-1/2 h-2 w-px -translate-x-1/2 -translate-y-1/2", i <= at ? "bg-cedar" : "bg-stone/50")} style={{ left: `${(i / 3) * 100}%` }} />)}
         <motion.div className="absolute top-1/2 -translate-x-1/2 -translate-y-[70%]" initial={false} animate={{ left: `${pct}%` }} transition={t(700)}>
           <CanoeMark size={24} />
           <AnimatePresence>{anchored && (
@@ -267,10 +262,9 @@ function CaseView({ c, ui, setUi, saved, rerun, anchored, mock, onSaveFact }: {
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={c.effective_recommendation + c.effective_source} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={t(240)}>
             <div className="flex items-center gap-3">
-              <Dot rec={c.effective_recommendation} className="size-3" />
               <p className="font-display text-2xl">
-                {c.effective_source === "reviewer" && <s className="mr-2 text-stone">{REC_LABEL[d.recommendation]}</s>}
-                {REC_LABEL[c.effective_recommendation]}
+                {c.effective_source === "reviewer" && <s className="mr-2 text-stone"><RecommendationLabel recommendation={d.recommendation} large className="text-stone" /></s>}
+                <RecommendationLabel recommendation={c.effective_recommendation} closed={closed} large />
               </p>
             </div>
             <p className="mt-2 text-[15px]">{d.detail.reason}</p>
@@ -402,7 +396,7 @@ function History({ c, saved }: { c: ClaimDetail; saved: string | null }) {
         {shown.map((e) => (
           <li key={e.key} className="relative pb-4">
             <span className="absolute -left-[25px] top-1.5 flex size-2.5 items-center justify-center">
-              {e.anchor ? <Anchor className="size-3.5 text-cedar" /> : <span className="size-2 rounded-full bg-stone/60" />}
+              {e.anchor ? <Anchor className="size-3.5 text-cedar" /> : <span className="h-px w-2 bg-stone/60" />}
               {saved === e.key && !reduce && <motion.span className="absolute size-2 rounded-full border border-cedar" initial={{ scale: 1, opacity: 0.7 }} animate={{ scale: 4, opacity: 0 }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} />}
             </span>
             <p className="text-sm">{e.title}</p>

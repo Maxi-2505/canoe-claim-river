@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { markRequested } from "@/lib/claims.functions";
 import { HorizonLine, Wordmark } from "@/components/canoe/brand";
-import { cn } from "@/lib/utils";
+import { RecommendationLabel } from "@/components/canoe/RecommendationLabel";
 
 const casesQuery = queryOptions({
   queryKey: ["cases"],
@@ -33,9 +33,6 @@ export const Route = createFileRoute("/cases")({
   loader: ({ context }) => context.queryClient.ensureQueryData(casesQuery),
   component: CasesPage,
 });
-
-// Internal page: colour allowed. reed = routine, cedar = request information, ink = human review.
-const DOT: Record<string, string> = { routine_processing: "bg-reed", request_information: "bg-cedar", human_review: "bg-ink" };
 
 function CasesPage() {
   const { data } = useSuspenseQuery(casesQuery);
@@ -73,7 +70,7 @@ function CasesPage() {
                 <td className="whitespace-nowrap px-3 py-2">{r.case_status}</td>
                 <td className="max-w-[280px] truncate px-3 py-2" title={r.claim_summary}>{r.claim_summary}</td>
                 <td className="whitespace-nowrap px-3 py-2">
-                  {r.recommendation ? <span className="inline-flex items-center gap-2"><span className={cn("size-2 rounded-full", DOT[r.recommendation] ?? "bg-stone")} />{r.recommendation}</span> : <span className="text-stone">—</span>}
+                  {r.recommendation || r.case_status === "closed" ? <RecommendationLabel recommendation={r.recommendation} closed={r.case_status === "closed"} infoTone="cedar" /> : <span className="text-stone">—</span>}
                 </td>
                 <td className="whitespace-nowrap px-3 py-2 font-mono">{r.rule}</td>
                 <td className="whitespace-nowrap px-3 py-2">{r.policy_version}</td>
