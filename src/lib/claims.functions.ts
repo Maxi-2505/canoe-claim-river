@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { motorConfig } from "@/lib/intake/config";
 import { CASE_ID_RE, buildRow, factLogEntries, parseMissing, patchMissingColumns } from "@/lib/intake/logic";
-import { POLICY_VERSION, type IntakeState } from "@/lib/intake/types";
+import { POLICY_VERSION, type ClaimRow, type IntakeState } from "@/lib/intake/types";
 
 const factSchema = z.object({
   value: z.union([z.string().max(4000), z.number(), z.null()]),
@@ -53,10 +53,10 @@ export const updateClaim = createServerFn({ method: "POST" })
     const fromCase = parseMissing(stored.missing_fields);
     const missing = data.missing?.length ? data.missing : fromCase;
     const now = new Date().toISOString();
-    let update: Record<string, string>;
+    let update: Partial<ClaimRow> & { request_status?: string; updated_at: string };
     if (missing.length) {
       // Patch only the missing columns; recommendation/rule stay for the rules engine to re-run.
-      update = { ...patchMissingColumns(state, motorConfig, missing), request_status: "answered_awaiting_recheck", updated_at: now } as Record<string, string>;
+      update = { ...patchMissingColumns(state, motorConfig, missing), request_status: "answered_awaiting_recheck", updated_at: now };
     } else {
       const { case_id: _id, ...rest } = buildRow(data.caseId, state, motorConfig);
       update = { ...rest, updated_at: now };
