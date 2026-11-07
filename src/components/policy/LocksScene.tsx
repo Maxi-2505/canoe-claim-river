@@ -201,7 +201,7 @@ export function LocksScene(p: LocksSceneProps) {
                 <text x={x} y={ly - 10} textAnchor="middle" fontSize={10} fill="currentColor" className="font-mono" letterSpacing="0.04em">{gateLabel(r, {})}</text>
                 <text x={x} y={ly} textAnchor="middle" fontSize={7.5} className="fill-stone font-mono">{r.id}</text>
                 {isNew && <g className="text-cedar"><text x={x} y={ly - 22} textAnchor="middle" fontSize={8.5} fill="currentColor" className="font-mono" textDecoration="underline">new</text></g>}
-                {plaque && <g><rect x={x - 46} y={ly - 36} width={92} height={14} rx={2} className="fill-paper stroke-cedar" strokeWidth={0.8} /><text x={x} y={ly - 26} textAnchor="middle" fontSize={8.5} className="fill-cedar font-mono">{plaque}</text></g>}
+                {plaque && <g><rect x={x - 46} y={RB + 10} width={92} height={14} rx={2} className="fill-paper stroke-cedar" strokeWidth={0.8} /><text x={x} y={RB + 20} textAnchor="middle" fontSize={8.5} className="fill-cedar font-mono">{plaque}</text></g>}
                 {r.id === "R1.quote_over_limit" && <rect x={x - 40} y={ly - 20} width={80} height={RB - ly + 26} fill="transparent" role="button" aria-label="Open the dam" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setDam((d) => !d); }} />}
               </motion.g>
             );
@@ -214,8 +214,8 @@ export function LocksScene(p: LocksSceneProps) {
             const dim = p.highlight && `${c.row.from} -> ${c.row.to}` !== p.highlight;
             return (
               <g key={`t${c.id}`} opacity={dim ? 0.15 : 1}>
-                {p.showGhosts && <path d={toD(c.ghost.pts)} fill="none" className="stroke-stone" strokeOpacity={0.45} strokeDasharray="3 4" strokeWidth={0.9} />}
-                {raw > 0 && <path d={toD([...c.path.pts.slice(0, pos.i), [pos.x, pos.y]])} fill="none" className="stroke-cedar" strokeWidth={1.3} strokeOpacity={0.85} />}
+                {p.showGhosts && <path d={toD(c.ghost.pts)} fill="none" className="stroke-stone" strokeOpacity={0.75} strokeDasharray="3 4" strokeWidth={1} />}
+                {raw > 0 && <path d={toD([...c.path.pts.slice(0, pos.i), [pos.x, pos.y]].filter((q) => q[1] < 298))} fill="none" className="stroke-cedar" strokeWidth={1.3} strokeOpacity={0.85} />}
               </g>
             );
           })}
