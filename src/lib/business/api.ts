@@ -2,6 +2,7 @@ import { queryOptions } from '@tanstack/react-query';
 import { getPolicyApi } from '@/lib/policy/api';
 import { ApiError } from '@/lib/review/types';
 import type { BusinessData, BusinessClaim, Impact, Quality, AuditEvent } from './types';
+import type { PolicyDoc } from '@/lib/policy/types';
 
 const base = import.meta.env['VITE_API_URL'] as string | undefined;
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
@@ -16,8 +17,8 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 export async function loadBusiness(): Promise<BusinessData> {
   if (!base) {
     const { default: fixture } = await import('./fixture.json');
-    const policy = await getPolicyApi().getPolicy();
-    return { impact: fixture.impact as Impact, quality: fixture.quality as Quality, claims: fixture.claims.claims as BusinessClaim[], audit: fixture.audit.events, policy, mode: 'mock' };
+    const { default: policy } = await import('./policy-fixture.json');
+    return { impact: fixture.impact as Impact, quality: fixture.quality as Quality, claims: fixture.claims.claims as BusinessClaim[], audit: fixture.audit.events, policy: policy as PolicyDoc, mode: 'mock' };
   }
   const [impact, quality, claims, audit, policy] = await Promise.all([
     call<Impact>('/api/impact'), call<Quality>('/api/quality'), call<{ claims: BusinessClaim[] }>('/api/claims'),

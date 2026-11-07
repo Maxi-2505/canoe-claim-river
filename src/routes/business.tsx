@@ -15,5 +15,5 @@ export const Route = createFileRoute('/business')({
 });
 function BusinessError({ error }: ErrorComponentProps) {
   const router = useRouter();
-  return <BusinessShell><p role="alert" className="mt-10 text-stone">{error.message}</p><Button variant="outline" className="btn-quiet mt-4" onClick={() => router.invalidate()}>Retry</Button></BusinessShell>;
+  return <BusinessShell><p role="alert" className="mt-10 text-stone">{error instanceof Error ? error.message : 'Business could not be loaded.'}</p><Button variant="outline" className="btn-quiet mt-4" onClick={() => router.invalidate()}>Retry</Button></BusinessShell>;
 }

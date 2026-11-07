@@ -5,9 +5,9 @@ export const Route = createFileRoute("/policy")({
   head: () => ({
     meta: [
       { title: "Policy — Canoe" },
-      { name: "description", content: "Change a triage rule, backtest it on open claims, and release it with an approver." },
+      { name: "description", content: "Change a draft triage rule, simulate its effect on open claims, and release it with an approver." },
       { property: "og:title", content: "Policy — Canoe" },
-      { property: "og:description", content: "Internal policy owner page: change, simulate, check, release." },
+      { property: "og:description", content: "Internal policy owner page: change a draft, simulate, release." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
