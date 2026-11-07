@@ -57,6 +57,25 @@ describe("mappings", () => {
   });
 });
 
+describe("liability_disputed", () => {
+  const ld = (s: IntakeState) => buildRow("X", s, c).liability_disputed;
+  it("nobody else involved → False", () => expect(ld(a(base(), [["other_party", "no"]]))).toBe("False"));
+  it("other party, they agree → False", () => expect(ld(a(base(), [["other_party", "yes"], ["other_party_agrees", "yes"]]))).toBe("False"));
+  it("other party, they disagree → True", () => expect(ld(a(base(), [["other_party", "yes"], ["other_party_agrees", "no"]]))).toBe("True"));
+  it("other party, agreement unsure → blank", () => expect(ld(a(base(), [["other_party", "yes"], ["other_party_agrees", "not_sure"]]))).toBe(""));
+  it("other party, agreement unanswered → blank", () => expect(ld(a(base(), [["other_party", "yes"]]))).toBe(""));
+  it("other party unsure → blank", () => expect(ld(a(base(), [["other_party", "not_sure"]]))).toBe(""));
+  it("other party unanswered → blank", () => expect(ld(base())).toBe(""));
+  it("missing mode for liability_disputed asks other_party first, then agreement if yes", () => {
+    const mode = { kind: "missing" as const, missing: ["liability_disputed"] };
+    let s = openMissing(a(base(), [["other_party", "not_sure"], ["injury", "no"]]), c, mode.missing);
+    expect(upcoming(s, c, mode).map((q) => q.id)).toEqual(["other_party"]);
+    s = answer(s, "other_party", "yes");
+    expect(upcoming(s, c, mode).map((q) => q.id)).toEqual(["other_party_agrees"]);
+    expect(upcoming(answer(s, "other_party", "no"), c, mode)).toEqual([]);
+  });
+});
+
 describe("insurer lookup", () => {
   it("EXP policy is inactive, empty is blank, other is active", () => {
     expect(insurerLookup(answer(emptyState(), "policy_number", "EXP-9")).policy_active_on_incident).toBe("False");
@@ -82,5 +101,6 @@ describe("csv", () => {
     expect(csv[0]).toBe(CSV_COLUMNS.join(","));
     expect(csv[0]).toBe("case_id,case_status,claim_summary,policy_active_on_incident,claim_type,repair_type,quote_eur,incident_report_present,itemized_quote_present,injury_reported,liability_disputed,duplicate_flag,evidence_conflict");
     expect(csv[1]).toBe("FORM-0001,open,Scrape,True,motor_own_damage,,,,,False,,False,False");
+    expect(toCsv([buildRow("F", a(base(), [["other_party", "no"]]), c)]).split("\n")[1]).toBe("F,open,Scrape,True,motor_own_damage,,,,,,False,False,False");
   });
 });
