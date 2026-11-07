@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import waterUrl from "@/assets/graphite-water.jpg";
+import seaAsset from "@/assets/pencil-sea-texture.jpg.asset.json";
+const waterUrl = seaAsset.url;
 import canoeUrl from "@/assets/graphite-canoe.png";
 import {
   SESSION_KEY, canoeSpot, clamp, easeOut, easeOutBack, entryDuration, frontFrom,
@@ -20,7 +21,7 @@ function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) =
           </pattern>
         </defs>
         <path d={wavePath(i)} fill="var(--paper)" />
-        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={0.15 + depth * 0.5} style={{ filter: `contrast(${0.8 + depth * 0.6})` }} />
+        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={0.45 + depth * 0.5} style={{ filter: `contrast(${0.8 + depth * 0.6})` }} />
       </svg>
     </div>
   );
