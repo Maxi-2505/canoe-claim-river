@@ -19,6 +19,7 @@ import { DocumentPicker, type ConfirmedDoc } from "./DocumentStep";
 import { displayValue } from "./display";
 import { useCalmMotion } from "./motion";
 import { DemoMenu, type Preset } from "./DemoMenu";
+import { useSiteTools } from "@/components/site-tools/SiteTools";
 
 type Screen = "start" | "preview" | "docs" | "question" | "review" | "done";
 interface Saved { screen: Screen; state: IntakeState; history: string[] }
@@ -37,6 +38,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
   const [doneId, setDoneId] = useState<string | null>(null);
   const loaded = useRef(false);
   const { advance } = useCalmMotion();
+  const { t } = useSiteTools();
 
   // Autosave after every answer (intake mode only).
   useEffect(() => {
@@ -113,7 +115,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
       setScreen("done");
       if (!missing) localStorage.removeItem(STORAGE);
     } catch {
-      toast("We couldn't send your claim just now. Please try again in a moment.");
+      toast(t("We couldn't send your claim just now. Please try again in a moment."));
     } finally { setSubmitting(false); }
   };
 
@@ -146,27 +148,27 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
             {screen === "start" && (
               <motion.section key="start" {...advance} className="space-y-10">
                 <div>
-                  <p className="eyebrow mb-5">Canoe / report a claim / about five minutes</p>
-                  <h1 className="font-display text-[44px] leading-[1.05] tracking-[-0.02em] md:text-[64px]">What <Accent>happened?</Accent></h1>
-                  <p className="mt-5 max-w-md text-base text-stone">Pick what your claim is about. We collect the facts. We never decide the claim.</p>
+                  <p className="eyebrow mb-5">{t("Canoe / report a claim / about five minutes")}</p>
+                  <h1 className="font-display text-[44px] leading-[1.05] tracking-[-0.02em] md:text-[64px]">{t("What")} <Accent>{t("happened?")}</Accent></h1>
+                  <p className="mt-5 max-w-md text-base text-stone">{t("Pick what your claim is about. We collect the facts. We never decide the claim.")}</p>
                 </div>
                 <div className="card-calm px-5">
-                  <p className="eyebrow pb-2 pt-5">Choose one</p>
+                  <p className="eyebrow pb-2 pt-5">{t("Choose one")}</p>
                   <button onClick={() => setScreen("docs")} className="group flex w-full items-center gap-4 border-t border-stone/20 py-4 text-left">
                     <span className="font-mono text-xs text-cedar">01</span>
                     <Car className="size-5 text-cedar" />
-                    <span className="flex-1 font-display text-2xl">My <Accent>car</Accent></span>
-                    <span className="font-mono text-xs text-stone group-hover:text-ink">start →</span>
+                    <span className="flex-1 font-display text-2xl">{t("My car")}</span>
+                    <span className="font-mono text-xs text-stone group-hover:text-ink">{t("start →")}</span>
                   </button>
                   {([["home", Home, "My home", "02"], ["health", HeartPulse, "My health", "03"]] as const).map(([k, Icon, label, n]) => (
                     <button key={k} onClick={() => { setPreviewLine(k); setScreen("preview"); }} className="group flex w-full items-center gap-4 border-t border-stone/20 py-4 text-left">
                       <span className="font-mono text-xs text-stone">{n}</span>
                       <Icon className="size-5 text-stone" />
-                      <span className="flex-1 font-display text-2xl text-ink/80">{label}</span>
-                      <span className="font-mono text-xs italic text-stone">preview</span>
+                      <span className="flex-1 font-display text-2xl text-ink/80">{t(label)}</span>
+                      <span className="font-mono text-xs italic text-stone">{t("preview")}</span>
                     </button>
                   ))}
-                  <p className="border-t border-stone/20 py-4 text-sm text-stone">Have a quote or police report? Keep it close. It saves you questions.</p>
+                  <p className="border-t border-stone/20 py-4 text-sm text-stone">{t("Have a quote or police report? Keep it close. It saves you questions.")}</p>
                 </div>
               </motion.section>
             )}
@@ -178,13 +180,13 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
             {screen === "docs" && (
               <motion.section key="docs" {...advance} className="space-y-6">
                 <div>
-                  <h1 className="question-title">Have your repair quote or police report?</h1>
-                  <p className="mt-3 text-sm text-stone">Add them and we'll fill in what we can — fewer questions for you.</p>
+                  <h1 className="question-title">{t("Have your repair quote or police report?")}</h1>
+                  <p className="mt-3 text-sm text-stone">{t("Add them and we'll fill in what we can — fewer questions for you.")}</p>
                 </div>
                 <DocumentPicker confirmedIds={confirmedDocIds} onConfirm={onDocument} />
                 <div className="flex flex-wrap items-center gap-4">
-                  <button onClick={() => setScreen("question")} className="btn-cedar px-6 py-2.5 text-sm">{confirmedDocIds.length ? "Continue" : "Skip — I'll answer the questions"}</button>
-                  <button onClick={() => setScreen("start")} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> Back</button>
+                  <button onClick={() => setScreen("question")} className="btn-cedar px-6 py-2.5 text-sm">{confirmedDocIds.length ? t("Continue") : t("Skip — I'll answer the questions")}</button>
+                  <button onClick={() => setScreen("start")} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> {t("Back")}</button>
                 </div>
               </motion.section>
             )}
@@ -192,9 +194,9 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
             {screen === "question" && current && (
               <motion.section key={`q-${current.id}`} {...advance} className="space-y-8">
                 {injury && current.id !== "injury" && (
-                  <div className="card-calm px-4 py-3 text-sm">A claims specialist will contact you personally. Anything else you add below helps us prepare.</div>
+                  <div className="card-calm px-4 py-3 text-sm">{t("A claims specialist will contact you personally. Anything else you add below helps us prepare.")}</div>
                 )}
-                <button onClick={back} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> Back</button>
+                <button onClick={back} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> {t("Back")}</button>
                 <QuestionCard
                   key={current.id}
                   quoteTotal={quoteTotal}
@@ -212,26 +214,26 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
             {screen === "review" && (
               <motion.section key="review" {...advance} className="space-y-6">
                 <div>
-                  <h1 className="question-title">Check your claim</h1>
-                  <p className="mt-3 text-sm text-stone">Tap any line to change it. Blank is fine — we'll ask later if we need it.</p>
+                  <h1 className="question-title">{t("Check your claim")}</h1>
+                  <p className="mt-3 text-sm text-stone">{t("Tap any line to change it. Blank is fine — we'll ask later if we need it.")}</p>
                 </div>
-                <button onClick={goBack} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> Back</button>
+                <button onClick={goBack} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> {t("Back")}</button>
                 <ReviewList state={state} onEdit={(id) => { setEditing({ id, toReview: true }); setScreen("question"); }} />
                 <div className="flex items-center gap-4">
-                  <button onClick={submit} disabled={submitting} className="btn-cedar px-6 py-2.5 text-sm">{submitting ? "Sending…" : missing ? "Send the update" : "Send my claim"}</button>
+                  <button onClick={submit} disabled={submitting} className="btn-cedar px-6 py-2.5 text-sm">{submitting ? t("Sending…") : missing ? t("Send the update") : t("Send my claim")}</button>
                 </div>
               </motion.section>
             )}
 
             {screen === "done" && (
               <motion.section key="done" {...advance} className="space-y-5">
-                <h1 className="question-title">{missing ? "Your claim is moving again." : "Thanks — your claim is in."}</h1>
-                <p className="text-stone">{missing ? "We've added what you sent. No need to do anything else." : "We'll get back to you within 2 working days."}</p>
+                <h1 className="question-title">{t(missing ? "Your claim is moving again." : "Thanks — your claim is in.")}</h1>
+                <p className="text-stone">{t(missing ? "We've added what you sent. No need to do anything else." : "We'll get back to you within 2 working days.")}</p>
                 <div className="card-calm inline-block px-5 py-3">
-                  <span className="block text-xs text-stone">Your claim reference</span>
+                  <span className="block text-xs text-stone">{t("Your claim reference")}</span>
                   <span className="font-display text-2xl">{doneId}</span>
                 </div>
-                {!missing && <div><button onClick={() => applyPreset("reset")} className="text-sm text-stone underline underline-offset-4 hover:text-ink">Start another claim</button></div>}
+                {!missing && <div><button onClick={() => applyPreset("reset")} className="text-sm text-stone underline underline-offset-4 hover:text-ink">{t("Start another claim")}</button></div>}
               </motion.section>
             )}
           </AnimatePresence>

@@ -83,15 +83,6 @@
   --mist: oklch(0.25 0.012 50);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --paper: oklch(0.2 0.01 50);
-    --ink: oklch(0.94 0.013 84);
-    --cedar: oklch(0.62 0.14 32);
-    --mist: oklch(0.25 0.012 50);
-  }
-}
-
 @layer base {
   * { border-color: var(--color-border); }
   html { -webkit-font-smoothing: antialiased; }
@@ -138,7 +129,7 @@
   background-size: cover;
   -webkit-mask-image: radial-gradient(ellipse at 70% 60%, #000 35%, transparent 75%);
   mask-image: radial-gradient(ellipse at 70% 60%, #000 35%, transparent 75%);
-  @media (prefers-color-scheme: dark) { mix-blend-mode: screen; filter: invert(1); opacity: 0.12; }
+  .dark & { mix-blend-mode: screen; filter: invert(1); opacity: 0.12; }
 }
 
 @utility question-title {
@@ -205,6 +196,44 @@
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 35%);
   mask-image: linear-gradient(to bottom, transparent, #000 35%);
 }
-@media (prefers-color-scheme: dark) {
-  .pencil-scene { mix-blend-mode: screen; filter: grayscale(1) invert(1); opacity: 0.25; }
+.dark .pencil-scene { mix-blend-mode: screen; filter: grayscale(1) invert(1); opacity: 0.25; }
+
+/* Floating site tools. All styling is scoped to these additions. */
+.canoe-site-controls { position: fixed; z-index: 40; left: 20px; bottom: 20px; display: flex; gap: 7px; }
+.canoe-tool-button, .canoe-locale-select { display: grid; place-items: center; height: 42px; min-width: 42px; border: 1px solid color-mix(in oklab, var(--stone) 35%, transparent); border-radius: 999px; background: var(--paper); color: var(--ink); box-shadow: 0 4px 16px color-mix(in oklab, var(--ink) 12%, transparent); }
+.canoe-tool-button { cursor: pointer; }
+.canoe-locale-select select { appearance: none; height: 100%; width: 100%; padding: 0 10px; border: 0; background: transparent; color: inherit; font: 500 12px var(--font-mono); cursor: pointer; }
+.canoe-chat-launcher { position: fixed; z-index: 41; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 90px; height: 66px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); box-shadow: none; cursor: pointer; }
+.canoe-chat-launcher:focus-visible { outline: 2px solid var(--cedar); outline-offset: 4px; }
+.canoe-chat-logo { display: block; width: 72px; height: 48px; object-fit: contain; filter: drop-shadow(0 3px 2px rgb(0 0 0 / 16%)); transform-origin: center; animation: canoe-chat-float 5.5s ease-in-out infinite; user-select: none; }
+.canoe-chat-invite { font: 500 11px/1.2 var(--font-display); letter-spacing: .02em; white-space: nowrap; color: var(--cedar); text-shadow: 0 1px 3px var(--paper); }
+.canoe-chat-launcher:hover .canoe-chat-invite { text-decoration: underline; text-underline-offset: 3px; }
+.canoe-chat-launcher:hover .canoe-chat-logo, .canoe-chat-launcher:focus-visible .canoe-chat-logo { animation-play-state: paused; }
+@keyframes canoe-chat-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-2px) rotate(1deg); }
 }
+@media (prefers-reduced-motion: reduce) { .canoe-chat-logo { animation: none; } }
+.canoe-chat-panel { position: fixed; z-index: 42; right: 124px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; width: min(360px, calc(100vw - 32px)); max-height: min(520px, calc(100dvh - 32px)); overflow: hidden; border: 1px solid color-mix(in oklab, var(--stone) 30%, transparent); border-radius: 18px; background: var(--paper); color: var(--ink); box-shadow: 0 14px 50px color-mix(in oklab, var(--ink) 18%, transparent); }
+.canoe-chat-header { display: flex; align-items: center; justify-content: space-between; padding: 15px 17px; border-bottom: 1px solid var(--border); }
+.canoe-chat-brand { display: flex; align-items: center; gap: 10px; }
+.canoe-chat-brand > span:last-child { display: flex; flex-direction: column; gap: 2px; }
+.canoe-chat-brand strong { font-family: var(--font-display); font-size: 17px; }
+.canoe-chat-brand small { color: var(--stone); font-size: 11px; }
+.canoe-chat-mark { display: grid; place-items: center; width: 44px; height: 34px; }
+.canoe-chat-mark > img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.canoe-chat-close { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 50%; background: transparent; color: var(--stone); cursor: pointer; }
+.canoe-chat-close:hover { background: var(--muted); color: var(--ink); }
+.canoe-chat-body { display: flex; flex: 1; flex-direction: column; gap: 10px; overflow-y: auto; padding: 16px; }
+.canoe-chat-bubble { max-width: 88%; margin: 0; padding: 10px 12px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+.canoe-chat-reply { align-self: flex-start; border: 1px solid var(--border); background: var(--card); }
+.canoe-chat-user { align-self: flex-end; background: var(--cedar); color: var(--paper); }
+.canoe-chat-topics { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 2px; }
+.canoe-chat-topics button { padding: 7px 10px; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--ink); font-size: 11px; cursor: pointer; }
+.canoe-chat-topics button:hover { border-color: var(--cedar); }
+.canoe-chat-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border); }
+.canoe-chat-form input { min-width: 0; flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--background); color: var(--foreground); font: inherit; font-size: 13px; }
+.canoe-chat-form button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--cedar); color: var(--paper); cursor: pointer; }
+.canoe-chat-form button:disabled { opacity: .45; cursor: default; }
+@media (max-width: 600px) { .canoe-chat-panel { right: 12px; } }
+@media (max-width: 480px) { .canoe-site-controls { left: 12px; bottom: 12px; } .canoe-chat-launcher { right: 12px; } }

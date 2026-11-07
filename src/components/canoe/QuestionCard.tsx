@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Fact, Question } from "@/lib/intake/types";
 import { cn } from "@/lib/utils";
 import { DocumentPicker, type ConfirmedDoc } from "./DocumentStep";
+import { useSiteTools } from "@/components/site-tools/SiteTools";
 
 const TRI = [
   { value: "yes", label: "Yes" },
@@ -23,6 +24,7 @@ export function QuestionCard({
   const initial = fact ? (fact.status === "dont_know" ? "not_sure" : fact.value == null ? "" : String(fact.value)) : "";
   const [value, setValue] = useState<string>(initial);
   const [showUpload, setShowUpload] = useState(false);
+  const { t } = useSiteTools();
   const opts: { value: string; label: string; hint?: string }[] = q.type === "tri_state" ? (q.options ?? TRI) : q.options ?? [];
 
   const submit = () => {
@@ -54,8 +56,8 @@ export function QuestionCard({
     <div className="space-y-6">
       <div>
         {optional && <p className="mb-2 text-xs uppercase tracking-wider text-stone">Optional — helps us prepare</p>}
-        <h1 className="question-title text-ink">{q.label}</h1>
-        <p className="mt-3 text-sm text-stone">{q.help}</p>
+        <h1 className="question-title text-ink">{t(q.label)}</h1>
+        <p className="mt-3 text-sm text-stone">{t(q.help)}</p>
       </div>
 
       {(q.type === "tri_state" || q.type === "choice") && (
@@ -71,8 +73,8 @@ export function QuestionCard({
             >
               <span className="grid size-5 shrink-0 place-items-center rounded border border-stone/40 text-[10px] text-stone">{i + 1}</span>
               <span>
-                <span className="block text-[15px]">{o.label}</span>
-                {o.hint ? <span className="block text-xs text-stone">{o.hint}</span> : null}
+                <span className="block text-[15px]">{t(o.label)}</span>
+                {o.hint ? <span className="block text-xs text-stone">{t(o.hint)}</span> : null}
               </span>
             </button>
           ))}
@@ -111,9 +113,9 @@ export function QuestionCard({
       )}
 
       <div className="flex items-center gap-4">
-        <button onClick={submit} disabled={(q.type === "tri_state" || q.type === "choice") && value === ""} className="btn-cedar px-6 py-2.5 text-sm">Continue</button>
+        <button onClick={submit} disabled={(q.type === "tri_state" || q.type === "choice") && value === ""} className="btn-cedar px-6 py-2.5 text-sm">{t("Continue")}</button>
         {q.type !== "tri_state" && q.type !== "choice" && (
-          <button onClick={() => onAnswer(null)} className="text-sm text-stone hover:text-ink">I'm not sure</button>
+          <button onClick={() => onAnswer(null)} className="text-sm text-stone hover:text-ink">{t("I'm not sure")}</button>
         )}
         <span className="hidden text-xs text-stone sm:inline">Enter ↵</span>
       </div>
