@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Questions live in `src/config/<vertical>.json`; the renderer in `src/components/canoe` is generic — add verticals as config, not code.
+- All intake rules (next question, mappings, insurer mock, CSV) are pure functions in `src/lib/intake/logic.ts` with tests beside them; UI must not re-implement them.
+- Writes to `claim_rows`/`fact_log` go only through server functions in `src/lib/claims.functions.ts` (admin client, row built server-side); the browser only reads.
