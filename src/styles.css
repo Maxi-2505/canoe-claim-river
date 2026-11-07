@@ -52,7 +52,7 @@
   --reed: oklch(0.52 0.05 120);
   --stone: oklch(0.52 0.015 60);
   --mist: oklch(0.982 0.007 84);
-  /* Internal review pages only: request-information dot. */
+  /* Internal review pages only: request-information text. */
   --ochre: oklch(0.7 0.12 75);
 
   --background: var(--paper);
@@ -116,6 +116,14 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--stone);
+}
+
+@utility recommendation-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 @utility canoe-backdrop {

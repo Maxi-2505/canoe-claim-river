@@ -35,3 +35,4 @@ use the editor.
 - Writes to `claim_rows`/`fact_log` go only through server functions in `src/lib/claims.functions.ts` (admin client, row built server-side); the browser only reads.
 - Decision columns on claim_rows (recommendation, rule, policy_version, explanation, missing_fields) come from the external rules engine; the app never computes them. Missing-mode updates patch only the listed CSV columns (patchMissingColumns). Why: the engine is the single source of decisions.
 - The reviewer page (/review) has no decision logic: all data goes through `src/lib/review/api.ts` (http when VITE_API_URL is set, else an in-memory mock built from claim_rows). Why: the Python backend owns decisions; the mock only mirrors its write behaviour.
+- Recommendation presentation uses the shared RecommendationLabel component, with existing page-specific information colours; this keeps status typography consistent without changing data or decisions.

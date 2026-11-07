@@ -11,7 +11,7 @@ function Chip({ label, value, source }: { label: string; value: string; source: 
   const { reduce, t } = useCalmMotion();
   return (
     <motion.li layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={t(300)} className="flex items-start gap-3 py-2">
-      <span className="relative mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-reed/15 text-reed">
+      <span className="relative mt-0.5 grid size-5 shrink-0 place-items-center text-reed">
         {!reduce && [0, 1].map((i) => (
           <motion.span key={i} className="absolute inset-0 rounded-full border border-cedar/20 bg-cedar/20"
             initial={{ scale: 1, opacity: 0.6 }} animate={{ scale: 2.4, opacity: 0 }}
