@@ -15,7 +15,7 @@ describe("mock adapter", () => {
     const c = s.get("DEV-013");
     expect(c.fields.find((f) => f.field === "quote_eur")?.status).toBe("blank");
     expect(c.latest_decision.detail.trace.find((t) => t.rule === "R1.quote_over_limit")?.result).toBe("unknown");
-    expect(c.info_requests[0].ask_fields).toEqual(["quote_eur"]);
+    expect(c.info_requests[0]?.ask_fields).toEqual(["quote_eur"]);
   });
   it("matched rule is true, others false", () => {
     const t = createMockStore([row("DEV-004", "human_review", { quote_eur: "2400" })]).get("DEV-004").latest_decision.detail.trace;
@@ -39,7 +39,7 @@ describe("mock adapter", () => {
     const s = createMockStore([row("DEV-002", "request_information", { incident_report_present: "False" })]);
     const c = s.facts("DEV-002", { changes: { incident_report_present: true }, reason: "found it", reviewer: "Jury" });
     expect(c.effective_recommendation).toBe("request_information");
-    expect(c.fact_edits[0].old_value).toBe(false);
+    expect(c.fact_edits[0]?.old_value).toBe(false);
   });
 });
 

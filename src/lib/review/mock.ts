@@ -17,7 +17,7 @@ function parse(field: string, raw: string): FieldValue {
 
 /** Shapes one imported row as the API would return it. Test data only — no decisions made here. */
 export function buildMockClaim(row: StoredRow): ClaimDetail {
-  const r = MOCK_RULES[row.case_id] ?? { rule_id: row.rule ?? "", reason: row.explanation ?? "", ask_fields: [], also_applies: [], statuses: {} };
+  const r = MOCK_RULES[row.case_id] ?? { rule_id: row['rule'] ?? "", reason: row['explanation'] ?? "", ask_fields: [], also_applies: [], statuses: {} };
   const fields = Object.keys(FIELD_LABELS).map((f) => {
     const raw = (row[f] ?? "").trim();
     const status = r.statuses[f] ?? (raw === "" ? "blank" : "known");
