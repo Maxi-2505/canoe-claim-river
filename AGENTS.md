@@ -38,3 +38,5 @@ use the editor.
 - Recommendation presentation uses the shared RecommendationLabel component, with existing page-specific information colours; this keeps status typography consistent without changing data or decisions.
 - PencilBackdrop delegates decorative rendering to PencilWaterBackground, which caches image-derived sketch strokes and animates on a single canvas; this isolates motion from intake state and foreground layout.
 - The policy page (/policy) has no decision logic: all data goes through `src/lib/policy/api.ts` (http when VITE_API_URL is set, else an in-memory mock with canned previews in `src/lib/policy/mock.ts`). Why: the Python engine owns rule evaluation; the mock only replays known demo results.
+- The policy Simulate scene (LocksScene) is a wiring diagram built only from preview rows: v1 and v2 wire paths share one segment structure so they can morph. Why: smooth "what changed" view without any decision logic.
+- The pencil lake backdrop renders only on the customer intake; internal pages stay on plain paper. Why: it overlapped internal cards.
