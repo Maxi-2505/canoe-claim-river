@@ -2,12 +2,12 @@ import { useEffect, useRef } from "react";
 import waterUrl from "@/assets/graphite-water.jpg";
 import canoeUrl from "@/assets/graphite-canoe.png";
 import {
-  SESSION_KEY, canoeSpot, clamp, easeOut, easeOutBack, entryDuration, foldStagger, frontFrom,
-  layerCount, layerTop, panels, rockAngle, waveAmplitude, wavePath,
+  SESSION_KEY, canoeSpot, clamp, easeOut, easeOutBack, entryDuration, frontFrom,
+  layerCount, layerTop, rockAngle, waveAmplitude, wavePath,
 } from "./papercut";
 
 const layers = Array.from({ length: layerCount }, (_, i) => i);
-const SNIPPETS = 5;
+const SNIPPETS = 9;
 
 function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) => void }) {
   const depth = i / (layerCount - 1);
@@ -21,7 +21,6 @@ function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) =
         </defs>
         <path d={wavePath(i)} fill="var(--paper)" />
         <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={0.15 + depth * 0.5} style={{ filter: `contrast(${0.8 + depth * 0.6})` }} />
-        <path d={wavePath(i)} fill="none" stroke="var(--mist)" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
       </svg>
     </div>
   );
@@ -31,10 +30,6 @@ export function PapercutSea() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const canoeRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const foldRef = useRef<HTMLDivElement>(null);
-  const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const glossRefs = useRef<(HTMLDivElement | null)[]>([]);
   const snipRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   useEffect(() => {
@@ -44,10 +39,9 @@ export function PapercutSea() {
     let seen = false;
     try { seen = sessionStorage.getItem(SESSION_KEY) === "1"; sessionStorage.setItem(SESSION_KEY, "1"); } catch { /* ignore */ }
     const animateEntry = !reduce && !seen;
-    const align = new URLSearchParams(location.search).has("align");
     const start = performance.now();
     const snips = Array.from({ length: SNIPPETS }, () => ({ born: -1e9, vx: 0, vy: 0 }));
-    let lastPitch = 0, frame = 0;
+    let lastPitch = 0, frame = 0, sprayed = !animateEntry;
 
     const render = (now: number) => {
       const t = animateEntry ? now - start : entryDuration + 1;
@@ -64,7 +58,9 @@ export function PapercutSea() {
         const dx = Math.sin((s * 2 * Math.PI) / p2 + i) * amp * 1.6;
         const land = easeOutBack((t - i * 90) / 600);
         const rise = (1 - land) * h * 0.8;
-        el.style.transform = `translate3d(${dx}px, ${dy + rise}px, 0)`;
+        const k = clamp((t - 800) / 1400);
+        const heave = i >= layerCount - 3 && k > 0 && k < 1 ? -Math.sin(k * Math.PI) * (6 + (i - layerCount + 3) * 4) : 0;
+        el.style.transform = `translate3d(${dx}px, ${dy + rise + heave}px, 0)`;
         el.style.opacity = String(clamp((t - i * 90) / 200));
       });
 
@@ -75,41 +71,30 @@ export function PapercutSea() {
       const ch = cw * 0.4;
       const ls = (s * 2 * Math.PI) / 5.3;
       const pitch = Math.sin(ls) * 0.75 + Math.sin((s * 2 * Math.PI) / 6.7 + 1) * 0.25;
-      const settle = animateEntry ? clamp((t - 2800) / 800) : 1;
-      const sink = (1 - easeOut(settle)) * -10 + Math.sin(settle * Math.PI * 3) * (1 - settle) * 6;
+      // Rise: hidden behind the front layers, bow down, then level; spring settle after.
+      const k = animateEntry ? easeOut((t - 800) / 1400) : 1;
+      const u = animateEntry ? clamp((t - 2200) / 800) : 1;
+      const spring = u > 0 && u < 1 ? -7 * Math.exp(-4 * u) * Math.cos(u * Math.PI * 5) * (1 - u) : 0;
+      const settle = u;
+      const riseY = (1 - k) * ch * 1.15 + (u === 0 && animateEntry ? 0 : spring);
+      const tilt = (1 - k) * -8;
+      const roll = (1 - k) * 0.12;
       const bob = Math.sin(ls - 0.4) * waveAmplitude * 0.75 * settle;
-      const angle = pitch * rockAngle * settle;
-      const drop = animateEntry ? (1 - easeOut((t - 900) / 500)) : 0;
-      const sway = Math.sin(t / 120) * 18 * drop;
+      const angle = pitch * rockAngle * settle + tilt;
       if (canoeRef.current) {
         canoeRef.current.style.width = `${cw}px`;
         canoeRef.current.style.height = `${ch}px`;
         canoeRef.current.style.left = `${spot.x * w - cw / 2}px`;
         canoeRef.current.style.top = `${spot.y * h - ch * 0.78}px`;
-        canoeRef.current.style.transform = `translate3d(${sway}px, ${bob + sink - drop * h * 0.5}px, 0) rotate(${angle + sway * 0.2}deg)`;
-        canoeRef.current.style.opacity = String(animateEntry ? clamp((t - 900) / 150) : 1);
+        canoeRef.current.style.transform = `translate3d(0, ${bob + riseY}px, 0) rotate(${angle}deg) scaleY(${1 - roll})`;
+      }
+      if (!sprayed && t > 1300) {
+        sprayed = true;
+        snips.forEach((sn, n) => { sn.born = now + n * 70; sn.vx = -30 + Math.random() * cw * 0.5; sn.vy = 60 + Math.random() * 50; });
       }
 
-      const folding = animateEntry && t < 2800;
-      if (imgRef.current) imgRef.current.style.opacity = folding ? "0" : "1";
-      if (foldRef.current) foldRef.current.style.display = folding || align ? "block" : "none";
-      panels.forEach((p, k) => {
-        const el = panelRefs.current[k];
-        if (!el) return;
-        const f = align ? 1 : easeOutBack((t - 1400 - p.order * foldStagger) / 600);
-        const rot = p.from * (1 - f);
-        el.style.transform = `rotate${p.axis}(${rot}deg)`;
-        el.style.opacity = align ? "0.5" : "1";
-        const g = glossRefs.current[k];
-        if (g) {
-          const sweep = clamp((t - 1700 - p.order * foldStagger) / 200);
-          g.style.transform = `translateX(${-100 + sweep * 200}%)`;
-          g.style.opacity = sweep > 0 && sweep < 1 ? "1" : "0";
-        }
-      });
-
       // Paper snippets pop at the bow (left) when it dips.
-      if (!reduce && settle > 0.4 && lastPitch > -0.6 && pitch <= -0.6) {
+      if (!reduce && settle > 0.99 && lastPitch > -0.6 && pitch <= -0.6) {
         snips.forEach((sn, k) => { sn.born = now + k * 40; sn.vx = -20 - Math.random() * 30; sn.vy = 40 + Math.random() * 30; });
       }
       lastPitch = pitch;
@@ -134,21 +119,10 @@ export function PapercutSea() {
     <div ref={sceneRef} className="papercut-sea" aria-hidden="true">
       {layers.map((i) => <Layer key={i} i={i} setRef={(el) => { layerRefs.current[i] = el; }} />)}
       <div ref={canoeRef} className="papercut-canoe" style={{ zIndex: frontFrom + 1 }}>
-        <img ref={imgRef} src={canoeUrl} alt="" draggable={false} />
-        <div ref={foldRef} className="papercut-fold">
-          {panels.map((p, k) => (
-            <div key={p.id} ref={(el) => { panelRefs.current[k] = el; }} className="papercut-panel" style={{ transformOrigin: p.origin }}>
-              <img src={canoeUrl} alt="" draggable={false} className="papercut-face" style={{ clipPath: p.clip }} />
-              <div className="papercut-back" style={{ clipPath: p.clip, transform: `rotate${p.axis}(180deg)` }} />
-              <div className="papercut-gloss-wrap" style={{ clipPath: p.clip }}>
-                <div ref={(el) => { glossRefs.current[k] = el; }} className="papercut-gloss" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <img src={canoeUrl} alt="" draggable={false} />
       </div>
       {Array.from({ length: SNIPPETS }, (_, k) => (
-        <span key={k} ref={(el) => { snipRefs.current[k] = el; }} className="papercut-snip" style={{ zIndex: frontFrom }} />
+        <span key={k} ref={(el) => { snipRefs.current[k] = el; }} className={k % 2 ? "papercut-snip papercut-drop" : "papercut-snip"} style={{ zIndex: frontFrom }} />
       ))}
       <div className="papercut-grain" />
     </div>

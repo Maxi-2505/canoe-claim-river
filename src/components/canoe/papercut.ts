@@ -2,8 +2,7 @@
 export const layerCount = 7;
 export const waveAmplitude = 7; // px, front layer bob
 export const rockAngle = 4; // degrees
-export const entryDuration = 3600; // ms
-export const foldStagger = 150; // ms
+export const entryDuration = 3000; // ms
 export const SESSION_KEY = "canoe-papercut-entered";
 
 export type Spot = { x: number; y: number; scale: number };
@@ -33,17 +32,6 @@ export function wavePath(i: number) {
   }
   return `M-20,300 L${pts.join(" L")} L1020,300 Z`;
 }
-
-/** Five panels of the canoe image. Edges are shared so they rebuild the image exactly. */
-export type Panel = { id: string; clip: string; origin: string; axis: "X" | "Y"; from: number; order: number };
-const B = 18, S = 82, T = 28, M = 52;
-export const panels: Panel[] = [
-  { id: "near-hull", clip: `polygon(${B}% ${M}%, ${S}% ${M}%, ${S}% 100%, ${B}% 100%)`, origin: `50% ${M}%`, axis: "X", from: 180, order: 0 },
-  { id: "far-hull", clip: `polygon(${B}% 0%, ${S}% 0%, ${S}% ${T}%, ${B}% ${T}%)`, origin: `50% ${T}%`, axis: "X", from: -180, order: 1 },
-  { id: "bow", clip: `polygon(0% 0%, ${B}% 0%, ${B}% 100%, 0% 100%)`, origin: `${B}% 50%`, axis: "Y", from: -180, order: 2 },
-  { id: "stern", clip: `polygon(${S}% 0%, 100% 0%, 100% 100%, ${S}% 100%)`, origin: `${S}% 50%`, axis: "Y", from: 180, order: 3 },
-  { id: "interior", clip: `polygon(${B}% ${T}%, ${S}% ${T}%, ${S}% ${M}%, ${B}% ${M}%)`, origin: "50% 50%", axis: "X", from: 90, order: 4 },
-];
 
 export const clamp = (n: number) => Math.max(0, Math.min(1, n));
 export const easeOut = (n: number) => 1 - Math.pow(1 - clamp(n), 3);
