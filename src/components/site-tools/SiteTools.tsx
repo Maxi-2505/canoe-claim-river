@@ -11,7 +11,7 @@ const themeStorageKey = "canoe-theme";
 const copy = {
   en: {
     language: "Language", theme: "Switch to dark mode", light: "Switch to light mode", chat: "Canoe help",
-    open: "Open Canoe help chat", close: "Close chat", hello: "Hello! I can help with basic questions about reporting a claim.",
+    open: "Open Ask Canoe help chat", close: "Close chat", hello: "Hello! I can help with basic questions about reporting a claim.",
     prompt: "Ask a question…", send: "Send message", topics: ["What do I need?", "How long does it take?", "What happens next?"],
     answers: [
       "For a car claim, it helps to have your policy number, the incident date, and a short description. A repair quote or police report can save you a few questions, but you can continue without them.",
@@ -21,7 +21,7 @@ const copy = {
   },
   de: {
     language: "Sprache", theme: "Dunkelmodus einschalten", light: "Hellmodus einschalten", chat: "Canoe Hilfe",
-    open: "Canoe Hilfe-Chat öffnen", close: "Chat schließen", hello: "Hallo! Ich beantworte allgemeine Fragen zur Schadenmeldung.",
+    open: "Ask-Canoe-Hilfe öffnen", close: "Chat schließen", hello: "Hallo! Ich beantworte allgemeine Fragen zur Schadenmeldung.",
     prompt: "Frage eingeben…", send: "Nachricht senden", topics: ["Was brauche ich?", "Wie lange dauert es?", "Wie geht es weiter?"],
     answers: [
       "Für einen Kfz-Schaden sind Ihre Versicherungsnummer, das Schadendatum und eine kurze Beschreibung hilfreich. Ein Kostenvoranschlag oder Polizeibericht kann einige Fragen ersparen. Sie können aber auch ohne diese Unterlagen fortfahren.",
@@ -110,6 +110,14 @@ export function SiteTools() {
       </div>
       <form className="canoe-chat-form" onSubmit={(event) => { event.preventDefault(); send(); }}><input value={question} onChange={(event) => setQuestion(event.target.value)} placeholder={text.prompt} aria-label={text.prompt} /><button aria-label={text.send} disabled={!question.trim()}><Send size={16} /></button></form>
     </section>}
-    <button className="canoe-chat-launcher" aria-label={open ? text.close : `${locale === "de" ? "Komm an Bord" : "Sail with us"} — ${text.open}`} aria-expanded={open} title={text.chat} onClick={() => setOpen(!open)}><ChatBoatMark className="canoe-chat-logo" /><span className="canoe-chat-invite">{locale === "de" ? "Komm an Bord" : "Sail with us"}</span></button>
+    <button className="canoe-chat-launcher" aria-label={open ? text.close : `${locale === "de" ? "Frag Canoe" : "Ask Canoe"} — ${text.open}`} aria-expanded={open} title={text.chat} onClick={() => setOpen(!open)}>
+      <span className="canoe-chat-logo">
+        <ChatBoatMark />
+        <svg className="canoe-chat-wave" viewBox="0 0 60 6" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 3 Q7.5 0.5 15 3 T30 3 T45 3 T60 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" vectorEffect="non-scaling-stroke" pathLength={60} />
+        </svg>
+      </span>
+      <span className="canoe-chat-invite">{locale === "de" ? "Frag Canoe" : "Ask Canoe"}</span>
+    </button>
   </>;
 }
