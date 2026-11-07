@@ -23,13 +23,19 @@ export type Database = {
           created_at: string
           duplicate_flag: string
           evidence_conflict: string
+          explanation: string
           incident_report_present: string
           injury_reported: string
           itemized_quote_present: string
           liability_disputed: string
+          missing_fields: string
           policy_active_on_incident: string
+          policy_version: string
           quote_eur: string
+          recommendation: string
           repair_type: string
+          request_status: string | null
+          rule: string
           updated_at: string
         }
         Insert: {
@@ -40,13 +46,19 @@ export type Database = {
           created_at?: string
           duplicate_flag?: string
           evidence_conflict?: string
+          explanation?: string
           incident_report_present?: string
           injury_reported?: string
           itemized_quote_present?: string
           liability_disputed?: string
+          missing_fields?: string
           policy_active_on_incident?: string
+          policy_version?: string
           quote_eur?: string
+          recommendation?: string
           repair_type?: string
+          request_status?: string | null
+          rule?: string
           updated_at?: string
         }
         Update: {
@@ -57,13 +69,19 @@ export type Database = {
           created_at?: string
           duplicate_flag?: string
           evidence_conflict?: string
+          explanation?: string
           incident_report_present?: string
           injury_reported?: string
           itemized_quote_present?: string
           liability_disputed?: string
+          missing_fields?: string
           policy_active_on_incident?: string
+          policy_version?: string
           quote_eur?: string
+          recommendation?: string
           repair_type?: string
+          request_status?: string | null
+          rule?: string
           updated_at?: string
         }
         Relationships: []
