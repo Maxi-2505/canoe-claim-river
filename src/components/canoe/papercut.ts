@@ -1,7 +1,7 @@
 // Tunable constants for the papercut sea. Decorative only — no claim state here.
 export const layerCount = 7;
-export const waveAmplitude = 7; // px, front layer bob
-export const rockAngle = 4; // degrees
+export const waveAmplitude = 13; // px, front layer bob
+export const rockAngle = 6; // degrees
 export const entryDuration = 3000; // ms
 export const SESSION_KEY = "canoe-papercut-entered";
 
@@ -23,7 +23,7 @@ function seeded(seed: number) {
 export function wavePath(i: number) {
   const rand = seeded(i * 97 + 13);
   const depth = i / (layerCount - 1);
-  const amp = 4 + depth * 14;
+  const amp = 7 + depth * 22;
   const wl = 150 - depth * 50;
   const pts: string[] = [];
   for (let x = -20; x <= 1020; x += 10) {
