@@ -3,9 +3,9 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motorConfig } from "@/lib/intake/config";
-import { isSettled, isVisible, openMissing, orderedQuestions, stateFromLog } from "@/lib/intake/logic";
+import { openMissing, parseMissing, stateFromLog, stateFromStoredRow } from "@/lib/intake/logic";
 import { IntakeFlow } from "@/components/canoe/IntakeFlow";
-import { displayValue } from "@/components/canoe/display";
+import { eur } from "@/components/canoe/samples";
 
 const claimQuery = (caseId: string) => queryOptions({
   queryKey: ["claim", caseId],
@@ -39,20 +39,34 @@ export const Route = createFileRoute("/continue/$caseId")({
   component: ContinuePage,
 });
 
+const CLAIM_TYPE: Record<string, string> = { motor_own_damage: "Damage to my car", theft: "Theft" };
+const present = (v: string) => (v === "True" ? "yes" : v === "False" ? "not yet" : "—");
+
 function ContinuePage() {
   const { caseId } = Route.useParams();
   const { missing: raw } = Route.useSearch();
   const { data } = useSuspenseQuery(claimQuery(caseId));
-  const missing = useMemo(() => (raw ?? "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 20), [raw]);
-  const initial = useMemo(() => openMissing(stateFromLog(data!.log), motorConfig, missing), [data, missing]);
-  const known = orderedQuestions(motorConfig).filter((q) => isVisible(q, initial, motorConfig) && isSettled(initial.facts[q.id]));
+  const row = data!.row;
+  const missing = useMemo(() => parseMissing(raw ?? row.missing_fields), [raw, row.missing_fields]);
+  const initial = useMemo(
+    () => openMissing(data!.log.length ? stateFromLog(data!.log) : stateFromStoredRow(row), motorConfig, missing),
+    [data, row, missing],
+  );
+  const quote = row.quote_eur !== "" && Number.isFinite(Number(row.quote_eur)) ? Number(row.quote_eur) : undefined;
+  const summary: [string, string][] = [
+    ["What happened", row.claim_summary || "—"],
+    ["Claim type", CLAIM_TYPE[row.claim_type] ?? (row.claim_type || "—")],
+    ["Repair quote", quote != null ? eur(quote) : "—"],
+    ["Incident report", present(row.incident_report_present)],
+    ["Itemized quote", present(row.itemized_quote_present)],
+  ];
   const header = (
     <div className="mb-8 rounded-2xl border border-stone/20 p-4 opacity-70">
       <p className="text-sm font-medium">Claim {caseId} · {missing.length} thing{missing.length === 1 ? "" : "s"} missing</p>
       <ul className="mt-2 grid gap-x-4 gap-y-1 text-xs text-stone sm:grid-cols-2">
-        {known.slice(0, 10).map((q) => <li key={q.id} className="truncate">{q.short}: {displayValue(q, initial.facts[q.id])}</li>)}
+        {summary.map(([k, v]) => <li key={k} className="truncate" title={v}>{k}: {v}</li>)}
       </ul>
     </div>
   );
-  return <IntakeFlow mode={{ kind: "missing", missing }} initialState={initial} caseId={caseId} header={header} />;
+  return <IntakeFlow mode={{ kind: "missing", missing }} initialState={initial} caseId={caseId} header={header} quoteTotal={quote} />;
 }

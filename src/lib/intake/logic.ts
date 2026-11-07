@@ -248,3 +248,30 @@ export function openMissing(state: IntakeState, config: FormConfig, missing: str
   }
   return { ...state, facts };
 }
+
+/** Case ids the continue flow accepts: imported DEV/PRA cases and Canoe FORM cases. */
+export const CASE_ID_RE = /^(DEV-\d{3,}|PRA-\d{3,}|FORM-\d{4,})$/;
+
+/** Missing list from a link (?missing=a,b) or the stored missing_fields (a;b). */
+export function parseMissing(raw: string | null | undefined): string[] {
+  return (raw ?? "").split(/[;,]/).map((s) => s.trim()).filter(Boolean).slice(0, 20);
+}
+
+/** Imported cases have no fact log: seed only what the question flow needs (claim type for show_if). */
+export function stateFromStoredRow(row: { claim_type?: string | null }): IntakeState {
+  const s = emptyState();
+  if (row.claim_type) s.facts["what_happened"] = { value: row.claim_type, status: "known", source: "system", timestamp: new Date().toISOString() };
+  return s;
+}
+
+/** Missing mode: only the CSV columns named in `missing` are recomputed; nothing else is touched. */
+export function patchMissingColumns(state: IntakeState, config: FormConfig, missing: string[]): Partial<ClaimRow> {
+  const built = buildRow("_", state, config);
+  const out: Partial<ClaimRow> = {};
+  for (const m of missing) {
+    const col = (CSV_COLUMNS as readonly string[]).includes(m) ? m : config.questions.find((q) => q.id === m)?.field;
+    if (!col || col === "case_id" || col === "case_status" || !(CSV_COLUMNS as readonly string[]).includes(col)) continue;
+    out[col as CsvColumn] = built[col as CsvColumn];
+  }
+  return out;
+}

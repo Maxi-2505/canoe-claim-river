@@ -23,8 +23,8 @@ type Screen = "start" | "preview" | "docs" | "question" | "review" | "done";
 interface Saved { screen: Screen; state: IntakeState; history: string[] }
 const STORAGE = "canoe-intake-v1";
 
-export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, header }: {
-  mode?: Mode; initialState?: IntakeState; caseId?: string; header?: React.ReactNode;
+export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, header, quoteTotal }: {
+  mode?: Mode; initialState?: IntakeState; caseId?: string; header?: React.ReactNode; quoteTotal?: number | undefined;
 }) {
   const missing = mode.kind === "missing";
   const [screen, setScreen] = useState<Screen>(missing ? "question" : "start");
@@ -97,7 +97,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
   const submit = async () => {
     setSubmitting(true);
     try {
-      const res = caseId ? await updateClaim({ data: { caseId, state } }) : await submitClaim({ data: { state } });
+      const res = caseId ? await updateClaim({ data: { caseId, state, ...(mode.kind === "missing" ? { missing: mode.missing } : {}) } }) : await submitClaim({ data: { state } });
       setDoneId(res.caseId);
       setScreen("done");
       if (!missing) localStorage.removeItem(STORAGE);
@@ -179,6 +179,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
                 <button onClick={back} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> Back</button>
                 <QuestionCard
                   key={current.id}
+                  quoteTotal={quoteTotal}
                   q={current}
                   fact={state.facts[current.id]}
                   optional={injury && current.id !== "injury"}
