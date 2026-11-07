@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import seaAsset from "@/assets/pencil-sea-texture.jpg.asset.json";
+import seaAsset from "@/assets/pencil-sea-tile.jpg.asset.json";
 const waterUrl = seaAsset.url;
 import canoeUrl from "@/assets/graphite-canoe.png";
 import {
