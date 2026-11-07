@@ -17,7 +17,7 @@ export async function loadBusiness(): Promise<BusinessData> {
   if (!base) {
     const { default: fixture } = await import('./fixture.json');
     const policy = await getPolicyApi().getPolicy();
-    return { impact: fixture.impact, quality: fixture.quality as Quality, claims: fixture.claims.claims as BusinessClaim[], audit: fixture.audit.events, policy, mode: 'mock' };
+    return { impact: fixture.impact as Impact, quality: fixture.quality as Quality, claims: fixture.claims.claims as BusinessClaim[], audit: fixture.audit.events, policy, mode: 'mock' };
   }
   const [impact, quality, claims, audit, policy] = await Promise.all([
     call<Impact>('/api/impact'), call<Quality>('/api/quality'), call<{ claims: BusinessClaim[] }>('/api/claims'),
@@ -27,7 +27,7 @@ export async function loadBusiness(): Promise<BusinessData> {
     if (!impact.rechecks.some(r => r.case_id === c.case_id)) return c;
     const detail = await call<{ decisions: { policy_version: string; rule_id: string }[] }>(`/api/claims/${encodeURIComponent(c.case_id)}`);
     const old = detail.decisions.find(d => d.policy_version === (impact.rechecks.find(r => r.case_id === c.case_id)?.from_version ?? 'v1'));
-    return { ...c, rule_v1: old?.rule_id };
+    return old ? { ...c, rule_v1: old.rule_id } : c;
   }));
   return { impact, quality, claims: enriched, audit: audit.events, policy, mode: 'http' };
 }
