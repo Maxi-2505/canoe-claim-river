@@ -10,7 +10,7 @@ export type Spot = { x: number; y: number; scale: number };
 export const positions: Spot[] = [{ x: 0.7, y: 0.72, scale: 1 }];
 
 /** Layer i (0 = back) — top edge as a fraction of scene height. */
-export const layerTop = (i: number) => 0.12 + Math.pow(i / (layerCount - 1), 1.5) * 0.66;
+export const layerTop = (i: number) => 0.12 + Math.pow(i / (layerCount - 1), 1.1) * 0.56;
 /** Index of the first layer drawn in front of the canoe. */
 export const frontFrom = layerCount - 3;
 
