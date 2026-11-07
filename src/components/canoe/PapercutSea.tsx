@@ -18,7 +18,7 @@ function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) =
       <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <pattern id={`pc-water-${i}`} patternUnits="userSpaceOnUse" width={tile.w} height={tile.h} x={tile.x} y={tile.y}>
-            <image href={waterUrl} width={tile.w} height={tile.h} preserveAspectRatio="xMidYMid slice" />
+            <image href={waterUrl} width={tile.w} height={tile.h} preserveAspectRatio="none" />
           </pattern>
         </defs>
         <path d={wavePath(i)} fill="var(--paper)" />
