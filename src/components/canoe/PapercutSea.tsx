@@ -13,8 +13,11 @@ const SNIPPETS = 9;
 function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) => void }) {
   const depth = i / (layerCount - 1);
   const tile = patternTile(i);
+  // Depth haze: the three farthest layers lose contrast and dissolve upward into the paper.
+  const haze = i < 4 ? (4 - i) / 4 : 0;
+  const fade = haze ? `linear-gradient(to bottom, transparent 0%, rgba(0,0,0,${0.15 * (1 - haze)}) 8%, rgba(0,0,0,${0.55 - haze * 0.25}) 30%, rgba(0,0,0,${1 - haze * 0.35}) 65%)` : undefined;
   return (
-    <div ref={setRef} className="papercut-layer" style={{ top: `${layerTop(i) * 100}%`, zIndex: i < frontFrom ? i : 20 + i }}>
+    <div ref={setRef} className="papercut-layer" style={{ top: `${layerTop(i) * 100}%`, zIndex: i < frontFrom ? i : 20 + i, maskImage: fade, WebkitMaskImage: fade, filter: haze ? `blur(${haze * 1.2}px)` : undefined }}>
       <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <pattern id={`pc-water-${i}`} patternUnits="userSpaceOnUse" width={tile.w} height={tile.h} x={tile.x} y={tile.y}>
@@ -22,7 +25,7 @@ function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) =
           </pattern>
         </defs>
         <path d={wavePath(i)} fill="var(--paper)" />
-        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={0.5 + depth * 0.45} style={{ filter: `contrast(${0.9 + depth * 0.5})` }} />
+        <path d={wavePath(i)} fill={`url(#pc-water-${i})`} opacity={(0.5 + depth * 0.45) * (1 - haze * 0.55)} style={{ filter: `contrast(${(0.9 + depth * 0.5) * (1 - haze * 0.4)})` }} />
       </svg>
     </div>
   );
@@ -120,6 +123,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
   return (
     <div ref={sceneRef} className={contained ? "papercut-sea papercut-sea--contained" : "papercut-sea"} aria-hidden="true">
       {layers.map((i) => <Layer key={i} i={i} setRef={(el) => { layerRefs.current[i] = el; }} />)}
+      <div className="papercut-fog" style={{ zIndex: 3 }} />
       <div ref={canoeRef} className="papercut-canoe" style={{ zIndex: frontFrom + 1 }}>
         <img src={canoeUrl} alt="" draggable={false} />
       </div>
