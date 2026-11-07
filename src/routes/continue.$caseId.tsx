@@ -1,0 +1,58 @@
+import { createFileRoute, notFound } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { motorConfig } from "@/lib/intake/config";
+import { isSettled, isVisible, openMissing, orderedQuestions, stateFromLog } from "@/lib/intake/logic";
+import { IntakeFlow } from "@/components/canoe/IntakeFlow";
+import { displayValue } from "@/components/canoe/display";
+
+const claimQuery = (caseId: string) => queryOptions({
+  queryKey: ["claim", caseId],
+  queryFn: async () => {
+    const { data: row, error } = await supabase.from("claim_rows").select("*").eq("case_id", caseId).maybeSingle();
+    if (error) throw error;
+    if (!row) return null;
+    const { data: log, error: e2 } = await supabase.from("fact_log").select("field,value,status,source,timestamp").eq("case_id", caseId);
+    if (e2) throw e2;
+    return { row, log: log ?? [] };
+  },
+});
+
+export const Route = createFileRoute("/continue/$caseId")({
+  validateSearch: (s: Record<string, unknown>) => ({ missing: typeof s["missing"] === "string" ? (s["missing"] as string) : undefined }),
+  head: ({ params }) => ({
+    meta: [
+      { title: `Continue claim ${params.caseId} — Canoe` },
+      { name: "description", content: "Add the details still missing from your claim." },
+      { property: "og:title", content: "Continue your claim — Canoe" },
+      { property: "og:description", content: "A few details and your claim moves again." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  loader: async ({ context, params }) => {
+    const d = await context.queryClient.ensureQueryData(claimQuery(params.caseId));
+    if (!d) throw notFound();
+  },
+  component: ContinuePage,
+});
+
+function ContinuePage() {
+  const { caseId } = Route.useParams();
+  const { missing: raw } = Route.useSearch();
+  const { data } = useSuspenseQuery(claimQuery(caseId));
+  const missing = useMemo(() => (raw ?? "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 20), [raw]);
+  const initial = useMemo(() => openMissing(stateFromLog(data!.log), motorConfig, missing), [data, missing]);
+  const known = orderedQuestions(motorConfig).filter((q) => isVisible(q, initial, motorConfig) && isSettled(initial.facts[q.id]));
+  const header = (
+    <div className="mb-8 rounded-2xl border border-stone/20 p-4 opacity-70">
+      <p className="text-sm font-medium">Claim {caseId} · {missing.length} thing{missing.length === 1 ? "" : "s"} missing</p>
+      <ul className="mt-2 grid gap-x-4 gap-y-1 text-xs text-stone sm:grid-cols-2">
+        {known.slice(0, 10).map((q) => <li key={q.id} className="truncate">{q.short}: {displayValue(q, initial.facts[q.id])}</li>)}
+      </ul>
+    </div>
+  );
+  return <IntakeFlow mode={{ kind: "missing", missing }} initialState={initial} caseId={caseId} header={header} />;
+}
