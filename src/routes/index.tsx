@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { IntakeFlow } from "@/components/canoe/IntakeFlow";
+import { LandingPage } from "@/components/landing/LandingPage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Canoe — Report a car claim" },
-      { name: "description", content: "Tell us what happened to your car. Add a quote or report and Canoe fills in what it can." },
-      { property: "og:title", content: "Canoe — Report a car claim" },
-      { property: "og:description", content: "A calm, short claim form. Steady through changing water." },
+      { title: "Canoe — Claims triage that holds when the rules change" },
+      { name: "description", content: "Canoe reads a motor claim, applies your written policy and tells your team the next step, with the rule and policy version behind every answer." },
+      { property: "og:title", content: "Canoe — Decisions that hold when the rules change" },
+      { property: "og:description", content: "Rules decide, people review, and every policy change is previewed before it goes live." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <IntakeFlow />,
+  component: LandingPage,
 });
