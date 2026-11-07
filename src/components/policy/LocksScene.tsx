@@ -7,9 +7,10 @@ import { euro, gateLabel, quoteLimitOf } from "@/lib/policy/text";
 import type { Draft, Preview, PreviewRow, Rec, Rule } from "@/lib/policy/types";
 
 /* Wiring diagram: one wire per open claim, rules as gate cards on the bus. Presentation only. */
-const W = 1200, H = 520, BUS_Y = 150, X0 = 40, GX0 = 220, GX1 = 990, TERM_X = 1070, R = 14, PITCH = 2.5;
+const W = 1200, H = 520, BUS_Y = 150, X0 = 40, GX0 = 230, GX1 = 990, TERM_X = 1070, R = 14, PITCH = 2.5;
 const RAIL: Record<Rec, number> = { routine_processing: BUS_Y, human_review: 330, request_information: 410 };
-const CARD_H = 58;
+const CARD_H = 52, ROW = 34;
+const cy = (i: number) => BUS_Y + (i % 2 ? ROW : -ROW);
 
 function bezier(x1: number, y1: number, x2: number, y2: number) {
   const cx = (t: number, a: number, b: number) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
@@ -44,7 +45,7 @@ export function LocksScene(p: LocksSceneProps) {
   }, [p.draft, p.live]);
   const n = gates.length;
   const spacing = n <= 1 ? 0 : (GX1 - GX0) / (n - 1);
-  const cardW = Math.min(120, n <= 1 ? 120 : spacing - 8);
+  const cardW = Math.min(124, n <= 2 ? 124 : 2 * spacing - 12);
   const gx = (i: number) => (n <= 1 ? (GX0 + GX1) / 2 : GX0 + i * spacing);
 
   const exitOf = (ruleId: string, to: Rec): Exit => {
@@ -84,7 +85,7 @@ export function LocksScene(p: LocksSceneProps) {
           return;
         }
         const grp = groups.get(`${x.gate}|${x.to}`)!.sort((a, b) => busIdx.get(a.row.case_id)! - busIdx.get(b.row.case_id)!);
-        const k = grp.indexOf(e), dx = gx(x.gate) + cardW / 2 + 6 + k * PITCH, ry = railY.get(e.row.case_id)!;
+        const k = grp.indexOf(e), dx = gx(x.gate) + (k - (grp.length - 1) / 2) * PITCH, ry = railY.get(e.row.case_id)!;
         res.set(e.row.case_id, { d: `M${X0} ${y} L${dx - R} ${y} Q${dx} ${y} ${dx} ${y + R} L${dx} ${ry - R} Q${dx} ${ry} ${dx + R} ${ry} L${TERM_X} ${ry}`, ax: gx(x.gate) });
       });
       return res;
@@ -150,7 +151,7 @@ export function LocksScene(p: LocksSceneProps) {
 
           {/* rails */}
           <g className="font-mono" fontSize={10} letterSpacing="0.08em">
-            <text x={X0 - 20} y={BUS_Y - 46} className="fill-ink">{ran ? `${wires.length} open claims` : "open claims"}</text>
+            <text x={X0 - 20} y={BUS_Y - 40} className="fill-ink">{ran ? `${wires.length} open claims` : "open claims"}</text>
             <line x1={X0} x2={TERM_X} y1={BUS_Y} y2={BUS_Y} className="stroke-stone" strokeOpacity={0.25} strokeDasharray="2 4" />
             <line x1={GX0} x2={TERM_X} y1={RAIL.human_review} y2={RAIL.human_review} className="stroke-ink" strokeOpacity={0.18} strokeDasharray="2 4" />
             <line x1={GX0} x2={TERM_X} y1={RAIL.request_information} y2={RAIL.request_information} className="stroke-ochre" strokeOpacity={0.3} strokeDasharray="2 4" />
@@ -190,7 +191,7 @@ export function LocksScene(p: LocksSceneProps) {
 
           {/* gates */}
           {gates.map((g, i) => {
-            const x = gx(i), info = g.rule.outcome === "request_information";
+            const x = gx(i), Y = cy(i), info = g.rule.outcome === "request_information";
             const c2 = catches(i, "v2").length, c1 = catches(i, "v1").length;
             const lift = g.isNew ? (1 - ease(dropT)) * -78 : 0;
             const oldQ = g.old?.when.find((c) => c.field === "quote_eur")?.value, newQ = g.rule.when.find((c) => c.field === "quote_eur")?.value;
@@ -202,20 +203,20 @@ export function LocksScene(p: LocksSceneProps) {
             return (
               <g key={g.rule.id} onMouseEnter={() => setHoverGate(i)} onMouseLeave={() => setHoverGate(null)}
                 onClick={i === qi ? () => setDam((d) => !d) : undefined} style={{ cursor: i === qi ? "pointer" : "default" }}>
-                {g.isNew && lift < -1 && <rect x={x - cardW / 2} y={BUS_Y - CARD_H / 2} width={cardW} height={CARD_H} rx={4} fill="none" className="stroke-cedar" strokeOpacity={0.4} strokeDasharray="1 3" />}
+                {g.isNew && lift < -1 && <rect x={x - cardW / 2} y={Y - CARD_H / 2} width={cardW} height={CARD_H} rx={4} fill="none" className="stroke-cedar" strokeOpacity={0.4} strokeDasharray="1 3" />}
                 <g transform={`translate(0 ${lift})`} className={tone}>
-                  <rect x={x - cardW / 2} y={BUS_Y - CARD_H / 2} width={cardW} height={CARD_H} rx={4} className={cn2(g)} strokeWidth={1} strokeDasharray={g.isNew ? "4 3" : undefined} />
-                  <text x={x - cardW / 2 + 8} y={BUS_Y - 12} fontSize={9.5} className="font-mono" fill="currentColor" textDecoration={g.removed ? "line-through" : undefined}>{g.rule.id.length > 18 ? g.rule.id.slice(0, 17) + "…" : g.rule.id}</text>
+                  <rect x={x - cardW / 2} y={Y - CARD_H / 2} width={cardW} height={CARD_H} rx={4} className={cn2(g)} strokeWidth={1} strokeDasharray={g.isNew ? "4 3" : undefined} />
+                  <text x={x - cardW / 2 + 8} y={Y - 10} fontSize={9.5} className="font-mono" fill="currentColor" textDecoration={g.removed ? "line-through" : undefined}>{fit(g.rule.id, Math.floor((cardW - (g.isNew || g.removed ? 50 : 16)) / 5.8))}</text>
                   {changedVal && typeof oldQ === "number" && typeof newQ === "number" ? (
-                    <text x={x - cardW / 2 + 8} y={BUS_Y + 5} fontSize={12} fill="currentColor">Quote &gt; <tspan className="fill-stone" textDecoration="line-through">{euro(oldQ)}</tspan> <tspan className="fill-cedar" opacity={ran ? flip : 0.35}>{euro(newQ)}</tspan></text>
+                    <text x={x - cardW / 2 + 8} y={Y + 6} fontSize={10.5} fill="currentColor">Quote &gt; <tspan className="fill-stone" textDecoration="line-through">{euro(oldQ)}</tspan> <tspan className="fill-cedar" opacity={ran ? flip : 0.35}>{euro(newQ)}</tspan></text>
                   ) : changedVal ? (
-                    <text x={x - cardW / 2 + 8} y={BUS_Y + 5} fontSize={12} fill="currentColor"><tspan className="fill-stone" textDecoration="line-through">{oldLabel}</tspan> <tspan className="fill-cedar">{newLabel}</tspan></text>
+                    <text x={x - cardW / 2 + 8} y={Y + 6} fontSize={10.5} fill="currentColor"><tspan className="fill-stone" textDecoration="line-through">{oldLabel}</tspan> <tspan className="fill-cedar">{newLabel}</tspan></text>
                   ) : (
-                    <text x={x - cardW / 2 + 8} y={BUS_Y + 5} fontSize={13} fill="currentColor" textDecoration={g.removed ? "line-through" : undefined}>{newLabel}</text>
+                    <text x={x - cardW / 2 + 8} y={Y + 6} fontSize={13} fill="currentColor" textDecoration={g.removed ? "line-through" : undefined}>{newLabel}</text>
                   )}
-                  <text x={x - cardW / 2 + 8} y={BUS_Y + 21} fontSize={9.5} className="fill-stone font-mono">{counter}</text>
-                  {g.isNew && <text x={x + cardW / 2 - 6} y={BUS_Y - 12} textAnchor="end" fontSize={9} className="fill-cedar font-mono" textDecoration="underline">new</text>}
-                  {g.removed && <text x={x + cardW / 2 - 6} y={BUS_Y - 12} textAnchor="end" fontSize={9} className="fill-stone font-mono" textDecoration="underline">removed</text>}
+                  <text x={x - cardW / 2 + 8} y={Y + 20} fontSize={9.5} className="fill-stone font-mono">{counter}</text>
+                  {g.isNew && <text x={x + cardW / 2 - 6} y={Y - 10} textAnchor="end" fontSize={9} className="fill-cedar font-mono" textDecoration="underline">new</text>}
+                  {g.removed && <text x={x + cardW / 2 - 6} y={Y - 10} textAnchor="end" fontSize={9} className="fill-stone font-mono" textDecoration="underline">removed</text>}
                 </g>
               </g>
             );
@@ -268,14 +269,14 @@ export function LocksScene(p: LocksSceneProps) {
       {hoverGate != null && ran && !hoverWire && (() => {
         const ids = catches(hoverGate, view).map((w) => w.row.case_id);
         return (
-          <div className="pointer-events-none absolute z-10 max-w-64 -translate-x-1/2 rounded-lg border bg-paper px-2.5 py-1.5 font-mono text-[11px] shadow-sm" style={toSvgPct(gx(hoverGate), BUS_Y + CARD_H / 2 + 10)}>
+          <div className="pointer-events-none absolute z-10 max-w-64 -translate-x-1/2 rounded-lg border bg-paper px-2.5 py-1.5 font-mono text-[11px] shadow-sm" style={toSvgPct(gx(hoverGate), hoverGate % 2 ? cy(hoverGate) + CARD_H / 2 + 8 : cy(hoverGate) - CARD_H / 2 - 30)}>
             {ids.length ? ids.join(" · ") : <span className="text-stone">catches none</span>}
           </div>
         );
       })()}
 
       {dam && qi >= 0 && limit != null && (
-        <div className="absolute z-20 w-72 -translate-x-1/2 rounded-xl border bg-paper p-4 shadow-md" style={toSvgPct(Math.min(W - 180, Math.max(180, gx(qi))), BUS_Y + CARD_H / 2 + 14)}>
+        <div className="absolute z-20 w-72 -translate-x-1/2 rounded-xl border bg-paper p-4 shadow-md" style={toSvgPct(Math.min(W - 180, Math.max(180, gx(qi))), cy(qi) + CARD_H / 2 + 14)}>
           <div className="flex items-baseline justify-between"><p className="eyebrow">Quote limit</p><button className="text-xs text-stone hover:text-ink" onClick={() => setDam(false)}>Close</button></div>
           <p className="mt-1 font-display text-2xl">Quote &gt; {euro(limit)}</p>
           {p.liveLimit != null && p.liveLimit !== limit && <p className="font-mono text-[11px] text-stone">live: {euro(p.liveLimit)}</p>}
@@ -294,3 +295,5 @@ function cn2(g: Gate) {
   if (g.isNew) return "fill-paper stroke-cedar";
   return "fill-paper stroke-current";
 }
+
+const fit = (s: string, n: number) => (s.length > n ? s.slice(0, Math.max(3, n - 1)) + "…" : s);
