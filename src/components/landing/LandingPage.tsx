@@ -78,8 +78,8 @@ function WiringSketch() {
 const team = [
   { name: "Mattis Kronenbitter", role: "Product & experience", line: "Business informatics, ex-GTM engineer", initials: "MK" },
   { name: "Maximilian Kempf", role: "Business case & go-to-market", line: "Ex-Plato sales", initials: "MK" },
-  { name: "[Name]", role: "Rules engine & API", line: "Robotics engineer", initials: "—" },
-  { name: "[Name]", role: "Backend & data", line: "Robotics engineer", initials: "—" },
+  { name: "Siddesh", role: "Rules engine & API", line: "AI engineer", initials: "S" },
+  { name: "Vineeth", role: "Backend & data", line: "AI engineer", initials: "V" },
 ];
 
 export function LandingPage() {
