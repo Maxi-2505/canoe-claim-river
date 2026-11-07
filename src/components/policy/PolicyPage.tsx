@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowUp, GripVertical, Trash2 } from "lucide-react";
 import { Accent, Wordmark } from "@/components/canoe/brand";
-import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { RecommendationLabel } from "@/components/canoe/RecommendationLabel";
 import { LocksScene } from "./LocksScene";
 import { getPolicyApi, type Draft, type PolicyDoc, type PolicyVersion, type Preview, type PublishResult, type Rule, type Cond } from "@/lib/policy/api";
@@ -51,6 +50,7 @@ export function PolicyPage() {
   const [viewing, setViewing] = useState<PolicyVersion | null>(null);
   const [result, setResult] = useState<PublishResult | null>(null);
   const [glide, setGlide] = useState(0);
+  const [view, setView] = useState<"v1" | "v2">("v2");
   const damTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const load = () => api.getPolicy().then((d) => { setDoc(d); setLoadErr(null); return d; }).catch((e) => { setLoadErr(e.message); return null; });
@@ -71,7 +71,7 @@ export function PolicyPage() {
     try {
       const p = await api.preview(d);
       setPreview(p); setPreviewKey(key(d)); setResult(null);
-      if (newRun) { setRunId((r) => r + 1); setHighlight(null); }
+      if (newRun) { setRunId((r) => r + 1); setHighlight(null); setView("v2"); }
     } catch (e) { setSimErr((e as Error).message); }
     finally { setBusy(false); setDamPending(false); }
   };
@@ -112,14 +112,14 @@ export function PolicyPage() {
         <Step n={2} title="Simulate" aside={api.mode === "mock" && <span className="font-mono text-[11px] text-stone">demo data · 26 cases</span>}>
           <div className="card-calm overflow-hidden p-3 md:p-5">
             <LocksScene draft={draft} live={live} preview={preview} stale={stale} runId={runId} skipToken={skip} glide={glide}
-              showGhosts={ghosts} highlight={highlight} liveLimit={quoteLimitOf(live.rules)} escalations={escalations} onLimit={onLimit} />
+              showGhosts={ghosts} highlight={highlight} liveLimit={quoteLimitOf(live.rules)} escalations={escalations} onLimit={onLimit} view={view} />
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button className="btn-cedar px-5 py-2 text-sm" disabled={busy} onClick={() => runPreview(draft, true)}>{stale ? "Simulate again" : "Simulate"}</button>
-            <button className="btn-quiet px-4 py-2 text-sm" disabled={!fresh} onClick={() => setRunId((r) => r + 1)}>Replay</button>
+            <button className="btn-quiet px-4 py-2 font-mono text-sm" disabled={!fresh} aria-pressed={view === "v1"} onClick={() => setView((v) => (v === "v1" ? "v2" : "v1"))}>{view === "v1" ? "v1 ⇄ v2 · showing v1" : "v1 ⇄ v2"}</button>
             <button className="btn-quiet px-4 py-2 text-sm" disabled={!preview} onClick={() => setSkip((s) => s + 1)}>Skip animation</button>
             <label className="ml-1 flex items-center gap-2 text-sm text-stone"><input type="checkbox" checked={ghosts} onChange={(e) => setGhosts(e.target.checked)} className="accent-[var(--cedar)]" /> Show v1 routes</label>
-            <span className="text-xs text-stone">Click the quote gate to open the dam.</span>
+            <span className="text-xs text-stone">Click the quote gate to change the limit.</span>
           </div>
           {simErr && <p className="mt-3 text-sm text-cedar">{simErr}</p>}
         </Step>
@@ -147,7 +147,6 @@ export function PolicyPage() {
 function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen pb-32">
-      <div style={{ opacity: 0.3 }}><PencilBackdrop /></div>
       <header className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-5 pt-5 md:px-8">
         <div className="flex items-center gap-4">
           <Wordmark />

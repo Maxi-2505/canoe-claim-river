@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Anchor, Building2, FileText, Menu, User, X } from "lucide-react";
 import { Wordmark, CanoeMark, Accent } from "@/components/canoe/brand";
-import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { useCalmMotion } from "@/components/canoe/motion";
 import { getReviewApi, ApiError, type ClaimDetail, type ClaimListItem, type Field, type FieldValue, type Rec } from "@/lib/review/api";
 import { FIELD_GROUPS, REASON, REC_LABEL, REC_SHORT, RULE_FIELD, euro, formatValue, inTab, isOpen, sortQueue, type Tab } from "@/lib/review/labels";
@@ -101,7 +100,6 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
 
   return (
     <div className="min-h-screen">
-      <div style={{ opacity: 0.35 }}><PencilBackdrop /></div>
       <header className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 px-5 pt-5 md:px-8">
         <div className="flex items-center gap-4">
           <button className="btn-quiet p-2 min-[1200px]:hidden" aria-label="Open queue" onClick={() => setDrawer(true)}><Menu className="size-4" /></button>
