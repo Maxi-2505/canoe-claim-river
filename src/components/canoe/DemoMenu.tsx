@@ -52,7 +52,11 @@ export function DemoMenu({ onPick }: { onPick: (p: Preset | "reset") => void }) 
           <button onClick={() => { onPick("reset"); setOpen(false); }} className="rounded-lg px-3 py-2 text-left text-stone hover:bg-paper">Reset</button>
         </div>
       )}
-      <button onClick={() => setOpen((o) => !o)} className="text-stone hover:text-ink">Demo</button>
+      <div className="flex items-center gap-3">
+        <button onClick={() => setOpen((o) => !o)} className="text-stone hover:text-ink">Demo</button>
+        <span className="h-3 w-px bg-stone/30" aria-hidden="true" />
+        <button onClick={() => { if (window.confirm("Start over? This clears every answer and upload.")) { onPick("reset"); setOpen(false); } }} className="font-mono text-[11px] uppercase tracking-wider text-stone hover:text-cedar">Reset demo</button>
+      </div>
     </div>
   );
 }
