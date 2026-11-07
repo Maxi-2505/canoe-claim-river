@@ -3,7 +3,7 @@ import { createPolicyStore, demoDraft, mockPreview, POLICY_V1, toDraft, withLimi
 import { describeDiff } from "./text";
 
 const R = "routine_processing", I = "request_information", H = "human_review";
-const spec: [string, string, string?, string?][] = [
+const spec: [string, string, (string | undefined)?, string?][] = [
   ["DEV-001", R], ["DEV-002", I], ["DEV-003", I], ["DEV-004", H], ["DEV-005", H], ["DEV-006", H], ["DEV-007", H], ["DEV-008", H], ["DEV-009", H],
   ["DEV-010", R], ["DEV-011", R, "ev"], ["DEV-012", H], ["DEV-013", I], ["DEV-014", H], ["PRA-001", R], ["PRA-002", R], ["PRA-003", R], ["PRA-004", R],
   ["PRA-005", R, "ev"], ["PRA-006", I, "ev"], ["PRA-007", H], ["PRA-008", H], ["PRA-009", R, undefined, "closed"], ["PRA-010", R, "ev", "closed"], ["PRA-011", H], ["PRA-012", I],
