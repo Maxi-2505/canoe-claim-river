@@ -22,7 +22,7 @@ export function SessionHeader() {
   const { session, signOut } = useDemoSession();
   const location = useLocation();
   if (!session) return null;
-  return <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs text-stone"><span>Signed in as {session.name} · {ROLE_LABEL[session.role]}</span><Button asChild variant="link" className="h-auto p-0 text-xs text-ink"><Link to="/sign-in" search={{ role: session.role, next: location.pathname }}>Switch role</Link></Button><Button variant="link" className="h-auto p-0 text-xs text-ink" onClick={signOut}>Sign out</Button></div>;
+  return <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs text-stone"><span>Signed in as {session.name}</span><Button asChild variant="link" className="h-auto p-0 text-xs text-ink"><Link to="/sign-in" search={{ role: session.role, next: location.pathname }}>Switch role</Link></Button><Button variant="link" className="h-auto p-0 text-xs text-ink" onClick={signOut}>Sign out</Button></div>;
 }
 export function DemoGate({ children }: { children: ReactNode }) {
   const { session, ready, signIn } = useDemoSession();
