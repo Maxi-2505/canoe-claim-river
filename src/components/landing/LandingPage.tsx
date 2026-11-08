@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { Wordmark } from "@/components/canoe/brand";
 import { useSiteTools } from "@/components/site-tools/SiteTools";
@@ -15,6 +15,23 @@ import "./LandingMotion.css";
 const navLink = "font-mono text-[11px] uppercase tracking-[0.14em] text-stone hover:text-ink";
 const btnMain = "btn-cedar inline-flex items-center px-5 py-2.5 text-sm";
 const btnGhost = "btn-quiet inline-flex items-center px-5 py-2.5 text-sm";
+
+// In-page jump that never writes a hash into the address bar: a #section left
+// there makes the browser reopen the site at that section instead of the hero.
+function NavAnchor({ id, children }: { id: string; children: ReactNode }) {
+  return (
+    <a
+      href={`#${id}`}
+      className={navLink}
+      onClick={(e) => {
+        e.preventDefault();
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }}
+    >
+      {children}
+    </a>
+  );
+}
 
 function Section({ id, children, className = "" }: { id?: string; children: ReactNode; className?: string }) {
   return (
@@ -53,6 +70,13 @@ export function LandingPage() {
   const { session } = useDemoSession();
   const [canoeEntered, setCanoeEntered] = useState(false);
   const onCanoeEntered = useCallback(() => setCanoeEntered(true), []);
+  // A stale #section left in the address bar would land the visitor mid-page,
+  // so drop it and open on the hero.
+  useEffect(() => {
+    if (!window.location.hash) return;
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+    window.scrollTo({ top: 0 });
+  }, []);
   const entries: [DemoRole, string][] = [["reviewer", "I'M A CLAIMS REVIEWER →"], ["policy_owner", "I'M A POLICY OWNER →"], ["operations", "I'M A OPERATIONS LEAD →"]];
   return (
     <div className="relative isolate overflow-hidden">
@@ -63,9 +87,9 @@ export function LandingPage() {
         <nav className="relative z-10 mx-auto flex max-w-[1120px] items-center justify-between gap-4 px-5 pt-6 md:px-8">
           <Wordmark />
           <div className="hidden items-center gap-6 md:flex">
-            <a href="#how-it-works" className={navLink}>How it works</a>
-            <a href="#policy-change" className={navLink}>Policy change</a>
-            <a href="#team" className={navLink}>Team</a>
+            <NavAnchor id="how-it-works">How it works</NavAnchor>
+            <NavAnchor id="policy-change">Policy change</NavAnchor>
+            <NavAnchor id="team">Team</NavAnchor>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/track" className="text-xs text-ink underline underline-offset-4">{t("Track a claim")}</Link>
