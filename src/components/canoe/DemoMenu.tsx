@@ -55,6 +55,7 @@ export function DemoMenu({ onPick, clockOnly = false }: { onPick: (p: Preset | "
           <div className="my-1 h-px bg-stone/20" />
           <label className="flex items-center gap-2 px-3 py-2"><input type="checkbox" checked={demo} onChange={(e) => setDemoTime(e.target.checked)} />{t("Demo time")}</label>
           <p className="px-3 pb-2 text-stone">{t("1 day = 10 seconds")}</p>
+          <p className="px-3 pb-2 text-stone">{t("Reminders are simulated in this prototype.")}</p>
           {!clockOnly && <button onClick={() => { onPick("reset"); setOpen(false); }} className="rounded-lg px-3 py-2 text-left text-stone hover:bg-paper">Reset</button>}
         </div>
       )}
