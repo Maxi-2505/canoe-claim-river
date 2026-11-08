@@ -1,5 +1,4 @@
-.today-slide { --today-paper: #F3EFE8; background: var(--today-paper); }
-.dark .today-slide { --today-paper: var(--paper); }
+.today-slide { background: var(--today-paper); }
 .today-slide .today-divider { transform-origin: left; }
 .today-slide[data-ready="true"]:not([data-visible="true"]) :is(.today-intro, .today-index, .today-statement, .today-footnote) { opacity: 0; }
 .today-slide[data-ready="true"]:not([data-visible="true"]) .today-divider { transform: scaleX(0); }
