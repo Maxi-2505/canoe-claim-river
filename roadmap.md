@@ -38,7 +38,7 @@
 - [x] Test transport, failed-parse draft protection and unchanged returned rules; verify live template/error uploads and simulation, desktop/current viewport/phone. All 145 tests pass; build clean. No publication performed.
 
 # Today slide
-- [ ] Finish one-time entrance, hover and reduced-motion verification on desktop/phone.
+- [x] Finish one-time entrance, hover and reduced-motion verification on desktop/phone; build clean.
 
 # Business Case visualizations
 - [ ] Review existing formulas and add the specified business-case scenario formulas with tests, without changing published reporting or decisions.

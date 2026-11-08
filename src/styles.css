@@ -53,6 +53,7 @@
   --stone: oklch(0.52 0.015 60);
   --mist: oklch(0.982 0.007 84);
   --today-paper: #F3EFE8;
+  --business-grid: color-mix(in oklab, var(--stone) 6%, transparent);
   /* Internal review pages only: request-information text. */
   --ochre: oklch(0.7 0.12 75);
 
