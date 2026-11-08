@@ -129,7 +129,7 @@ export function LandingPage() {
       </Section>
 
       {/* 7. BUSINESS VALUE - figures from the business case (assumptions, base case 200K claims). */}
-      <Section>
+      <Section className="!pb-10 md:!pb-12">
         <H2>What it is <CanoeAccent>worth</CanoeAccent>.</H2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {[
@@ -147,7 +147,7 @@ export function LandingPage() {
       </Section>
 
       {/* 8. PRINCIPLES */}
-      <Section>
+      <Section className="!pt-10 md:!pt-12">
         <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
           {["Rules decide. AI only assists.", "Blank stays blank.", "Closed stays closed.", "Every decision carries its version."].map((t, i) => (
             <div key={t} className="flex items-baseline gap-5 border-t border-border pt-5">

@@ -50,21 +50,21 @@ export function TodaySlide() {
       <div className="mx-auto max-w-[1186px] px-5 py-20 md:px-8 md:py-28">
         <div className="today-intro">
           <p className="font-mono text-sm uppercase tracking-[0.14em] text-stone md:text-xl">TODAY</p>
-          <h2 id="today-heading" data-waves-start="" aria-label="Every claim is handled by hand." className="today-headline mt-8 font-display text-[32px] font-bold leading-[1.12] tracking-normal md:text-[56px]">
+          <h2 id="today-heading" data-waves-start="" aria-label="Every claim is handled by hand." className="today-headline mt-6 font-display text-[32px] font-bold leading-[1.12] tracking-[-0.02em] md:text-[44px]">
             <span aria-hidden="true"><span className="today-word today-word-0">Every</span>{" "}<span className="today-word today-word-1">claim</span>{" "}<span className="today-word today-word-2">is</span>{" "}<span className="today-word today-word-3">handled</span>{" "}<span className="today-hand-phrase"><span className="today-word today-word-4">by</span>{" "}<span className="today-word today-word-5">hand<span className="today-hand-period">.<span className="today-hand"><PencilHand filterId={pencilFilterId} /></span></span></span><svg className="today-hand-underline" viewBox="0 0 200 10" preserveAspectRatio="none" fill="none"><path pathLength="1" d="M2 6 Q18 2 34 6 T66 6 T98 6 T130 6 T162 6 T198 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span></span>
           </h2>
         </div>
-        <ol className="mt-12 md:mt-20">
+        <ol className="mt-10 md:mt-14">
           {statements.map((text, i) => <li key={text} className={`today-row today-row-${i} relative`}>
             <div aria-hidden="true" className={`today-divider today-divider-${i} h-px w-full bg-border`} />
-            <div className="grid grid-cols-[2rem_minmax(0,1fr)] items-baseline gap-3 py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-6 md:py-10">
-              <span className="today-index font-mono text-base text-cedar md:text-2xl">0{i + 1}</span>
-              <div className="today-statement min-w-0 pr-2"><p className="today-text font-display text-xl font-bold leading-[1.3] tracking-normal md:text-[36px]">{text}</p></div>
+            <div className="grid grid-cols-[2rem_minmax(0,1fr)] items-baseline gap-3 py-5 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-6 md:py-8">
+              <span className="today-index font-mono text-sm text-cedar md:text-xl">0{i + 1}</span>
+              <div className="today-statement min-w-0 pr-2"><p className="today-text font-display text-lg font-bold leading-[1.3] tracking-normal md:text-[28px]">{text}</p></div>
             </div>
           </li>)}
         </ol>
         <div aria-hidden="true" className="today-divider today-divider-3 h-px w-full bg-border" />
-        <p className="today-footnote mt-8 text-base leading-relaxed text-stone md:mt-10 md:text-2xl">Assumed figures for a mid-sized European motor insurer, from our interview with the case team.</p>
+        <p className="today-footnote mt-6 text-sm leading-relaxed text-stone md:mt-8 md:text-lg">Assumed figures for a mid-sized European motor insurer, from our interview with the case team.</p>
       </div>
     </section>
   );
