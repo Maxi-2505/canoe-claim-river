@@ -176,7 +176,7 @@ export function LandingPage() {
       <Section id="team">
         <p className="eyebrow mb-4">About us</p>
         <H2>Four people, one <CanoeAccent>canoe</CanoeAccent>.</H2>
-        <p className="mt-6 max-w-[620px] text-ink/80">Why Canoe: [two sentences from the team]</p>
+        <p className="mt-6 max-w-[620px] text-ink/80">Why Canoe: Filing a claim is stressful, and Canoe is built to make it feel like calm water. Every recommendation shows the rules behind it, so claimants and reviewers always know why a claim goes where it goes.</p>
         {/* TODO(portraits): replace the graphite circles with pencil-sketch portraits. */}
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {team.map((m, i) => (
