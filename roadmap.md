@@ -5,7 +5,7 @@
 - [x] Tests and desktop live API verification.
 
 # Background performance
-- [ ] Add root scroll-linked gutter waves with existing canoe mark, collision hiding and reduced-motion support; verify scroll direction and layout.
+- [x] Add root scroll-linked gutter waves with existing canoe mark, collision hiding and reduced-motion support; verify scroll direction and layout.
 - [x] Measure initial and idle frames before changes.
 - [x] Decode and cache artwork, share and pause animation, preserve scene geometry.
 - [x] Verify desktop/phone, reduced motion, tests, build and after measurements.
