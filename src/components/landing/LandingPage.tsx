@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { Accent, Wordmark } from "@/components/canoe/brand";
+import { useSiteTools } from "@/components/site-tools/SiteTools";
 
 // Static landing mockup. No logic here; links only.
 const navLink = "font-mono text-[11px] uppercase tracking-[0.14em] text-stone hover:text-ink";
@@ -83,6 +84,7 @@ const team = [
 ];
 
 export function LandingPage() {
+  const { t } = useSiteTools();
   return (
     <div className="relative isolate overflow-hidden">
       {/* 1. HERO */}
@@ -97,6 +99,7 @@ export function LandingPage() {
             <a href="#team" className={navLink}>Team</a>
           </div>
           <div className="flex items-center gap-2">
+            <Link to="/track" className="text-xs text-ink underline underline-offset-4">{t("Track a claim")}</Link>
             <Link to="/review" className="btn-quiet hidden px-4 py-2 text-sm sm:inline-flex">Open workspace</Link>
             <Link to="/claim" className="btn-cedar inline-flex px-4 py-2 text-sm">Report a claim</Link>
           </div>
@@ -256,6 +259,7 @@ export function LandingPage() {
             <Link to="/review" className={navLink}>Review</Link>
             <Link to="/policy" className={navLink}>Policy</Link>
             <Link to="/claim" className={navLink}>Report a claim</Link>
+            <Link to="/track" className={navLink}>{t("Track a claim")}</Link>
           </div>
         </div>
       </footer>

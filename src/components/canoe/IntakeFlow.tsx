@@ -20,6 +20,13 @@ import { displayValue } from "./display";
 import { useCalmMotion } from "./motion";
 import { DemoMenu, type Preset } from "./DemoMenu";
 import { useSiteTools } from "@/components/site-tools/SiteTools";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { createCustomerClaim, answerCustomerRequest } from "@/lib/customer/customer.functions";
+import { rememberClaim } from "@/lib/customer/recent";
+import { CustomerTrack } from "@/components/customer/CustomerTrack";
+import { Button } from "@/components/ui/button";
+import { Copy } from "lucide-react";
 
 type Screen = "start" | "preview" | "docs" | "question" | "review" | "done";
 interface Saved { screen: Screen; state: IntakeState; history: string[] }
@@ -39,6 +46,10 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
   const loaded = useRef(false);
   const { advance } = useCalmMotion();
   const { t } = useSiteTools();
+  const navigate = useNavigate();
+  const sendLive = useServerFn(createCustomerClaim);
+  const answerLive = useServerFn(answerCustomerRequest);
+  const [copied, setCopied] = useState(false);
 
   // Autosave after every answer (intake mode only).
   useEffect(() => {
@@ -110,7 +121,10 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
   const submit = async () => {
     setSubmitting(true);
     try {
-      const res = caseId ? await updateClaim({ data: { caseId, state, ...(mode.kind === "missing" ? { missing: mode.missing } : {}) } }) : await submitClaim({ data: { state } });
+      const live = !!import.meta.env['VITE_API_URL'];
+      const res = live ? caseId ? await answerLive({ data: { caseId, state } }) : await sendLive({ data: { state } }) : caseId ? await updateClaim({ data: { caseId, state, ...(mode.kind === "missing" ? { missing: mode.missing } : {}) } }) : await submitClaim({ data: { state } });
+      rememberClaim(res.caseId);
+      if (missing && live) { await navigate({ to: "/track/$caseId", params: { caseId: res.caseId } }); return; }
       setDoneId(res.caseId);
       setScreen("done");
       if (!missing) localStorage.removeItem(STORAGE);
@@ -225,14 +239,13 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
               </motion.section>
             )}
 
-            {screen === "done" && (
+            {screen === "done" && doneId && (
               <motion.section key="done" {...advance} className="space-y-5">
-                <h1 className="question-title">{t(missing ? "Your claim is moving again." : "Thanks — your claim is in.")}</h1>
-                <p className="text-stone">{t(missing ? "We've added what you sent. No need to do anything else." : "We'll get back to you within 2 working days.")}</p>
-                <div className="card-calm inline-block px-5 py-3">
-                  <span className="block text-xs text-stone">{t("Your claim reference")}</span>
-                  <span className="font-display text-2xl">{doneId}</span>
-                </div>
+                <h1 className="question-title">{t("It's on its")} <Accent>{t("way")}</Accent>.</h1>
+                <CustomerTrack station={1} received />
+                <p className="text-xs text-stone">{t("Your claim reference")}</p>
+                <div className="flex items-center gap-3"><span className="font-display text-3xl">{doneId}</span><Button variant="ghost" size="icon" aria-label={t("Copy claim number")} onClick={async () => { try { await navigator.clipboard.writeText(doneId); setCopied(true); } catch { toast(t("Please copy your claim number.")); } }}><Copy /></Button>{copied && <span className="text-xs text-stone">{t("Copied")}</span>}</div>
+                <Button asChild><Link to="/track/$caseId" params={{ caseId: doneId }}>{t("Track your claim")}</Link></Button>
                 {!missing && <div><button onClick={() => applyPreset("reset")} className="text-sm text-stone underline underline-offset-4 hover:text-ink">{t("Start another claim")}</button></div>}
               </motion.section>
             )}
