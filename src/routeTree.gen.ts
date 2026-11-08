@@ -17,6 +17,8 @@ import { Route as ReviewRouteImport } from './routes/review'
 import { Route as ContinueCaseIdRouteImport } from './routes/continue.$caseId'
 import { Route as ReviewIndexRouteImport } from './routes/review.index'
 import { Route as ReviewCaseIdRouteImport } from './routes/review.$caseId'
+import { Route as TrackIndexRouteImport } from './routes/track.index'
+import { Route as TrackCaseIdRouteImport } from './routes/track.$caseId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -58,6 +60,16 @@ const ReviewCaseIdRoute = ReviewCaseIdRouteImport.update({
   path: '/$caseId',
   getParentRoute: () => ReviewRoute,
 } as any)
+const TrackIndexRoute = TrackIndexRouteImport.update({
+  id: '/track/',
+  path: '/track/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackCaseIdRoute = TrackCaseIdRouteImport.update({
+  id: '/track/$caseId',
+  path: '/track/$caseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,7 +79,9 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRouteWithChildren
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
+  '/track/$caseId': typeof TrackCaseIdRoute
   '/review/': typeof ReviewIndexRoute
+  '/track/': typeof TrackIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,7 +90,9 @@ export interface FileRoutesByTo {
   '/policy': typeof PolicyRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
+  '/track/$caseId': typeof TrackCaseIdRoute
   '/review': typeof ReviewIndexRoute
+  '/track': typeof TrackIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,7 +103,9 @@ export interface FileRoutesById {
   '/review': typeof ReviewRouteWithChildren
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
+  '/track/$caseId': typeof TrackCaseIdRoute
   '/review/': typeof ReviewIndexRoute
+  '/track/': typeof TrackIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,7 +117,9 @@ export interface FileRouteTypes {
     | '/review'
     | '/continue/$caseId'
     | '/review/$caseId'
+    | '/track/$caseId'
     | '/review/'
+    | '/track/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -108,7 +128,9 @@ export interface FileRouteTypes {
     | '/policy'
     | '/continue/$caseId'
     | '/review/$caseId'
+    | '/track/$caseId'
     | '/review'
+    | '/track'
   id:
     | '__root__'
     | '/'
@@ -118,7 +140,9 @@ export interface FileRouteTypes {
     | '/review'
     | '/continue/$caseId'
     | '/review/$caseId'
+    | '/track/$caseId'
     | '/review/'
+    | '/track/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,6 +152,8 @@ export interface RootRouteChildren {
   PolicyRoute: typeof PolicyRoute
   ReviewRoute: typeof ReviewRouteWithChildren
   ContinueCaseIdRoute: typeof ContinueCaseIdRoute
+  TrackCaseIdRoute: typeof TrackCaseIdRoute
+  TrackIndexRoute: typeof TrackIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -188,6 +214,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReviewCaseIdRouteImport
       parentRoute: typeof ReviewRoute
     }
+    '/track/': {
+      id: '/track/'
+      path: '/track'
+      fullPath: '/track/'
+      preLoaderRoute: typeof TrackIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track/$caseId': {
+      id: '/track/$caseId'
+      path: '/track/$caseId'
+      fullPath: '/track/$caseId'
+      preLoaderRoute: typeof TrackCaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -211,6 +251,8 @@ const rootRouteChildren: RootRouteChildren = {
   PolicyRoute: PolicyRoute,
   ReviewRoute: ReviewRouteWithChildren,
   ContinueCaseIdRoute: ContinueCaseIdRoute,
+  TrackCaseIdRoute: TrackCaseIdRoute,
+  TrackIndexRoute: TrackIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -5,17 +5,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { motorConfig } from "@/lib/intake/config";
 import { openMissing, parseMissing, stateFromLog, stateFromStoredRow } from "@/lib/intake/logic";
 import { IntakeFlow } from "@/components/canoe/IntakeFlow";
+import { getCustomerClaim } from "@/lib/customer/customer.functions";
+import { useSiteTools } from "@/components/site-tools/SiteTools";
 import { eur } from "@/components/canoe/samples";
 
 const claimQuery = (caseId: string) => queryOptions({
   queryKey: ["claim", caseId],
   queryFn: async () => {
+    if (import.meta.env['VITE_API_URL']) {
+      const claim = await getCustomerClaim({ data: { caseId } });
+      return { live: claim, row: null, log: [] };
+    }
     const { data: row, error } = await supabase.from("claim_rows").select("*").eq("case_id", caseId).maybeSingle();
     if (error) throw error;
     if (!row) return null;
     const { data: log, error: e2 } = await supabase.from("fact_log").select("field,value,status,source,timestamp").eq("case_id", caseId);
     if (e2) throw e2;
-    return { row, log: log ?? [] };
+    return { live: null, row, log: log ?? [] };
   },
 });
 
@@ -46,12 +52,16 @@ function ContinuePage() {
   const { caseId } = Route.useParams();
   const { missing: raw } = Route.useSearch();
   const { data } = useSuspenseQuery(claimQuery(caseId));
-  const row = data!.row;
-  const missing = useMemo(() => parseMissing(raw ?? row.missing_fields), [raw, row.missing_fields]);
-  const initial = useMemo(
-    () => openMissing(data!.log.length ? stateFromLog(data!.log) : stateFromStoredRow(row), motorConfig, missing),
-    [data, row, missing],
-  );
+  const { t } = useSiteTools();
+  const row = data?.row;
+  const live = data?.live;
+  const missing = useMemo(() => live ? [...new Set(live.info_requests.filter((r) => r.status === "open").flatMap((r) => r.ask_fields))] : parseMissing(raw ?? row?.missing_fields), [raw, row, live]);
+  const initial = useMemo(() => openMissing(data?.log.length ? stateFromLog(data.log) : stateFromStoredRow(row ?? { claim_type: "motor_own_damage" }), motorConfig, missing), [data, row, missing]);
+  if (live) {
+    if (live.case_status === "closed" || !missing.length) return <div className="mx-auto max-w-xl p-8"><p>{t("No information is requested right now.")}</p></div>;
+    return <IntakeFlow mode={{ kind: "missing", missing }} initialState={initial} caseId={caseId} header={<p className="mb-6 font-mono text-sm">{caseId}</p>} />;
+  }
+  if (!row) return null;
   const quote = row.quote_eur !== "" && Number.isFinite(Number(row.quote_eur)) ? Number(row.quote_eur) : undefined;
   const summary: [string, string][] = [
     ["What happened", row.claim_summary || "—"],
