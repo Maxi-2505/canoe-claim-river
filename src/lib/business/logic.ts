@@ -52,3 +52,31 @@ export function csv(rows: unknown[][]): string {
     return `"${safe.replace(/"/g, '""')}"`;
   }).join(',')).join('\r\n');
 }
+
+/** User-supplied illustrative financial scenario, not measured reporting. */
+export function calculateScenario(claims: number) {
+  const perMin = 40000 / (220 * 8 * 60);
+  const todayCostPerClaim = ((15 / 26) * 3 + (11 / 26) * 9) * perMin;
+  const canoeHandlingPerClaim = ((10 / 26) * 0.05 * 3 + (5 / 26) * 1 + (11 / 26) * 6) * perMin;
+  const today = claims * todayCostPerClaim;
+  const canoeHandling = claims * canoeHandlingPerClaim;
+  const fee = Math.max(30000, claims * 0.25);
+  const net = today - canoeHandling - fee;
+  return { claims, perMin, todayCostPerClaim, canoeHandlingPerClaim, today, canoeHandling, fee, net,
+    paybackMonths: net > 0 ? 25000 / (net / 12) : null, integration: 25000, riskRatio: 98, simpleShare: 0.58, escalatedShare: 0.42 };
+}
+export const TURNAROUND_SCENARIO = [
+  { label: 'Large insurer', range: '60–90 days', minutes: 90 * 24 * 60 },
+  { label: 'Mid-size insurer', range: '15–20 days', minutes: 20 * 24 * 60 },
+  { label: 'Agile insurer', range: '1–2 days', minutes: 2 * 24 * 60 },
+  { label: 'With Canoe', range: '1–10 minutes', minutes: 10 },
+] as const;
+/** Counts engine outputs only; closed records remain historical. */
+export function policyDistribution(impact: Impact, claims: BusinessClaim[]) {
+  const preview = publishedPreview(impact, claims);
+  const outcomes = ['routine_processing', 'human_review', 'request_information'] as const;
+  const count = (side: 'from' | 'to') => outcomes.map(outcome => preview.rows.filter(row => row[side] === outcome).length);
+  return { before: count('from'), after: count('to'), from: preview.from_version, to: preview.to_version,
+    total: preview.rows.length, closed: preview.rows.filter(row => row.retained).length,
+    extraReview: preview.rows.filter(row => !row.retained && row.from !== 'human_review' && row.to === 'human_review').length };
+}

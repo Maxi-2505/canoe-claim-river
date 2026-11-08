@@ -1,0 +1,33 @@
+.today-slide { background: var(--today-paper); }
+.today-slide .today-divider { transform-origin: left; }
+.today-slide[data-ready="true"]:not([data-visible="true"]) :is(.today-intro, .today-index, .today-statement, .today-footnote) { opacity: 0; }
+.today-slide[data-ready="true"]:not([data-visible="true"]) .today-divider { transform: scaleX(0); }
+.today-slide[data-visible="true"] .today-intro { animation: today-intro 500ms ease-out both; }
+.today-slide[data-visible="true"] .today-divider { animation: today-line 600ms ease-out both; }
+.today-slide[data-visible="true"] .today-divider-0 { animation-delay: 500ms; }
+.today-slide[data-visible="true"] .today-divider-1 { animation-delay: 700ms; }
+.today-slide[data-visible="true"] .today-divider-2 { animation-delay: 900ms; }
+.today-slide[data-visible="true"] .today-divider-3 { animation-delay: 1100ms; }
+.today-slide[data-visible="true"] :is(.today-index, .today-statement) { animation: today-row 500ms ease-out both; }
+.today-slide[data-visible="true"] .today-row-0 .today-index { animation-delay: 1700ms; }
+.today-slide[data-visible="true"] .today-row-0 .today-statement { animation-delay: 1780ms; }
+.today-slide[data-visible="true"] .today-row-1 .today-index { animation-delay: 1820ms; }
+.today-slide[data-visible="true"] .today-row-1 .today-statement { animation-delay: 1900ms; }
+.today-slide[data-visible="true"] .today-row-2 .today-index { animation-delay: 1940ms; }
+.today-slide[data-visible="true"] .today-row-2 .today-statement { animation-delay: 2020ms; }
+.today-slide[data-visible="true"] .today-footnote { animation: today-footnote 500ms ease-out 2520ms both; }
+.today-slide .today-text { transition: transform 200ms ease-out; }
+.today-slide .today-index { font-weight: 400; transition: font-weight 200ms ease-out; }
+@media (hover: hover) {
+  .today-slide .today-row:hover .today-text { transform: translateX(6px); }
+  .today-slide .today-row:hover .today-index { font-weight: 600; }
+}
+@keyframes today-intro { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes today-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes today-row { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes today-footnote { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .today-slide :is(.today-intro, .today-divider, .today-index, .today-statement, .today-footnote, .today-text) {
+    animation: none !important; opacity: 1 !important; transform: none !important; transition: none !important;
+  }
+}

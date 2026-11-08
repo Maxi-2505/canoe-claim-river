@@ -52,6 +52,8 @@
   --reed: oklch(0.52 0.05 120);
   --stone: oklch(0.52 0.015 60);
   --mist: oklch(0.982 0.007 84);
+  --today-paper: #F3EFE8;
+  --business-grid: color-mix(in oklab, var(--stone) 6%, transparent);
   /* Internal review pages only: request-information text. */
   --ochre: oklch(0.7 0.12 75);
 
@@ -77,6 +79,7 @@
 }
 
 .dark {
+  --today-paper: var(--paper);
   --paper: oklch(0.2 0.01 50);
   --ink: oklch(0.94 0.013 84);
   --cedar: oklch(0.62 0.14 32);

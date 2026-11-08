@@ -7,6 +7,7 @@ import { useDemoSession } from "@/components/demo-role/DemoSession";
 import { ROLE_PAGE, type DemoRole } from "@/lib/demo-role/logic";
 import { Button } from "@/components/ui/button";
 import { WiringDiagram } from "./WiringDiagram";
+import { TodaySlide } from "./TodaySlide";
 
 // Static landing mockup. No logic here; links only.
 const navLink = "font-mono text-[11px] uppercase tracking-[0.14em] text-stone hover:text-ink";
@@ -81,19 +82,7 @@ export function LandingPage() {
       </div>
 
       {/* 2. PROBLEM */}
-      <Section>
-        <p className="eyebrow mb-4">Today</p>
-        <H2>Every claim is handled by hand.</H2>
-        <ol className="mt-10 max-w-[760px] border-t border-border">
-          {["2–3 minutes per simple claim, 8–10 per escalation.", "0% of claims pass without a person.", "A rule change takes weeks to months to reach production."].map((t, i) => (
-            <li key={t} className="flex items-baseline gap-6 border-b border-border py-5">
-              <span className="font-mono text-xs text-cedar">0{i + 1}</span>
-              <span className="font-display text-xl md:text-2xl">{t}</span>
-            </li>
-          ))}
-        </ol>
-        <p className="mt-5 max-w-[620px] text-sm text-stone">Figures for a mid-sized European motor insurer, from our interview with the case team. Assumptions, not measurements.</p>
-      </Section>
+      <TodaySlide />
 
       {/* 3. HOW IT WORKS */}
       <Section id="how-it-works">
