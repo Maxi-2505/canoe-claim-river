@@ -18,8 +18,6 @@
 .today-slide[data-visible="true"] .today-footnote { animation: today-footnote 500ms ease-out 2520ms both; }
 .today-slide .today-text { transform-origin: left center; transition: transform 250ms ease-out; }
 .today-slide .today-index { font-weight: 400; }
-.today-headline { --today-hand-ink: #1A1814; --today-hand-red: #A3261A; }
-.dark .today-headline { --today-hand-ink: var(--ink); --today-hand-red: var(--cedar); }
 .today-hand-phrase, .today-hand-period { position: relative; }
 .today-hand-phrase { white-space: nowrap; }
 .today-hand { position: absolute; left: calc(100% + 8px); bottom: 0; width: 56px; height: 56px; color: var(--today-hand-ink); opacity: 0; pointer-events: none; transition: opacity 200ms ease-out; }
