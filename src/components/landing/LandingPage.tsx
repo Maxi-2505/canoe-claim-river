@@ -16,8 +16,8 @@ const navLink = "font-mono text-[11px] uppercase tracking-[0.14em] text-stone ho
 const btnMain = "btn-cedar inline-flex items-center px-5 py-2.5 text-sm";
 const btnGhost = "btn-quiet inline-flex items-center px-5 py-2.5 text-sm";
 
-// In-page jump that leaves no hash behind: a #section in the address bar makes
-// the browser reopen the site at that section instead of the hero.
+// In-page jump that never writes a hash into the address bar: a #section left
+// there makes the browser reopen the site at that section instead of the hero.
 function NavAnchor({ id, children }: { id: string; children: ReactNode }) {
   return (
     <a
@@ -26,7 +26,6 @@ function NavAnchor({ id, children }: { id: string; children: ReactNode }) {
       onClick={(e) => {
         e.preventDefault();
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-        history.replaceState(null, "", window.location.pathname + window.location.search);
       }}
     >
       {children}
