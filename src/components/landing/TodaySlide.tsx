@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Hand } from "lucide-react";
 import "./TodaySlide.css";
 
 const statements = [
@@ -11,6 +12,7 @@ export function TodaySlide() {
   const section = useRef<HTMLElement>(null);
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [headlineActive, setHeadlineActive] = useState(false);
   useEffect(() => {
     const element = section.current;
     if (!element) return;
@@ -31,7 +33,9 @@ export function TodaySlide() {
       <div className="mx-auto max-w-[1186px] px-5 py-20 md:px-8 md:py-28">
         <div className="today-intro">
           <p className="font-mono text-sm uppercase tracking-[0.14em] text-stone md:text-xl">TODAY</p>
-          <h2 id="today-heading" className="mt-8 font-display text-[32px] font-bold leading-[1.12] tracking-normal md:text-[56px]">Every claim is handled by hand.</h2>
+          <h2 id="today-heading" data-active={headlineActive} onPointerEnter={(event) => { if (event.pointerType === "mouse") setHeadlineActive(true); }} onPointerLeave={(event) => { if (event.pointerType === "mouse") setHeadlineActive(false); }} onPointerUp={(event) => { if (event.pointerType !== "mouse") setHeadlineActive((active) => !active); }} className="today-headline mt-8 font-display text-[32px] font-bold leading-[1.12] tracking-normal md:text-[56px]">
+            Every claim is handled <span className="today-hand-phrase">by hand<span className="today-hand-period">.<span aria-hidden="true" className="today-hand"><Hand size={56} strokeWidth={1.25} fill="none" /></span></span><svg aria-hidden="true" className="today-hand-underline" viewBox="0 0 200 10" preserveAspectRatio="none" fill="none"><path pathLength="1" d="M2 6 Q18 2 34 6 T66 6 T98 6 T130 6 T162 6 T198 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></span>
+          </h2>
         </div>
         <ol className="mt-12 md:mt-20">
           {statements.map((text, i) => <li key={text} className={`today-row today-row-${i} relative`}>

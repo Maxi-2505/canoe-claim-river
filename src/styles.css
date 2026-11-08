@@ -53,6 +53,8 @@
   --stone: oklch(0.52 0.015 60);
   --mist: oklch(0.982 0.007 84);
   --today-paper: #F3EFE8;
+  --today-hand-ink: #1A1814;
+  --today-hand-red: #A3261A;
   --business-grid: color-mix(in oklab, var(--stone) 6%, transparent);
   /* Internal review pages only: request-information text. */
   --ochre: oklch(0.7 0.12 75);
@@ -80,6 +82,8 @@
 
 .dark {
   --today-paper: var(--paper);
+  --today-hand-ink: var(--ink);
+  --today-hand-red: var(--cedar);
   --paper: oklch(0.2 0.01 50);
   --ink: oklch(0.94 0.013 84);
   --cedar: oklch(0.62 0.14 32);
