@@ -46,7 +46,7 @@ export function TrackingPage({ caseId }: { caseId?: string }) {
           <Button asChild><Link to="/continue/$caseId" params={{ caseId: status.caseId }} search={{ missing: undefined }}>{t("Add it now")}</Link></Button>
           <p className="text-xs text-stone">{t(SIMULATED)}</p>
         </div>}
-        <ol className="mt-8 border-l border-stone/30 pl-5">{status.events.map((e, i) => <li key={`${e.at}-${i}`} className="relative pb-4"><span className="absolute -left-6 top-2 h-px w-2 bg-stone" /><p className="text-sm">{t(e.text)}</p><p className="font-mono text-[10px] text-stone">{date(e.at)}</p></li>)}</ol>
+        <ol className="mt-8 border-l border-stone/30 bg-paper/95 py-3 pl-5">{status.events.map((e, i) => <li key={`${e.at}-${i}`} className="relative pb-4"><span className="absolute -left-6 top-2 h-px w-2 bg-stone" /><p className="text-sm">{t(e.text)}</p><p className="font-mono text-[10px] text-stone">{date(e.at)}</p></li>)}</ol>
       </>}
       {demo && <p className="mt-6 font-mono text-xs text-cedar">{t("Demo time")} · {t("1 day = 10 seconds")}</p>}
     </section></main><DemoMenu onPick={() => { navigate({ to: "/claim" }); }} clockOnly />
