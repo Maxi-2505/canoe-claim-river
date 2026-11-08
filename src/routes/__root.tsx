@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteTools, SiteToolsProvider } from "@/components/site-tools/SiteTools";
 import { DemoGate, DemoSessionProvider } from "@/components/demo-role/DemoSession";
+import { ScrollWaves } from "@/components/canoe/ScrollWaves";
 
 function NotFoundComponent() {
   return (
@@ -129,6 +130,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <SiteToolsProvider>
+        <ScrollWaves />
         <DemoSessionProvider><DemoGate><Outlet /></DemoGate></DemoSessionProvider>
         <SiteTools />
         <Toaster />
