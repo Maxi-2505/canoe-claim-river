@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Hand } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Icon, type IconNode } from "lucide-react";
 import "./TodaySlide.css";
 
 const statements = [
@@ -8,11 +8,30 @@ const statements = [
   "A rule change takes weeks to months to reach production.",
 ];
 
+// Lucide Hand geometry split at the palm, four fingers and thumb for pencil ordering.
+const pencilStrokes = [
+  "M22 14a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34",
+  "M6 14V6a2 2 0 0 1 4 0v4.5",
+  "M10 6V4a2 2 0 0 1 4 0v6",
+  "M14 6a2 2 0 0 1 4 0v5",
+  "M18 8a2 2 0 1 1 4 0v6",
+  "M6.01 19.66l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15",
+];
+const pencilNodes: IconNode = pencilStrokes.map((d, i) => ["path", { d, key: `stroke-${i}`, pathLength: 1, vectorEffect: "non-scaling-stroke", className: `today-pencil-stroke today-pencil-stroke-${i}` }]);
+
+function PencilHand({ filterId }: { filterId: string }) {
+  return <Icon iconNode={pencilNodes} size={64} strokeWidth={0.75} fill="none" className="today-pencil" filter={`url(#${filterId})`}>
+    <defs><filter id={filterId} x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="1" seed="7" result="pencil-noise" /><feDisplacementMap in="SourceGraphic" in2="pencil-noise" scale="1.5" xChannelSelector="R" yChannelSelector="G" /></filter></defs>
+    <g className="today-pencil-copy" transform="translate(0.225 0.225) rotate(0.8 12 12)">{pencilStrokes.map((d, i) => <path key={d} d={d} pathLength={1} vectorEffect="non-scaling-stroke" className={`today-pencil-stroke today-pencil-stroke-${i}`} />)}</g>
+  </Icon>;
+}
+
 export function TodaySlide() {
   const section = useRef<HTMLElement>(null);
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState(false);
   const [headlineActive, setHeadlineActive] = useState(false);
+  const pencilFilterId = `today-pencil-${useId().replace(/:/g, "")}`;
   useEffect(() => {
     const element = section.current;
     if (!element) return;
@@ -34,7 +53,7 @@ export function TodaySlide() {
         <div className="today-intro">
           <p className="font-mono text-sm uppercase tracking-[0.14em] text-stone md:text-xl">TODAY</p>
           <h2 id="today-heading" data-active={headlineActive} onPointerEnter={(event) => { if (event.pointerType === "mouse") setHeadlineActive(true); }} onPointerLeave={(event) => { if (event.pointerType === "mouse") setHeadlineActive(false); }} onPointerUp={(event) => { if (event.pointerType !== "mouse") setHeadlineActive((active) => !active); }} className="today-headline mt-8 font-display text-[32px] font-bold leading-[1.12] tracking-normal md:text-[56px]">
-            Every claim is handled <span className="today-hand-phrase">by hand<span className="today-hand-period">.<span aria-hidden="true" className="today-hand"><Hand size={56} strokeWidth={1.25} fill="none" /></span></span><svg aria-hidden="true" className="today-hand-underline" viewBox="0 0 200 10" preserveAspectRatio="none" fill="none"><path pathLength="1" d="M2 6 Q18 2 34 6 T66 6 T98 6 T130 6 T162 6 T198 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></span>
+            Every claim is handled <span className="today-hand-phrase">by hand<span className="today-hand-period">.<span aria-hidden="true" className="today-hand"><PencilHand filterId={pencilFilterId} /></span></span><svg aria-hidden="true" className="today-hand-underline" viewBox="0 0 200 10" preserveAspectRatio="none" fill="none"><path pathLength="1" d="M2 6 Q18 2 34 6 T66 6 T98 6 T130 6 T162 6 T198 6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" filter={`url(#${pencilFilterId})`} /></svg></span>
           </h2>
         </div>
         <ol className="mt-12 md:mt-20">
