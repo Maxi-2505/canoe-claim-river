@@ -4,6 +4,10 @@
 .landing-hold[data-entered="true"] > span { color: var(--cedar); }
 .landing-hold[data-entered="true"] svg { opacity: 1; }
 .landing-hold[data-entered="true"] path { animation: landing-draw 650ms ease-out both; }
+.landing-role-card { transform-origin: center; transition: transform 250ms ease-out; }
+@media (hover: hover) {
+  .landing-role-card:hover { transform: scale(1.04); }
+}
 .landing-steps { position: relative; }
 .landing-step { position: relative; }
 .landing-step-copy { opacity: 1; }
@@ -26,6 +30,7 @@
   .landing-steps[data-visible="true"] .landing-step-2::before { animation-delay: 1200ms; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .landing-role-card { transform: none !important; transition: none; }
   .landing-hold > span { color: var(--cedar); transition: none; }
   .landing-hold svg { opacity: 1; }
   .landing-hold path { stroke-dashoffset: 0; animation: none !important; }
