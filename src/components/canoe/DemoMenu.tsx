@@ -24,7 +24,7 @@ function easy() {
   return s;
 }
 function incomplete() {
-  let s = story(emptyState());
+  let s = answer(story(emptyState()), "incident_date", "2026-11-04");
   s = answer(s, "is_electric", "no");
   s = applyDocument(s, "quote", { amount: 750, itemized: true, sampleId: "quote-a" });
   s = answer(s, "has_report", "no");
