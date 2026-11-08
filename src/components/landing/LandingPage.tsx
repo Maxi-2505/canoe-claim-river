@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useCallback, useState, type ReactNode } from "react";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
-import { Accent, Wordmark } from "@/components/canoe/brand";
+import { Wordmark } from "@/components/canoe/brand";
 import { useSiteTools } from "@/components/site-tools/SiteTools";
 import { useDemoSession } from "@/components/demo-role/DemoSession";
 import { ROLE_PAGE, type DemoRole } from "@/lib/demo-role/logic";
@@ -137,7 +137,7 @@ export function LandingPage() {
             { value: "1.9", label: "Months to pay back" },
             { value: "1-10 min", label: "Per rule change, instead of weeks" },
           ].map(({ value, label }) => (
-            <div key={label} className="card-calm p-6">
+            <div key={label} className="landing-role-card card-calm p-6">
               <p className="font-display text-5xl">{value}</p>
               <p className="mt-3 text-sm text-ink/80">{label}</p>
             </div>
@@ -179,7 +179,7 @@ export function LandingPage() {
       <div className="relative min-h-[620px]">
         <PencilBackdrop contained />
         <Section className="text-left">
-          <p id="waves-end" className="max-w-[760px] font-display text-[40px] leading-[1.05] tracking-[-0.02em] md:text-[60px]">Steady through changing <Accent>water</Accent>.</p>
+          <p id="waves-end" className="max-w-[760px] font-display text-[40px] leading-[1.05] tracking-[-0.02em] md:text-[60px]">Steady through changing <CanoeAccent>water</CanoeAccent>.</p>
           <div className="mt-8"><MainButtons /></div>
         </Section>
       </div>
