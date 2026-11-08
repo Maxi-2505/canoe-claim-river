@@ -45,7 +45,7 @@ const team = [
 export function LandingPage() {
   const { t } = useSiteTools();
   const { session } = useDemoSession();
-  const entries: [DemoRole, string][] = [["reviewer", "I'M A CLAIMS REVIEWER →"], ["policy_owner", "I'M A POLICY OWNER →"], ["operations", "I'M IN OPERATIONS →"]];
+  const entries: [DemoRole, string][] = [["reviewer", "I'M A CLAIMS REVIEWER →"], ["policy_owner", "I'M A POLICY OWNER →"], ["operations", "I'M A OPERATIONS LEAD →"]];
   return (
     <div className="relative isolate overflow-hidden">
       {/* 1. HERO */}
