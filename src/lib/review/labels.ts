@@ -22,9 +22,9 @@ export const isOpen = (c: { case_status: string }) => c.case_status === "open";
 export function inTab(c: ClaimListItem, tab: Tab): boolean {
   if (tab === "closed") return !isOpen(c);
   if (!isOpen(c)) return false;
-  if (tab === "needs") return c.effective_recommendation !== "routine_processing" || c.recheck_pending || c.effective_source !== "system";
+  if (tab === "needs") return c.effective_recommendation === "human_review";
   if (tab === "waiting") return c.effective_recommendation === "request_information";
-  return c.effective_recommendation === "routine_processing" && c.effective_source === "system";
+  return c.effective_recommendation === "routine_processing";
 }
 export function sortQueue(list: ClaimListItem[]): ClaimListItem[] {
   return [...list].sort((a, b) => Number(b.recheck_pending) - Number(a.recheck_pending) || a.created_at.localeCompare(b.created_at) || a.case_id.localeCompare(b.case_id));
