@@ -117,7 +117,7 @@ export function LandingPage() {
             Canoe reads a motor claim, applies your written policy and tells your team the next step — with the facts, the rule and the policy version behind every answer. When the policy changes, you see what moves before it goes live.
           </p>
           <div className="mt-6 space-y-4">
-            <div className="flex flex-wrap items-center gap-5"><Button asChild><Link to="/claim">Report a claim</Link></Button><Link to="/track" className="text-sm text-stone underline underline-offset-4 hover:text-ink">{t("Track a claim")}</Link></div>
+            <div className="flex flex-wrap items-center gap-5"><Button asChild><Link to="/claim">Report a claim</Link></Button><Button asChild variant="outline"><Link to="/batch">Batch version</Link></Button><Link to="/track" className="text-sm text-stone underline underline-offset-4 hover:text-ink">{t("Track a claim")}</Link></div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               {entries.map(([role, label]) => <Button key={role} asChild variant="outline" className="h-auto w-full justify-between whitespace-normal rounded-none border-ink bg-transparent px-5 py-5 text-left font-mono text-[11px] uppercase tracking-[0.18em] hover:bg-paper hover:text-ink">{session?.role === role ? <Link to={ROLE_PAGE[role]}>{label}</Link> : <Link to="/sign-in" search={{ role, next: ROLE_PAGE[role] }}>{label}</Link>}</Button>)}
             </div>

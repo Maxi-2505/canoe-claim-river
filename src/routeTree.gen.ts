@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BatchRouteImport } from './routes/batch'
 import { Route as BusinessRouteImport } from './routes/business'
 import { Route as ClaimRouteImport } from './routes/claim'
 import { Route as PolicyRouteImport } from './routes/policy'
@@ -24,6 +25,11 @@ import { Route as TrackCaseIdRouteImport } from './routes/track.$caseId'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BatchRoute = BatchRouteImport.update({
+  id: '/batch',
+  path: '/batch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessRoute = BusinessRouteImport.update({
@@ -79,6 +85,7 @@ const TrackCaseIdRoute = TrackCaseIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/batch': typeof BatchRoute
   '/business': typeof BusinessRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/batch': typeof BatchRoute
   '/business': typeof BusinessRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
@@ -105,6 +113,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/batch': typeof BatchRoute
   '/business': typeof BusinessRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/batch'
     | '/business'
     | '/claim'
     | '/policy'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/batch'
     | '/business'
     | '/claim'
     | '/policy'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/batch'
     | '/business'
     | '/claim'
     | '/policy'
@@ -159,6 +171,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BatchRoute: typeof BatchRoute
   BusinessRoute: typeof BusinessRoute
   ClaimRoute: typeof ClaimRoute
   PolicyRoute: typeof PolicyRoute
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/batch': {
+      id: '/batch'
+      path: '/batch'
+      fullPath: '/batch'
+      preLoaderRoute: typeof BatchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/business': {
@@ -266,6 +286,7 @@ const ReviewRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BatchRoute: BatchRoute,
   BusinessRoute: BusinessRoute,
   ClaimRoute: ClaimRoute,
   PolicyRoute: PolicyRoute,

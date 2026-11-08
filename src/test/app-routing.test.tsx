@@ -12,7 +12,7 @@ describe("App routing", () => {
     expect(router.matchRoutes(path).at(-1)?.routeId).toBe(rootRouteId);
   });
 
-  it.each([["/review", "/review/"], ["/policy", "/policy"], ["/business", "/business"]])("keeps %s available", (path, routeId) => {
+  it.each([["/review", "/review/"], ["/policy", "/policy"], ["/business", "/business"], ["/batch", "/batch"]])("keeps %s available", (path, routeId) => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
     expect(router.matchRoutes(path).at(-1)?.routeId).toBe(routeId);
   });

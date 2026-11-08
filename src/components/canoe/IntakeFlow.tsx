@@ -184,6 +184,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
                   ))}
                   <p className="border-t border-stone/20 py-4 text-sm text-stone">{t("Have a quote or police report? Keep it close. It saves you questions.")}</p>
                 </div>
+                <Button asChild variant="outline"><Link to="/batch">Batch version</Link></Button>
               </motion.section>
             )}
 
