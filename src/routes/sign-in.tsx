@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useDemoSession } from "@/components/demo-role/DemoSession";
 import { DEMO_NAME, ROLE_LABEL, ROLES, isRole, safeNext } from "@/lib/demo-role/logic";
 export const Route = createFileRoute("/sign-in")({
-  validateSearch: (s: Record<string, unknown>): { role?: string; next?: string } => ({ ...(typeof s.role === "string" ? { role: s.role } : {}), ...(typeof s.next === "string" ? { next: s.next } : {}) }),
+  validateSearch: (s: Record<string, unknown>): { role?: string; next?: string } => ({ ...(typeof s['role'] === "string" ? { role: s['role'] } : {}), ...(typeof s['next'] === "string" ? { next: s['next'] } : {}) }),
   head: () => ({ meta: [{ title: "Demo sign-in — Canoe" }, { name: "description", content: "Choose a demo workspace role for Canoe. No real accounts or authentication." }, { property: "og:title", content: "Demo sign-in — Canoe" }, { property: "og:description", content: "Enter the Canoe reviewer, policy owner or operations demo." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }),
   component: SignInPage,
 });

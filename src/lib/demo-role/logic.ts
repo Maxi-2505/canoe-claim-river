@@ -28,5 +28,5 @@ export function safeNext(value: unknown, role: DemoRole) {
 export function parseSession(value: unknown): DemoSession | null {
   if (!value || typeof value !== "object") return null;
   const s = value as Record<string, unknown>;
-  return isRole(s.role) && typeof s.name === "string" && s.name.trim() && s.name.length <= 100 ? { role: s.role, name: s.name.trim() } : null;
+  return isRole(s['role']) && typeof s['name'] === "string" && s['name'].trim() && s['name'].length <= 100 ? { role: s['role'], name: s['name'].trim() } : null;
 }
