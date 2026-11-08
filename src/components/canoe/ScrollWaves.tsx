@@ -41,7 +41,7 @@ export function ScrollWaves() {
       element.style.height = `${length}px`;
       // Centre the track in the gutter between the text column and the page edge.
       const textRight = end.getBoundingClientRect().right;
-      element.style.left = `${Math.max(0, textRight + (innerWidth - textRight) * 0.65 - 50)}px`;
+      element.style.left = `${Math.max(0, textRight + (innerWidth - textRight) * 0.8 - 50)}px`;
       svg.setAttribute("viewBox", `0 0 100 ${length}`);
     };
     const sample = (index: number, y: number, phase: number, boatY: number) => {
