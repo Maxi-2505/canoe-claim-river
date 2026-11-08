@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Moon, Send, Sun, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import ReactMarkdown from "react-markdown";
@@ -9,6 +9,7 @@ import { ClaimStatusCard } from "./ClaimStatusCard";
 import { ChatBoatMark } from "./ChatBoatMark";
 import { Link } from "@tanstack/react-router";
 import type { getCustomerStatus } from "@/lib/customer/status";
+import { SiteToolsContext } from "./site-tools-context";
 
 export type Locale = "en" | "de";
 export type Theme = "light" | "dark";
@@ -43,8 +44,7 @@ const translations: Record<string, string> = {
   "Optional - helps us prepare": "Optional – hilft uns bei der Vorbereitung", "Add it now - we'll read it for you": "Jetzt hinzufügen – wir lesen es für Sie", "Or add the quote - we'll read it for you": "Oder Kostenvoranschlag hinzufügen – wir lesen ihn für Sie",
 };
 
-type SiteToolsContextValue = ReturnType<typeof useSiteToolsState>;
-const SiteToolsContext = createContext<SiteToolsContextValue | null>(null);
+export type SiteToolsContextValue = ReturnType<typeof useSiteToolsState>;
 
 function useSiteToolsState() {
   const [locale, setLocale] = useState<Locale>("en");

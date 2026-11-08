@@ -1,11 +1,10 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useContext, useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Wordmark } from "@/components/canoe/brand";
 import { Button } from "@/components/ui/button";
 import { canView, DEMO_NAME, ROLE_LABEL, pageRole, parseSession, type DemoRole, type DemoSession } from "@/lib/demo-role/logic";
+import { DemoSessionContext as Context } from "./session-context";
 const KEY = "canoe-demo-session";
-type SessionContext = { session: DemoSession | null; ready: boolean; signIn: (role: DemoRole, name?: string) => void; signOut: () => void };
-const Context = createContext<SessionContext | null>(null);
 export function DemoSessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<DemoSession | null>(null);
   const [ready, setReady] = useState(false);
