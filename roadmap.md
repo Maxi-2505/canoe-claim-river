@@ -30,5 +30,5 @@
 - [x] Role-matrix tests and laptop/phone/public-route checks; leave Ask Canoe unchanged.
 
 # Batch version
-- [ ] Add homepage and intake links and a public CSV upload/results page without local decisions.
-- [ ] Test raw CSV transport, optional register saving, exact response display/download, errors, and desktop/phone flow.
+- [x] Add homepage and intake links and a public CSV upload/results page without local decisions.
+- [x] Test raw CSV transport, optional save=1 request (intercepted; no live register write), exact response display/download, errors, and desktop/phone flow. Live unsaved batch verified; 127 tests and build pass.
