@@ -18,12 +18,12 @@ export function validateCsv(name: string, text: string): void {
 export function summarizeBatch(response: BatchResponse) {
   const outcomes = new Map<string, number>();
   for (const row of response.results) {
-    const outcome = String(row.recommendation_v2 ?? "");
+    const outcome = String(row['recommendation_v2'] ?? "");
     outcomes.set(outcome, (outcomes.get(outcome) ?? 0) + 1);
   }
   return {
     triaged: response.results.length,
-    recheck: response.results.filter((row) => row.needs_recheck === "True").length,
+    recheck: response.results.filter((row) => row['needs_recheck'] === "True").length,
     outcomes: Array.from(outcomes.entries()),
   };
 }

@@ -19,7 +19,7 @@ describe("Batch transport and summaries", () => {
     const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ ...response, saved: { count: 3 } })));
     vi.stubGlobal("fetch", fetcher);
     expect((await runBatch("raw,csv", true, "https://example.test")).saved).toEqual({ count: 3 });
-    expect(fetcher.mock.calls[0][0]).toBe("https://example.test/api/batch?save=1");
+    expect(fetcher.mock.calls[0]?.[0]).toBe("https://example.test/api/batch?save=1");
   });
   it("counts only literal True and returned v2 outcomes", () => {
     expect(summarizeBatch(response)).toEqual({ triaged: 3, recheck: 1, outcomes: [["human_review", 2], ["routine_processing", 1]] });
