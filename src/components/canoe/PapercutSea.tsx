@@ -91,9 +91,9 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
       // Canoe rides the layer just behind the front layers.
       const base = canoeSpot(now);
       const spot0 = w < 700 ? { ...base, x: Math.min(base.x, 0.62) } : base;
-      // Keep the canoe where it sat in the shorter scene; the extra height is far-off sea.
-      const h0 = contained ? h : Math.min(innerHeight * 0.46, 460);
-      const spot = { ...spot0, y: 1 - (1 - spot0.y) * (h0 / h) };
+      // Same fractional waterline in both variants: the wave crests are fractional too,
+      // so the visible hull above the front wave matches the contained hero.
+      const spot = spot0;
       const cw = Math.min(560, w * (w < 700 ? 0.58 : 0.44), h * 0.95) * spot.scale; // keep the hull inside the front waves on short, wide screens
       const ch = cw * 0.4;
       const ls = (s * 2 * Math.PI) / 5.3;
