@@ -64,7 +64,7 @@ export function TodaySlide() {
           </li>)}
         </ol>
         <div aria-hidden="true" className="today-divider today-divider-3 h-px w-full bg-border" />
-        <p className="today-footnote mt-8 text-base leading-relaxed text-stone md:mt-10 md:text-2xl">Figures for a mid-sized European motor insurer, from our interview with the case team. Assumptions, not measurements.</p>
+        <p className="today-footnote mt-8 text-base leading-relaxed text-stone md:mt-10 md:text-2xl">Assumed figures for a mid-sized European motor insurer, from our interview with the case team.</p>
       </div>
     </section>
   );
