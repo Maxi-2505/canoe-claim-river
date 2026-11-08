@@ -1,5 +1,5 @@
 import { isPublicDemoId } from "@/lib/chat/logic";
-import { motorConfig } from "@/lib/intake/config";
+import { projectCustomerClaim } from "./projection";
 import type { CustomerClaim } from "./status";
 export async function readCustomerClaim(caseId: string, secret?: string, base?: string, token?: string): Promise<CustomerClaim> {
   const { hasClaimAccess } = await import("./access.server");
@@ -15,9 +15,5 @@ export async function readCustomerClaim(caseId: string, secret?: string, base?: 
   const c = await response.json();
   if (c.case_id !== caseId) throw new Error("Claim status is unavailable. Please try again.");
   // Explicit projection: no personal facts, notes, rules, versions, or internal explanations.
-  const infoRequests = (c.info_requests ?? []).map((r: CustomerClaim["info_requests"][number]) => ({ status: r.status, created_at: r.created_at, ask_fields: r.ask_fields.filter((f) => motorConfig.questions.some((q) => q.source === "customer" && (q.field === f || q.also_for?.includes(f)))), answered_at: r.answered_at }));
-  // The API records an answered request even when it omits request_status.
-  const lastRequest = infoRequests.at(-1);
-  const awaitingRecheck = lastRequest?.status === "answered" && c.effective_recommendation === "request_information" && !(c.decisions ?? []).some((d: { created_at: string }) => lastRequest.answered_at && Date.parse(d.created_at) > Date.parse(lastRequest.answered_at));
-  return { case_id: c.case_id, case_status: c.case_status, created_at: c.created_at, effective_recommendation: c.effective_recommendation, closed_at: c.closed_at, settlement: c.settlement ? { decision: c.settlement.decision, created_at: c.settlement.created_at } : null, request_status: c.request_status ?? (awaitingRecheck ? "answered_awaiting_recheck" : null), info_requests: infoRequests };
+  return projectCustomerClaim({ ...c, info_requests: c.info_requests ?? [] });
 }

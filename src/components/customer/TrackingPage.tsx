@@ -5,7 +5,7 @@ import { getCustomerClaim } from "@/lib/customer/customer.functions";
 import { getCustomerStatus } from "@/lib/customer/status";
 import { useCustomerClock } from "@/lib/customer/clock";
 import { recentClaims, rememberClaim } from "@/lib/customer/recent";
-import { SIMULATED } from "@/lib/customer/reminders";
+import { CustomerReminders } from "./CustomerReminders";
 import { Wordmark, Accent } from "@/components/canoe/brand";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { DemoMenu } from "@/components/canoe/DemoMenu";
@@ -41,10 +41,8 @@ export function TrackingPage({ caseId }: { caseId?: string }) {
         <h2 className="eyebrow mb-2 mt-8">{t("What happens next")}</h2><p className="text-stone">{t(status.next)}</p>
         {status.needInfo && <div className="card-calm mt-6 space-y-3 p-5">
           <p>{t("We need:")} {status.needInfo.labels.map(t).join(" · ")}</p>
-          <p className="text-sm text-stone">{t("Reminder")} {Math.min(status.needInfo.reminder.stage, 3)} {t("of 3 sent")} {date(status.needInfo.reminder.sentAt.at(-1) ?? claim.data?.created_at ?? "")}{status.needInfo.reminder.nextAt && <> · {t("next on")} {date(status.needInfo.reminder.nextAt)}</>}</p>
-          {status.needInfo.reminder.overdue && <p className="text-sm">{t("A reviewer call is due (simulated).")}</p>}
+          <CustomerReminders createdAt={claim.data?.info_requests.filter((r) => r.status === "open").at(-1)?.created_at ?? claim.data?.created_at ?? ""} />
           <Button asChild><Link to="/continue/$caseId" params={{ caseId: status.caseId }} search={{ missing: undefined }}>{t("Add it now")}</Link></Button>
-          <p className="text-xs text-stone">{t(SIMULATED)}</p>
         </div>}
         <ol className="mt-8 border-l border-stone/30 bg-paper/95 py-3 pl-5">{status.events.map((e, i) => <li key={`${e.at}-${i}`} className="relative pb-4"><span className="absolute -left-6 top-2 h-px w-2 bg-stone" /><p className="text-sm">{t(e.text)}</p><p className="font-mono text-[10px] text-stone">{date(e.at)}</p></li>)}</ol>
       </>}
