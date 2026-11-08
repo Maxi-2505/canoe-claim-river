@@ -71,7 +71,7 @@ export function LandingPage() {
         <Section className="!pt-12 md:!pt-14">
           <p className="eyebrow mb-5">Canoe / claims triage</p>
           <h1 className="max-w-[760px] font-display text-[44px] leading-[1.05] tracking-[-0.02em] md:text-[68px]">
-            Decisions that <span className="landing-hold" data-entered={canoeEntered}><Accent>hold</Accent></span> when the rules change.
+            Decisions that <span className="landing-hold" data-entered={canoeEntered}><span className="relative inline-block not-italic">hold<svg viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true" className="absolute -bottom-[0.14em] left-0 h-[0.14em] w-full text-cedar/60"><path pathLength="1" d="M2 6 Q26 1 50 6 T100 6 T150 6 T198 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" /></svg></span></span> when the rules change.
           </h1>
           <p className="mt-6 max-w-[580px] text-[17px] leading-relaxed text-ink/80">
             Canoe reads a motor claim, applies your written policy and tells your team the next step - with the facts, the rule and the policy version behind every answer. When the policy changes, you see what moves before it goes live.

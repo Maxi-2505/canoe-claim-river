@@ -38,7 +38,7 @@
 - [x] Test transport, failed-parse draft protection and unchanged returned rules; verify live template/error uploads and simulation, desktop/current viewport/phone. All 145 tests pass; build clean. No publication performed.
 
 # Today slide
-- [ ] Synchronize hero accent with canoe arrival, prevent final wave overshoot, use ink hand and animate the three-step connector; verify desktop/phone and reduced motion.
+- [x] Synchronize hero accent with canoe arrival, prevent final wave overshoot, use ink hand and animate the three-step connector; verify desktop/phone and reduced motion.
 - [x] Finish one-time entrance, hover and reduced-motion verification on desktop/phone; build clean.
 - [x] Replace the waving headline hand with the specified sequential, still graphite double-stroke sketch; verify hover/touch and reduced motion.
 
