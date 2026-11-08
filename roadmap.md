@@ -16,9 +16,9 @@
 - [ ] Focused tests and live chat desktop/mobile verification.
 
 # Customer tracking and reminders
-- [ ] Live submission and information responses with private customer access.
-- [ ] Shared tested statuses, reminders and demo clock.
-- [ ] Confirmation, tracking pages, navigation and chat entry.
-- [ ] Reviewer simulated reminders and queue tags.
-- [ ] Live easy/incomplete flows, desktop/phone, tests and build verification.
-- [ ] Finish existing implementation: continuation reminders, safe status projection, and fresh live November-date verification without bypassing duplicate checks.
+- [x] Live submission and information responses with private customer access.
+- [x] Shared tested statuses, reminders and demo clock.
+- [x] Confirmation, tracking pages, navigation and existing status export for chat (LLM work unchanged).
+- [x] Reviewer simulated reminders and queue tags.
+- [x] Live easy/incomplete flows, desktop/phone, tests and build verification.
+- [x] Finish existing implementation: continuation reminders, safe status projection, and fresh live November-date verification without bypassing duplicate checks.
