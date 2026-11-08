@@ -272,5 +272,19 @@
 .canoe-chat-form input { min-width: 0; flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--background); color: var(--foreground); font: inherit; font-size: 13px; }
 .canoe-chat-form button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--cedar); color: var(--paper); cursor: pointer; }
 .canoe-chat-form button:disabled { opacity: .45; cursor: default; }
+.canoe-chat-role { max-width: 180px; border: 0; padding: 0; background: transparent; color: var(--stone); font: 400 11px var(--font-sans); cursor: pointer; }
+.canoe-chat-bubble { overflow-wrap: anywhere; flex-shrink: 0; }
+.canoe-chat-bubble p { margin: 0; }
+.canoe-chat-bubble p + p { margin-top: 8px; }
+.canoe-chat-bubble ul, .canoe-chat-bubble ol { padding-left: 16px; margin: 6px 0; }
+.canoe-chat-bubble a { color: var(--cedar); text-decoration: underline; }
+.canoe-chat-retry { padding: 4px 0 0; height: auto; font-size: 12px; }
+.canoe-chat-status { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.canoe-chat-status header { display: flex; justify-content: space-between; align-items: center; gap: 10px; font: 500 11px var(--font-mono); }
+.canoe-chat-status dl { margin: 10px 0 6px; display: grid; gap: 5px; }
+.canoe-chat-status dl > div { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 8px; font-size: 11px; }
+.canoe-chat-status dt, .canoe-chat-status small { color: var(--stone); }
+.canoe-chat-status dd { margin: 0; overflow-wrap: anywhere; }
+.canoe-chat-status small { font-size: 10px; }
 @media (max-width: 600px) { .canoe-chat-panel { right: 12px; } }
 @media (max-width: 480px) { .canoe-site-controls { left: 12px; bottom: 12px; } .canoe-chat-launcher { right: 12px; bottom: 12px; } }
