@@ -17,12 +17,12 @@ const pencilStrokes = [
   "M18 8a2 2 0 1 1 4 0v6",
   "M6.01 19.66l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15",
 ];
-const pencilNodes: IconNode = pencilStrokes.map((d, i) => ["path", { d, key: `stroke-${i}`, pathLength: "1", vectorEffect: "non-scaling-stroke", className: `today-pencil-stroke today-pencil-stroke-${i}` }]);
+const pencilNodes: IconNode = pencilStrokes.map((d, i) => ["path", { d, key: `stroke-${i}`, pathLength: "1", className: `today-pencil-stroke today-pencil-stroke-${i}` }]);
 
 function PencilHand({ filterId }: { filterId: string }) {
-  return <Icon iconNode={pencilNodes} size={64} strokeWidth={0.75} fill="none" className="today-pencil" filter={`url(#${filterId})`}>
+  return <Icon iconNode={pencilNodes} size={64} strokeWidth={0.75} absoluteStrokeWidth fill="none" className="today-pencil" filter={`url(#${filterId})`}>
     <defs><filter id={filterId} x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="1" seed="7" result="pencil-noise" /><feDisplacementMap in="SourceGraphic" in2="pencil-noise" scale="1.5" xChannelSelector="R" yChannelSelector="G" /></filter></defs>
-    <g className="today-pencil-copy" transform="translate(0.225 0.225) rotate(0.8 12 12)">{pencilStrokes.map((d, i) => <path key={d} d={d} pathLength={1} vectorEffect="non-scaling-stroke" className={`today-pencil-stroke today-pencil-stroke-${i}`} />)}</g>
+    <g className="today-pencil-copy" transform="translate(0.225 0.225) rotate(0.8 12 12)">{pencilStrokes.map((d, i) => <path key={d} d={d} pathLength={1} className={`today-pencil-stroke today-pencil-stroke-${i}`} />)}</g>
   </Icon>;
 }
 
