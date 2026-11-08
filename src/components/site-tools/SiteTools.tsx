@@ -86,7 +86,7 @@ export function useSiteTools() {
 }
 
 export function SiteTools() {
-  const { locale, setLocale, theme, setTheme, text } = useSiteTools();
+  const { locale, setLocale, theme, setTheme, text, t } = useSiteTools();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<(ChatTurn & { status?: TrackingStatus; customerStatus?: ReturnType<typeof getCustomerStatus>; error?: boolean })[]>([]);
@@ -130,7 +130,7 @@ export function SiteTools() {
         <p className="canoe-chat-bubble canoe-chat-reply">{text.hello}</p>
         {messages.map((message, index) => <div key={index} className={`canoe-chat-bubble ${message.role === "user" ? "canoe-chat-user" : "canoe-chat-reply"}`}>
           {message.status && <ClaimStatusCard status={message.status} locale={locale} />}
-          {message.customerStatus && <section className="canoe-chat-status"><strong>{message.customerStatus.caseId}</strong><p>{useCustomerText(message.customerStatus.headline, locale)}</p><p>{useCustomerText(message.customerStatus.next, locale)}</p><Link to="/track/$caseId" params={{ caseId: message.customerStatus.caseId }} className="underline underline-offset-4">{locale === "de" ? "Schaden verfolgen" : "Track your claim"} →</Link></section>}
+          {message.customerStatus && <section className="canoe-chat-status"><strong>{message.customerStatus.caseId}</strong><p>{t(message.customerStatus.headline)}</p><p>{t(message.customerStatus.next)}</p><Link to="/track/$caseId" params={{ caseId: message.customerStatus.caseId }} className="underline underline-offset-4">{locale === "de" ? "Schaden verfolgen" : "Track your claim"} →</Link></section>}
           {message.role === "assistant" ? <ReactMarkdown>{message.content}</ReactMarkdown> : message.content}
           {message.error && index === messages.length - 1 && <Button variant="link" className="canoe-chat-retry" disabled={loading} onClick={() => send(messages[index - 1]?.content ?? "", true)}>{text.retry}</Button>}
         </div>)}
