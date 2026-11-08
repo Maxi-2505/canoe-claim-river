@@ -45,7 +45,7 @@ const team = [
   { name: "Mattis", line: "GTM Engineer", initials: "M" },
   { name: "Maximilian", line: "Sales", initials: "M" },
   { name: "Siddesh", line: "AI engineer", initials: "S" },
-  { name: "Vineeth", line: "AI engineer", initials: "V" },
+  { name: "Vineth", line: "AI engineer", initials: "V" },
 ];
 
 export function LandingPage() {
