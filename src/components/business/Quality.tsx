@@ -5,15 +5,19 @@ import { RecommendationLabel } from '@/components/canoe/RecommendationLabel';
 import { importLabels } from '@/lib/business/api';
 import type { Quality as QualityData } from '@/lib/business/types';
 import { CaseLink, percent, Section, Stat } from './shared';
+import { useDemoSession } from '@/components/demo-role/DemoSession';
+import { canAct } from '@/lib/demo-role/logic';
 const correctness = (v: boolean | null) => v == null ? 'Not labelled' : v ? 'Correct' : 'Wrong';
 export function Quality({ quality: q, refresh }: { quality: QualityData; refresh: () => Promise<unknown> }) {
   const input = useRef<HTMLInputElement>(null);
+  const { session } = useDemoSession();
+  const writable = canAct(session?.role, 'business');
   const [busy, setBusy] = useState(false), [notice, setNotice] = useState('');
-  const upload = <Button variant="outline" className="btn-quiet" disabled={busy} onClick={() => input.current?.click()}><Upload />{busy ? 'Importing…' : 'Import labels'}</Button>;
+  const upload = writable ? <Button variant="outline" className="btn-quiet" disabled={busy} onClick={() => input.current?.click()}><Upload />{busy ? 'Importing…' : 'Import labels'}</Button> : null;
   const m = q.monitoring;
   return <div>
     <input ref={input} type="file" accept=".csv,text/csv" className="hidden" aria-label="Import labels CSV" onChange={async e => {
-      const file = e.target.files?.[0]; if (!file) return; setBusy(true); setNotice('');
+      const file = e.target.files?.[0]; if (!file || !writable) return; setBusy(true); setNotice('');
       try { await importLabels(await file.text()); await refresh(); setNotice('Labels imported. Quality refreshed.'); } catch (err) { setNotice(err instanceof Error ? err.message : 'Labels could not be imported.'); } finally { setBusy(false); e.target.value = ''; }
     }} />
     <div className="flex flex-wrap items-center justify-between gap-4"><h2 className="font-display text-2xl">Quality on labelled cases</h2>{upload}</div>

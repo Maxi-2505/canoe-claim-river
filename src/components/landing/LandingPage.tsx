@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { Accent, Wordmark } from "@/components/canoe/brand";
 import { useSiteTools } from "@/components/site-tools/SiteTools";
+import { useDemoSession } from "@/components/demo-role/DemoSession";
+import { ROLE_PAGE, type DemoRole } from "@/lib/demo-role/logic";
+import { Button } from "@/components/ui/button";
 
 // Static landing mockup. No logic here; links only.
 const navLink = "font-mono text-[11px] uppercase tracking-[0.14em] text-stone hover:text-ink";
@@ -85,6 +88,8 @@ const team = [
 
 export function LandingPage() {
   const { t } = useSiteTools();
+  const { session } = useDemoSession();
+  const entries: [DemoRole, string][] = [["reviewer", "I'M A CLAIMS REVIEWER →"], ["policy_owner", "I'M A POLICY OWNER →"], ["operations", "I'M IN OPERATIONS →"];
   return (
     <div className="relative isolate overflow-hidden">
       {/* 1. HERO */}
@@ -100,11 +105,10 @@ export function LandingPage() {
           </div>
           <div className="flex items-center gap-2">
             <Link to="/track" className="text-xs text-ink underline underline-offset-4">{t("Track a claim")}</Link>
-            <Link to="/review" className="btn-quiet hidden px-4 py-2 text-sm sm:inline-flex">Open workspace</Link>
             <Link to="/claim" className="btn-cedar inline-flex px-4 py-2 text-sm">Report a claim</Link>
           </div>
         </nav>
-        <Section className="!pt-16 md:!pt-24">
+        <Section className="!pt-12 md:!pt-14">
           <p className="eyebrow mb-5">Canoe / claims triage</p>
           <h1 className="max-w-[760px] font-display text-[44px] leading-[1.05] tracking-[-0.02em] md:text-[68px]">
             Decisions that <Accent>hold</Accent> when the rules change.
@@ -112,9 +116,11 @@ export function LandingPage() {
           <p className="mt-6 max-w-[580px] text-[17px] leading-relaxed text-ink/80">
             Canoe reads a motor claim, applies your written policy and tells your team the next step — with the facts, the rule and the policy version behind every answer. When the policy changes, you see what moves before it goes live.
           </p>
-          <div className="mt-8 space-y-4">
-            <MainButtons />
-            <Link to="/review" className="inline-block text-sm text-stone underline underline-offset-4 hover:text-ink">Open the reviewer workspace</Link>
+          <div className="mt-6 space-y-4">
+            <div className="flex flex-wrap items-center gap-5"><Button asChild><Link to="/claim">Report a claim</Link></Button><Link to="/track" className="text-sm text-stone underline underline-offset-4 hover:text-ink">{t("Track a claim")}</Link></div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              {entries.map(([role, label]) => <Button key={role} asChild variant="outline" className="h-auto w-full justify-between whitespace-normal rounded-none border-ink bg-transparent px-5 py-5 text-left font-mono text-[11px] uppercase tracking-[0.18em] hover:bg-paper hover:text-ink">{session?.role === role ? <Link to={ROLE_PAGE[role]}>{label}</Link> : <Link to="/sign-in" search={{ role, next: ROLE_PAGE[role] }}>{label}</Link>}</Button>)}
+            </div>
           </div>
         </Section>
       </div>

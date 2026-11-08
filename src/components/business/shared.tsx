@@ -1,8 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { Wordmark } from '@/components/canoe/brand';
 import type { ReactNode } from 'react';
+import { SessionHeader } from '@/components/demo-role/DemoSession';
 export function BusinessShell({ children }: { children: ReactNode }) {
-  return <div className="min-h-screen pb-32"><header className="mx-auto flex max-w-[1280px] items-center gap-4 px-5 pt-5 md:px-8"><Wordmark /><nav className="flex flex-wrap gap-4 font-mono text-[11px] uppercase text-stone"><Link to="/review">Review</Link><Link to="/policy">Policy</Link><Link to="/business" className="text-ink">Business</Link></nav></header><main className="mx-auto max-w-[1280px] px-5 md:px-8">{children}</main></div>;
+  return <div className="min-h-screen pb-32"><header className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-4 px-5 pt-5 md:px-8"><div className="flex flex-wrap items-center gap-4"><Wordmark /><nav className="flex flex-wrap gap-4 font-mono text-[11px] uppercase text-stone"><Link to="/review">Review</Link><Link to="/policy">Policy</Link><Link to="/business" className="text-ink">Business</Link></nav></div><SessionHeader /></header><main className="mx-auto max-w-[1280px] px-5 md:px-8">{children}</main></div>;
 }
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return <section className="mt-10 border-t border-stone/25 pt-6"><h2 className="font-display text-2xl">{title}</h2><div className="mt-4">{children}</div></section>;

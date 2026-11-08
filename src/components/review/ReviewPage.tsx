@@ -10,6 +10,8 @@ import { FIELD_GROUPS, REASON, REC_LABEL, REC_SHORT, RULE_FIELD, euro, formatVal
 import { cn } from "@/lib/utils";
 import { RecommendationLabel } from "@/components/canoe/RecommendationLabel";
 import { ReviewReminders, QueueReminder } from "@/components/customer/ReviewReminders";
+import { SessionHeader, useDemoSession } from "@/components/demo-role/DemoSession";
+import { canAct } from "@/lib/demo-role/logic";
 
 const RECS: Rec[] = ["routine_processing", "request_information", "human_review"];
 const CATEGORIES = ["Evidence contradicts data", "Fact captured wrong", "Rule doesn't fit this case", "New information received", "Other"];
@@ -22,11 +24,6 @@ const reasonText = (rule: string) => REASON[rule] ?? null;
 
 function Italic({ children }: { children: ReactNode }) { return <Accent>{children}</Accent>; }
 
-function useReviewer(): [string, (s: string) => void] {
-  const [name, setName] = useState("Jury");
-  useEffect(() => { try { const s = localStorage.getItem("canoe.reviewer"); if (s) setName(s); } catch { /* storage off */ } }, []);
-  return [name, (s) => { setName(s); try { localStorage.setItem("canoe.reviewer", s); } catch { /* storage off */ } }];
-}
 
 type Ui = { changing: boolean; armed: "approve" | "decline" | null; editing: string | null };
 const UI0: Ui = { changing: false, armed: null, editing: null };
@@ -35,7 +32,9 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
   const api = useMemo(() => getReviewApi(), []);
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const [reviewer, setReviewer] = useReviewer();
+  const { session } = useDemoSession();
+  const reviewer = session?.name ?? "";
+  const writable = canAct(session?.role, "review");
   const [tab, setTab] = useState<Tab>("needs");
   const [q, setQ] = useState("");
   const [drawer, setDrawer] = useState(false);
@@ -50,7 +49,7 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
   const matches = (c: ClaimListItem) => !term || c.case_id.toLowerCase().includes(term) || c.summary.toLowerCase().includes(term);
   const visible = sortQueue(claims.filter((c) => inTab(c, tab) && matches(c)));
   const activeId = caseId ?? visible[0]?.case_id;
-  const detail = useQuery({ queryKey: ["review", "claim", activeId], queryFn: () => api.getClaim(activeId!), enabled: !!activeId });
+  const detail = useQuery({ queryKey: ["review", "claim", activeId], queryFn: () => { if (!activeId) throw new Error("Choose a claim"); return api.getClaim(activeId); }, enabled: !!activeId });
   const c = detail.data;
 
   useEffect(() => { setUi(UI0); setRerun(null); setSaved(null); setAnchored(false); }, [activeId]);
@@ -74,8 +73,8 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
   };
 
   // Keyboard: J/K, A, D, C, E, Esc
-  const uiRef = useRef({ step, c, setUi });
-  uiRef.current = { step, c, setUi };
+  const uiRef = useRef({ step, c, setUi, writable });
+  uiRef.current = { step, c, setUi, writable };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
@@ -85,7 +84,7 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
       const cur = uiRef.current.c;
       if (k === "j") uiRef.current.step(1);
       else if (k === "k") uiRef.current.step(-1);
-      else if (!cur || !isOpen(cur)) return;
+      else if (!uiRef.current.writable || !cur || !isOpen(cur)) return;
       else if (k === "a" && cur.effective_recommendation !== "request_information") document.querySelector<HTMLButtonElement>('[data-settle="approve"]')?.click();
       else if (k === "d" && cur.effective_recommendation === "human_review") document.querySelector<HTMLButtonElement>('[data-settle="decline"]')?.click();
       else if (k === "c") uiRef.current.setUi((u) => ({ ...u, changing: true }));
@@ -101,7 +100,7 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
 
   return (
     <div className="min-h-screen">
-      <header className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 px-5 pt-5 md:px-8">
+      <header className="mx-auto flex max-w-[1680px] flex-wrap items-center justify-between gap-4 px-5 pt-5 md:px-8">
         <div className="flex items-center gap-4">
           <button className="btn-quiet p-2 min-[1200px]:hidden" aria-label="Open queue" onClick={() => setDrawer(true)}><Menu className="size-4" /></button>
           <Wordmark />
@@ -111,10 +110,7 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
             <Link to="/business">Business</Link>
           </nav>
         </div>
-        <label className="flex items-center gap-2 text-xs text-stone">
-          <span className="eyebrow">Reviewing as</span>
-          <input value={reviewer} onChange={(e) => setReviewer(e.target.value)} className="field-input w-28 px-2.5 py-1 font-mono text-xs text-ink" aria-label="Reviewing as" />
-        </label>
+        <SessionHeader />
       </header>
 
       <div className="mx-auto max-w-[1680px] px-5 pt-6 md:px-8">
@@ -159,8 +155,9 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
             : !c ? <div className="card-calm h-64 animate-pulse opacity-60" />
             : (
               <AnimatePresence mode="wait">
-                <CaseView key={c.case_id} c={c} ui={ui} setUi={setUi} saved={saved} rerun={rerun} anchored={anchored} mock={api.mode === "mock"}
+                <CaseView key={c.case_id} c={c} ui={ui} setUi={setUi} saved={saved} rerun={rerun} anchored={anchored} mock={api.mode === "mock"} writable={writable}
                   onSaveFact={async (field, value, reason) => {
+                    if (!writable) return;
                     const before = c.effective_recommendation;
                     const u = await api.facts(c.case_id, { changes: { [field]: value }, reason, reviewer });
                     setRerun({ before, after: u.effective_recommendation, mock: api.mode === "mock" });
@@ -173,10 +170,10 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
 
         {c && (
           <aside className="fixed inset-x-0 bottom-0 z-30 max-h-[45vh] overflow-y-auto border-t border-stone/25 bg-paper p-4 min-[1200px]:sticky min-[1200px]:top-6 min-[1200px]:z-auto min-[1200px]:max-h-none min-[1200px]:w-[340px] min-[1200px]:shrink-0 min-[1200px]:self-start min-[1200px]:border-0 min-[1200px]:bg-transparent min-[1200px]:p-0">
-            <Rail key={c.case_id} c={c} ui={ui} setUi={setUi} reviewer={reviewer}
-              override={async (rec, reason) => { const u = await api.override(c.case_id, { corrected_recommendation: rec, reason, reviewer }); apply(u, `ov-${u.overrides.length}`); setUi(UI0); }}
-              settle={async (decision, reason) => { const u = await api.settle(c.case_id, { decision, reason, reviewer }); setSaved("settle"); onClosed(u); }}
-              outcome={async (final_outcome, note) => { const u = await api.outcome(c.case_id, { final_outcome, note, source: "reviewer", recorded_by: reviewer }); apply(u, `out-${u.outcomes.length}`); }} />
+            <Rail key={c.case_id} c={c} ui={ui} setUi={setUi} reviewer={reviewer} writable={writable}
+              override={async (rec, reason) => { if (!writable) return; const u = await api.override(c.case_id, { corrected_recommendation: rec, reason, reviewer }); apply(u, `ov-${u.overrides.length}`); setUi(UI0); }}
+              settle={async (decision, reason) => { if (!writable) return; const u = await api.settle(c.case_id, { decision, reason, reviewer }); setSaved("settle"); onClosed(u); }}
+              outcome={async (final_outcome, note) => { if (!writable) return; const u = await api.outcome(c.case_id, { final_outcome, note, source: "reviewer", recorded_by: reviewer }); apply(u, `out-${u.outcomes.length}`); }} />
           </aside>
         )}
       </div>
@@ -240,9 +237,9 @@ function SourceIcon({ source }: { source: string }) {
   return <span title={`Source: ${source}`} className="text-stone"><Icon className="size-3.5" /></span>;
 }
 
-function CaseView({ c, ui, setUi, saved, rerun, anchored, mock, onSaveFact }: {
+function CaseView({ c, ui, setUi, saved, rerun, anchored, mock, onSaveFact, writable }: {
   c: ClaimDetail; ui: Ui; setUi: (f: (u: Ui) => Ui) => void; saved: string | null; rerun: { before: Rec; after: Rec; mock: boolean } | null;
-  anchored: boolean; mock: boolean; onSaveFact: (field: string, value: FieldValue, reason: string) => Promise<void>;
+  anchored: boolean; mock: boolean; writable: boolean; onSaveFact: (field: string, value: FieldValue, reason: string) => Promise<void>;
 }) {
   const { advance, t } = useCalmMotion();
   const d = c.latest_decision;
@@ -297,7 +294,7 @@ function CaseView({ c, ui, setUi, saved, rerun, anchored, mock, onSaveFact }: {
                 if (!f) return null;
                 const edit = [...c.fact_edits].reverse().find((e) => e.field === id);
                 return <FactRow key={id} f={f} triggered={triggered === id} edit={edit ? formatValue(id, edit.old_value) || "not provided" : null}
-                  editable={c.editable} editing={ui.editing === id} mock={mock}
+                  editable={c.editable && writable} editing={writable && ui.editing === id} mock={mock}
                   onEdit={() => setUi((u) => ({ ...u, editing: id }))} onCancel={() => setUi((u) => ({ ...u, editing: null }))} onSave={onSaveFact} />;
               })}
             </div>
@@ -410,8 +407,8 @@ function History({ c, saved }: { c: ClaimDetail; saved: string | null }) {
   );
 }
 
-function Rail({ c, ui, setUi, reviewer, override, settle, outcome }: {
-  c: ClaimDetail; ui: Ui; setUi: (f: (u: Ui) => Ui) => void; reviewer: string;
+function Rail({ c, ui, setUi, reviewer, override, settle, outcome, writable }: {
+  c: ClaimDetail; ui: Ui; setUi: (f: (u: Ui) => Ui) => void; reviewer: string; writable: boolean;
   override: (rec: Rec, reason: string) => Promise<void>; settle: (d: "approve" | "decline", reason: string) => Promise<void>; outcome: (o: string, note: string) => Promise<void>;
 }) {
   const eff = c.effective_recommendation;
@@ -448,7 +445,7 @@ function Rail({ c, ui, setUi, reviewer, override, settle, outcome }: {
         {s ? <p className="mt-2 text-sm">{s.decision === "approve" ? "Approved" : "Declined"} by {s.reviewer} · policy {s.policy_version} · {time(s.created_at)}{s.reason && <> — “{s.reason}”</>}</p>
           : <p className="mt-2 text-sm">Closed before this system.</p>}
         <p className="font-display mt-2 text-lg"><Italic>This decision stays as it is.</Italic></p>
-        <OutcomeForm onSave={outcome} />
+        {writable && <OutcomeForm onSave={outcome} />}
         {footer}
       </div>
     );
@@ -456,6 +453,7 @@ function Rail({ c, ui, setUi, reviewer, override, settle, outcome }: {
 
   const changed = c.effective_source !== "system";
   const req = c.info_requests.find((r) => r.status === "open") ?? c.info_requests[0];
+  if (!writable) return <div className="card-calm p-5"><p className="eyebrow">Decision · read-only</p><p className="mt-3"><RecommendationLabel recommendation={eff} /></p><p className="mt-3 text-sm text-stone" title="Reviewers only">Reviewers only</p>{req?.status === "open" && <p className="mt-3 text-xs text-stone">Waiting on customer since {hhmm(req.created_at)}</p>}</div>;
   return (
     <div className="card-calm p-5">
       <p className="eyebrow">Decision</p>
