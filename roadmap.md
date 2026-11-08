@@ -28,3 +28,7 @@
 - [x] Demo sign-in, session, internal gates, role switch/sign-out and jury shortcut.
 - [x] Read-only role controls and signed-in write identity; preserve second approver.
 - [x] Role-matrix tests and laptop/phone/public-route checks; leave Ask Canoe unchanged.
+
+# Batch version
+- [ ] Add homepage and intake links and a public CSV upload/results page without local decisions.
+- [ ] Test raw CSV transport, optional register saving, exact response display/download, errors, and desktop/phone flow.
