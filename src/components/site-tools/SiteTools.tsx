@@ -1,5 +1,11 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Moon, Send, Sun, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import ReactMarkdown from "react-markdown";
+import { Button } from "@/components/ui/button";
+import { askCanoe, chatInput } from "@/lib/chat/chat.functions";
+import type { AgentRole, ChatTurn, TrackingStatus } from "@/lib/chat/types";
+import { ClaimStatusCard } from "./ClaimStatusCard";
 import { ChatBoatMark } from "./ChatBoatMark";
 
 export type Locale = "en" | "de";
@@ -11,23 +17,15 @@ const themeStorageKey = "canoe-theme";
 const copy = {
   en: {
     language: "Language", theme: "Switch to dark mode", light: "Switch to light mode", chat: "Canoe help",
-    open: "Open Ask Canoe help chat", close: "Close chat", hello: "Hello! I can help with basic questions about reporting a claim.",
-    prompt: "Ask a question…", send: "Send message", topics: ["What do I need?", "How long does it take?", "What happens next?"],
-    answers: [
-      "For a car claim, it helps to have your policy number, the incident date, and a short description. A repair quote or police report can save you a few questions, but you can continue without them.",
-      "The form usually takes about five minutes. You can add a repair quote or incident report first to reduce the number of questions.",
-      "A claims specialist reviews the information. Canoe collects the facts; it does not make the claim decision. You should hear back within two working days.",
-    ], fallback: "I can help with preparing a claim, the documents to gather, and what happens after you send it. For a specific claim decision, please contact your insurer.",
+    open: "Open Ask Canoe help chat", close: "Close chat", hello: "Hello! I can explain Canoe’s policy, help prepare a claim, or track a demo reference. Please don’t share personal details here.",
+    prompt: "Ask a question…", send: "Send message", topics: ["Track my claim", "What documents do I need?", "Explain human review"],
+    role: "Assistant role", roles: ["Policy Guide", "Claims Support", "Document Guide"], thinking: "Canoe is responding…", retry: "Retry", error: "Canoe is unavailable right now. Please try again.",
   },
   de: {
     language: "Sprache", theme: "Dunkelmodus einschalten", light: "Hellmodus einschalten", chat: "Canoe Hilfe",
-    open: "Ask-Canoe-Hilfe öffnen", close: "Chat schließen", hello: "Hallo! Ich beantworte allgemeine Fragen zur Schadenmeldung.",
-    prompt: "Frage eingeben…", send: "Nachricht senden", topics: ["Was brauche ich?", "Wie lange dauert es?", "Wie geht es weiter?"],
-    answers: [
-      "Für einen Kfz-Schaden sind Ihre Versicherungsnummer, das Schadendatum und eine kurze Beschreibung hilfreich. Ein Kostenvoranschlag oder Polizeibericht kann einige Fragen ersparen. Sie können aber auch ohne diese Unterlagen fortfahren.",
-      "Das Formular dauert normalerweise etwa fünf Minuten. Wenn Sie zuerst einen Kostenvoranschlag oder einen Schadensbericht hinzufügen, müssen Sie möglicherweise weniger Fragen beantworten.",
-      "Eine Sachbearbeiterin oder ein Sachbearbeiter prüft die Angaben. Canoe sammelt die Fakten und entscheidet nicht über den Schaden. Sie sollten innerhalb von zwei Werktagen eine Rückmeldung erhalten.",
-    ], fallback: "Ich helfe Ihnen bei der Vorbereitung einer Schadenmeldung, den benötigten Unterlagen und den nächsten Schritten. Für eine konkrete Entscheidung wenden Sie sich bitte an Ihren Versicherer.",
+    open: "Ask-Canoe-Hilfe öffnen", close: "Chat schließen", hello: "Hallo! Ich erkläre Canoes Policy, helfe bei der Schadenmeldung oder prüfe eine Demoreferenz. Bitte teilen Sie hier keine persönlichen Daten.",
+    prompt: "Frage eingeben…", send: "Nachricht senden", topics: ["Meinen Schaden verfolgen", "Welche Unterlagen brauche ich?", "Menschliche Prüfung erklären"],
+    role: "Assistentenrolle", roles: ["Policy-Hilfe", "Schadenhilfe", "Dokumentenhilfe"], thinking: "Canoe antwortet…", retry: "Erneut versuchen", error: "Canoe ist gerade nicht erreichbar. Bitte versuchen Sie es erneut.",
   },
 } as const;
 
@@ -77,19 +75,29 @@ export function SiteTools() {
   const { locale, setLocale, theme, setTheme, text } = useSiteTools();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState<{ from: "canoe" | "you"; text: string }[]>([]);
-  const answer = (input: string) => {
-    const normalized = input.toLocaleLowerCase();
-    const index = normalized.includes("need") || normalized.includes("document") || normalized.includes("unterlag") || normalized.includes("brauch") ? 0
-      : normalized.includes("long") || normalized.includes("time") || normalized.includes("dau") ? 1
-      : normalized.includes("next") || normalized.includes("happen") || normalized.includes("weiter") ? 2 : -1;
-    return index === -1 ? text.fallback : text.answers[index];
-  };
-  const send = (value = question) => {
+  const [messages, setMessages] = useState<(ChatTurn & { status?: TrackingStatus; error?: boolean })[]>([]);
+  const [role, setRole] = useState<AgentRole>("policy");
+  const [loading, setLoading] = useState(false);
+  const busy = useRef(false);
+  const latest = useRef<HTMLDivElement>(null);
+  const sendChat = useServerFn(askCanoe);
+  useEffect(() => { latest.current?.scrollIntoView({ block: "nearest" }); }, [messages, loading, open]);
+  const send = async (value = question, retry = false) => {
     const clean = value.trim();
-    if (!clean) return;
-    setMessages((items) => [...items, { from: "you", text: clean }, { from: "canoe", text: answer(clean) }]);
+    if (!clean || busy.current) return;
+    const prior = retry ? messages.slice(0, -2) : messages;
+    const next: ChatTurn[] = [...prior.filter((m) => !m.error).map(({ role, content }) => ({ role, content })), { role: "user", content: clean }];
+    const parsed = chatInput.safeParse({ role, locale, messages: next.slice(-20) });
+    if (!parsed.success) return;
+    busy.current = true;
+    setLoading(true);
+    setMessages([...prior, { role: "user", content: clean }].slice(-40));
     setQuestion("");
+    try {
+      const reply = await sendChat({ data: parsed.data });
+      setMessages((items) => [...items, { role: "assistant", content: reply.text, status: reply.status, error: reply.error }]);
+    } catch { setMessages((items) => [...items, { role: "assistant", content: text.error, error: true }]); }
+    finally { busy.current = false; setLoading(false); }
   };
 
   return <>
@@ -102,13 +110,19 @@ export function SiteTools() {
       </label>
     </div>
     {open && <section className="canoe-chat-panel" aria-label={text.chat}>
-      <header className="canoe-chat-header"><span className="canoe-chat-brand"><span className="canoe-chat-mark"><ChatBoatMark /></span><span><strong>Canoe</strong><small>{text.chat}</small></span></span><button className="canoe-chat-close" aria-label={text.close} onClick={() => setOpen(false)}><X size={18} /></button></header>
-      <div className="canoe-chat-body" aria-live="polite">
+      <header className="canoe-chat-header"><span className="canoe-chat-brand"><span className="canoe-chat-mark"><ChatBoatMark /></span><span><strong>Canoe</strong><select className="canoe-chat-role" aria-label={text.role} value={role} disabled={loading} onChange={(e) => setRole(e.target.value as AgentRole)}>{(["policy", "support", "documents"] as const).map((r, i) => <option key={r} value={r}>{text.roles[i]}</option>)}</select></span></span><Button variant="ghost" className="canoe-chat-close" aria-label={text.close} onClick={() => setOpen(false)}><X size={18} /></Button></header>
+      <div className="canoe-chat-body" aria-live="polite" aria-busy={loading}>
         <p className="canoe-chat-bubble canoe-chat-reply">{text.hello}</p>
-        {messages.map((message, index) => <p key={index} className={`canoe-chat-bubble ${message.from === "you" ? "canoe-chat-user" : "canoe-chat-reply"}`}>{message.text}</p>)}
-        {messages.length === 0 && <div className="canoe-chat-topics">{text.topics.map((topic) => <button key={topic} onClick={() => send(topic)}>{topic}</button>)}</div>}
+        {messages.map((message, index) => <div key={index} className={`canoe-chat-bubble ${message.role === "user" ? "canoe-chat-user" : "canoe-chat-reply"}`}>
+          {message.status && <ClaimStatusCard status={message.status} locale={locale} />}
+          {message.role === "assistant" ? <ReactMarkdown>{message.content}</ReactMarkdown> : message.content}
+          {message.error && index === messages.length - 1 && <Button variant="link" className="canoe-chat-retry" disabled={loading} onClick={() => send(messages[index - 1]?.content ?? "", true)}>{text.retry}</Button>}
+        </div>)}
+        {loading && <p className="canoe-chat-bubble canoe-chat-reply" role="status">{text.thinking}</p>}
+        {messages.length === 0 && <div className="canoe-chat-topics">{text.topics.map((topic) => <Button variant="ghost" key={topic} disabled={loading} onClick={() => send(topic)}>{topic}</Button>)}</div>}
+        <div ref={latest} />
       </div>
-      <form className="canoe-chat-form" onSubmit={(event) => { event.preventDefault(); send(); }}><input value={question} onChange={(event) => setQuestion(event.target.value)} placeholder={text.prompt} aria-label={text.prompt} /><button aria-label={text.send} disabled={!question.trim()}><Send size={16} /></button></form>
+      <form className="canoe-chat-form" onSubmit={(event) => { event.preventDefault(); send(); }}><input value={question} maxLength={1200} onChange={(event) => setQuestion(event.target.value)} placeholder={text.prompt} aria-label={text.prompt} /><Button type="submit" aria-label={text.send} disabled={loading || !question.trim()}><Send size={16} /></Button></form>
     </section>}
     <button className="canoe-chat-launcher" aria-label={open ? text.close : `${locale === "de" ? "Frag Canoe" : "Ask Canoe"} — ${text.open}`} aria-expanded={open} title={text.chat} onClick={() => setOpen(!open)}>
       <span className="canoe-chat-logo">

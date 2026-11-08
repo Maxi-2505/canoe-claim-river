@@ -86,11 +86,11 @@ export async function respond(input: { locale: ChatLocale; role: AgentRole; mess
       if (!active) throw new Error("Published policy missing");
       policyContext = JSON.stringify({ source: "live published policy", ...active });
     }
-    const intakeContext = JSON.stringify(motor.questions.map((q) => ({ question: q.title, help: q.help })));
+    const intakeContext = JSON.stringify(motor.questions.map((q) => ({ question: q.label, help: q.help })));
     const response = await generateResponse({
       model: "openai/gpt-6-astra", instructions: agentInstructions(role, locale, policyContext, intakeContext),
       input: messages.map((m) => ({ role: m.role, content: m.content })),
-      max_output_tokens: 700, store: false,
+      max_output_tokens: 700,
     });
     const text = response.output.flatMap((item) => item.type === "message"
       ? item.content.map((part) => part.type === "output_text" ? part.text : part.refusal) : []).join("\n").trim();
