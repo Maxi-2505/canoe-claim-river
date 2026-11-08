@@ -128,20 +128,6 @@ export function LandingPage() {
         </div>
       </Section>
 
-      {/* 6. PROOF */}
-      <Section>
-        <p className="eyebrow mb-8">Measured on the labelled cases</p>
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {[["14/14", "correct under v1"], ["14/14", "correct under v2"], ["0", "wrong routine approvals"], ["6", "open claims flagged for recheck"]].map(([n, l]) => (
-            <div key={l}>
-              <p className="font-display text-5xl md:text-6xl">{n}</p>
-              <p className="mt-2 text-sm text-stone">{l}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-8 text-sm text-stone">14 labelled cases are a starting point, not a risk rate.</p>
-      </Section>
-
       {/* 7. BUSINESS VALUE - figures from the business case (assumptions, base case 200K claims). */}
       <Section>
         <H2>What it is <CanoeAccent>worth</CanoeAccent>.</H2>
@@ -180,7 +166,7 @@ export function LandingPage() {
         {/* TODO(portraits): replace the graphite circles with pencil-sketch portraits. */}
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {team.map((m, i) => (
-            <div key={i} className="card-calm p-6">
+            <div key={i} className="landing-role-card card-calm p-6">
               <div aria-hidden="true" className="flex h-20 w-20 items-center justify-center rounded-full border border-ink/40 bg-[radial-gradient(circle_at_35%_30%,var(--mist),color-mix(in_oklab,var(--stone)_35%,var(--paper)))] font-display text-xl text-ink/70">{m.initials}</div>
               <p className="mt-5 font-display text-xl">{m.name}</p>
               <p className="mt-2 text-sm text-ink/80">{m.line}</p>
