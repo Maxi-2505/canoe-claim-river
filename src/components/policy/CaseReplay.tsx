@@ -97,7 +97,7 @@ function Picker({ list, err, retry, selected, onSelect }: { list: ClaimListItem[
                   <span className="font-mono text-xs text-ink">{c.case_id}{closed && <span className="ml-1.5 text-stone">· closed</span>}</span>
                   <RecommendationLabel recommendation={c.recommendation_latest} />
                 </span>
-                <span className="block truncate text-xs text-stone">{c.summary || "—"}</span>
+                <span className="block truncate text-xs text-stone">{c.summary || "-"}</span>
               </button>
             );
           })}
@@ -236,7 +236,7 @@ function Diagram({ route, fieldValue, runKey, paused, sel, setSel, closed }: {
 
 /* ---------------- main ---------------- */
 
-const EVAL_TEXT: Record<Eval, string> = { passed: "Passed check — not triggered", triggered: "Triggered", unknown: "Unknown — a fact was blank", not_recorded: "Not recorded" };
+const EVAL_TEXT: Record<Eval, string> = { passed: "Passed check - not triggered", triggered: "Triggered", unknown: "Unknown - a fact was blank", not_recorded: "Not recorded" };
 
 export function CaseReplay({ doc, draft, draftVersion, preview, fresh }: { doc: PolicyDoc; draft: Draft; draftVersion: string; preview: Preview | null; fresh: boolean }) {
   const api = getReviewApi();
@@ -305,7 +305,7 @@ export function CaseReplay({ doc, draft, draftVersion, preview, fresh }: { doc: 
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                 <div className="min-w-0">
                   <p className="eyebrow">{claim.case_id} · {isClosed ? "Closed" : "Open"} · policy {claim.latest_decision.policy_version}</p>
-                  <p className="mt-1 font-display text-xl leading-tight">{claim.summary || "—"}</p>
+                  <p className="mt-1 font-display text-xl leading-tight">{claim.summary || "-"}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {canPropose && (
@@ -326,8 +326,8 @@ export function CaseReplay({ doc, draft, draftVersion, preview, fresh }: { doc: 
 
               {route.inconsistent && <p className="mt-2 font-mono text-[11px] text-cedar">{route.inconsistent}</p>}
               {route.source === "recorded" && route.nodes.every((x) => x.evalState === "not_recorded") && <p className="mt-2 font-mono text-[11px] text-stone">No rule trace was recorded for this decision. The outcome is shown as recorded.</p>}
-              {route.source === "recorded" && api.mode === "mock" && <p className="mt-2 font-mono text-[11px] text-stone">Demo trace — simplified from the claim file, not a live engine run.</p>}
-              {route.source === "proposed" && <p className="mt-2 font-mono text-[11px] text-stone">Proposed, preview only — not published. The preview gives the deciding rule only; other checks are not recorded.</p>}
+              {route.source === "recorded" && api.mode === "mock" && <p className="mt-2 font-mono text-[11px] text-stone">Demo trace - simplified from the claim file, not a live engine run.</p>}
+              {route.source === "proposed" && <p className="mt-2 font-mono text-[11px] text-stone">Proposed, preview only - not published. The preview gives the deciding rule only; other checks are not recorded.</p>}
               {preview && !fresh && !isClosed && <p className="mt-2 font-mono text-[11px] text-stone">The draft changed since the last simulation. Simulate again to compare.</p>}
 
               {node && (
@@ -336,9 +336,9 @@ export function CaseReplay({ doc, draft, draftVersion, preview, fresh }: { doc: 
                     <p className="font-mono text-xs text-ink">{String((sel ?? 0) + 1).padStart(2, "0")} · {node.id}</p>
                     <button className="text-xs text-stone hover:text-ink" onClick={() => setSel(null)}>Close</button>
                   </div>
-                  <p className="mt-1">{REASON[node.id] ?? node.id}{node.reason && <span className="text-stone"> — {node.reason}</span>}</p>
+                  <p className="mt-1">{REASON[node.id] ?? node.id}{node.reason && <span className="text-stone"> - {node.reason}</span>}</p>
                   <p className={cn("mt-1 font-mono text-[11px]", node.winner ? "text-cedar" : "text-stone")}>
-                    {node.winner ? `Triggered — decided this case (sends to ${TERM_LABEL[node.outcome as Rec] ?? node.outcome})` : EVAL_TEXT[node.evalState]}
+                    {node.winner ? `Triggered - decided this case (sends to ${TERM_LABEL[node.outcome as Rec] ?? node.outcome})` : EVAL_TEXT[node.evalState]}
                     {node.afterWinner && " · after the deciding rule, did not change the outcome"}
                   </p>
                   {node.fields.length > 0 && <ul className="mt-2 space-y-0.5 font-mono text-[11px]">
@@ -360,7 +360,7 @@ export function CaseReplay({ doc, draft, draftVersion, preview, fresh }: { doc: 
                   {claim.settlement ? (
                     <>
                       <p className="mt-1 font-display text-xl">{claim.settlement.decision === "approve" ? "Approved" : "Declined"}</p>
-                      <p className="font-mono text-[11px] text-stone">by {claim.settlement.reviewer} · policy {claim.settlement.policy_version}{claim.settlement.reason && ` — “${claim.settlement.reason}”`}</p>
+                      <p className="font-mono text-[11px] text-stone">by {claim.settlement.reviewer} · policy {claim.settlement.policy_version}{claim.settlement.reason && ` - “${claim.settlement.reason}”`}</p>
                     </>
                   ) : <p className="mt-1 text-sm text-stone">{isClosed ? "Closed before this system. Recorded triage recommendation only." : "Not settled. Recorded triage recommendation only."}</p>}
                   {claim.outcomes.length > 0 && <p className="mt-1 font-mono text-[11px] text-stone">Later outcome: {claim.outcomes[claim.outcomes.length - 1]!.final_outcome}</p>}

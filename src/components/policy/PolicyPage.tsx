@@ -273,7 +273,7 @@ function RuleEditor({ draft, live, fields, setDraft, version, liveVersion, mock 
         })}
         {removed.map((r) => (
           <li key={`rm-${r.id}`} className="flex items-center gap-3 py-3 text-stone">
-            <span className="w-4" /><span className="w-6 font-mono text-xs">—</span>
+            <span className="w-4" /><span className="w-6 font-mono text-xs">-</span>
             <span className="flex-1 line-through">{ruleSentence(r, fields)} → {r.outcome === "human_review" ? "REVIEW" : "INFO NEEDED"}</span>
             <span className="font-mono text-[11px]">removed</span>
             <button className="text-xs underline hover:text-ink" onClick={() => { const idx = live.rules.findIndex((x) => x.id === r.id); const rs = [...draft.rules]; rs.splice(Math.min(idx, rs.length), 0, r); set(rs); }}>Undo</button>

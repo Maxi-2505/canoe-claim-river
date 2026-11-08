@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** The logo canoe as a single ink line — the same stroke as the wordmark mark. */
+/** The logo canoe as a single ink line - the same stroke as the wordmark mark. */
 export function ChatBoatMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" className={cn("text-ink", className)}>

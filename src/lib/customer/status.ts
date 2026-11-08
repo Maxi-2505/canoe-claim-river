@@ -25,12 +25,12 @@ export function getCustomerStatus(claim: CustomerClaim, now: number | Date) {
   let needInfo: { fields: string[]; labels: string[]; reminder: ReturnType<typeof getReminders> } | undefined;
   if (claim.case_status === "closed") {
     station = 4; kind = "decided";
-    headline = claim.settlement?.decision === "approve" ? "Approved for normal processing." : claim.settlement?.decision === "decline" ? "Closed — we've written to you." : "Closed.";
+    headline = claim.settlement?.decision === "approve" ? "Approved for normal processing." : claim.settlement?.decision === "decline" ? "Closed - we've written to you." : "Closed.";
     events.push({ at: claim.settlement?.created_at ?? claim.closed_at ?? claim.created_at, text: "Decided" });
   } else if (claim.effective_recommendation === "routine_processing" || claim.request_status === "answered_awaiting_recheck") {
     station = 2; kind = "checking";
     headline = claim.request_status === "answered_awaiting_recheck" ? "Your update is being checked." : "Everything is complete. It's moving to normal handling.";
-    next = "No payment is approved yet — your insurer will be in touch.";
+    next = "No payment is approved yet - your insurer will be in touch.";
   } else if (claim.effective_recommendation === "request_information") {
     station = 2; kind = "need_info"; headline = "We need one thing from you"; next = "Add it now";
     const r = claim.info_requests.filter((r) => r.status === "open").at(-1);

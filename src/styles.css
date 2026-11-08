@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Canoe — "Steady through changing water". Six colours only: paper, ink, cedar, reed, stone, mist. */
+/* Canoe - "Steady through changing water". Six colours only: paper, ink, cedar, reed, stone, mist. */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 8px);

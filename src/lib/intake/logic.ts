@@ -9,7 +9,7 @@ export function factOf(state: IntakeState, id: string): Fact | undefined {
   return state.facts[id];
 }
 
-/** A fact counts as "answered" once known, dont_know or system — never ask it again. */
+/** A fact counts as "answered" once known, dont_know or system - never ask it again. */
 export function isSettled(f?: Fact) {
   return !!f && (f.status === "known" || f.status === "dont_know" || f.status === "system");
 }
@@ -180,7 +180,7 @@ export function toCsv(rows: Partial<Record<CsvColumn, string | null>>[]) {
   return lines.join("\n") + "\n";
 }
 
-/** Answer helper: "not_sure" leaves the field blank (dont_know) — never a guess. */
+/** Answer helper: "not_sure" leaves the field blank (dont_know) - never a guess. */
 export function answer(state: IntakeState, id: string, value: string | number | null, source: Fact["source"] = "customer"): IntakeState {
   const blank = value === "not_sure" || value === null || value === "";
   return {

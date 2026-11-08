@@ -273,7 +273,7 @@ function CaseView({ c, ui, setUi, saved, rerun, anchored, mock, onSaveFact, writ
             <p className="mt-3 font-mono text-[11px] text-stone">rule {d.rule_id} · policy {d.policy_version}</p>
             {c.effective_source === "reviewer" && lastOv && <p className="mt-2 text-sm">Changed to {REC_SHORT[lastOv.corrected_recommendation]} by {lastOv.reviewer}: “{lastOv.reason}”</p>}
             {c.effective_source === "reviewer_confirmed" && lastOv && <p className="mt-2 text-sm">Confirmed by {lastOv.reviewer}: “{lastOv.reason}”</p>}
-            {recheck && <p className="mt-2 text-sm text-stone">Re-evaluated under {recheck.to_version} — was {REC_SHORT[recheck.from_recommendation]}.</p>}
+            {recheck && <p className="mt-2 text-sm text-stone">Re-evaluated under {recheck.to_version} - was {REC_SHORT[recheck.from_recommendation]}.</p>}
             {rerun && (
               <p className="mt-3 border-t border-stone/20 pt-3 text-sm">
                 {rerun.mock ? <span className="text-stone">Fact saved. Re-run needs the live engine.</span>
@@ -435,14 +435,14 @@ function Rail({ c, ui, setUi, reviewer, override, settle, outcome, writable }: {
       {ui.armed === d ? "Click again to close for good" : label}
     </button>
   );
-  const footer = <p className="mt-5 border-t border-stone/20 pt-3 text-xs text-stone">Recorded as <b className="text-ink">{reviewer || "—"}</b> · policy <b className="text-ink">{pv}</b> · with time.</p>;
+  const footer = <p className="mt-5 border-t border-stone/20 pt-3 text-xs text-stone">Recorded as <b className="text-ink">{reviewer || "-"}</b> · policy <b className="text-ink">{pv}</b> · with time.</p>;
 
   if (!isOpen(c)) {
     const s = c.settlement;
     return (
       <div className="card-calm p-5">
         <p className="eyebrow">Settled</p>
-        {s ? <p className="mt-2 text-sm">{s.decision === "approve" ? "Approved" : "Declined"} by {s.reviewer} · policy {s.policy_version} · {time(s.created_at)}{s.reason && <> — “{s.reason}”</>}</p>
+        {s ? <p className="mt-2 text-sm">{s.decision === "approve" ? "Approved" : "Declined"} by {s.reviewer} · policy {s.policy_version} · {time(s.created_at)}{s.reason && <> - “{s.reason}”</>}</p>
           : <p className="mt-2 text-sm">Closed before this system.</p>}
         <p className="font-display mt-2 text-lg"><Italic>This decision stays as it is.</Italic></p>
         {writable && <OutcomeForm onSave={outcome} />}
@@ -461,7 +461,7 @@ function Rail({ c, ui, setUi, reviewer, override, settle, outcome, writable }: {
         <div className="mt-3 space-y-3">
           {eff === "request_information" && !changed ? (
             <div className="rounded-xl border border-stone/30 p-3 text-sm">
-              <p title={req ? time(req.created_at) : ""}>Waiting on customer{req ? ` since ${hhmm(req.created_at)}` : ""} — asked for: <span className="font-mono text-xs">{req?.ask_fields.join(", ") || "—"}</span></p>
+              <p title={req ? time(req.created_at) : ""}>Waiting on customer{req ? ` since ${hhmm(req.created_at)}` : ""} - asked for: <span className="font-mono text-xs">{req?.ask_fields.join(", ") || "-"}</span></p>
               <button className="btn-cedar mt-3 w-full px-4 py-2 text-sm" onClick={async () => {
                 const link = `${window.location.origin}/continue/${c.case_id}`;
                 try { await navigator.clipboard.writeText(link); setCopied(true); } catch { setCopied(true); }
@@ -513,13 +513,13 @@ function ChangeRec({ current, reviewer, pv, onCancel, onRecord }: { current: Rec
         {CATEGORIES.map((x) => <option key={x}>{x}</option>)}
       </select>
       <textarea autoFocus value={text} onChange={(e) => setText(e.target.value)} rows={2} placeholder="What did you see? (required)" aria-label="Reason" className="field-input w-full px-3 py-2 text-sm" />
-      <p className="font-mono text-[11px] text-stone">{REC_SHORT[current]} → {REC_SHORT[rec]} · as {reviewer || "—"} · policy {pv}</p>
+      <p className="font-mono text-[11px] text-stone">{REC_SHORT[current]} → {REC_SHORT[rec]} · as {reviewer || "-"} · policy {pv}</p>
       {err && <p className="text-xs text-cedar">{err}</p>}
       <div className="flex gap-2">
         <button disabled={busy} className="btn-cedar px-5 py-2 text-sm" onClick={async () => {
           if (!text.trim()) { setErr("Add a reason first."); return; }
           setBusy(true); setErr(null);
-          try { await onRecord(rec, `${cat} — ${text.trim()}`); } catch (e) { setErr(msg(e)); } finally { setBusy(false); }
+          try { await onRecord(rec, `${cat} - ${text.trim()}`); } catch (e) { setErr(msg(e)); } finally { setBusy(false); }
         }}>Record</button>
         <button className="btn-quiet px-4 py-2 text-sm" onClick={onCancel}>Cancel</button>
       </div>

@@ -1,4 +1,4 @@
-/** Wording helpers for the policy page. Text only — no decisions are made here. */
+/** Wording helpers for the policy page. Text only - no decisions are made here. */
 import type { Cond, Draft, Op, Rule, RuleOutcome } from "./types";
 
 export const BOOL_FIELDS = ["policy_active_on_incident", "incident_report_present", "itemized_quote_present", "injury_reported", "liability_disputed", "duplicate_flag", "evidence_conflict"];

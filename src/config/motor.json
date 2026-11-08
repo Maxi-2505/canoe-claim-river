@@ -62,7 +62,7 @@
       "vertical": "motor",
       "section": "story",
       "label": "What is your policy number?",
-      "help": "You'll find it on your insurance card — we need it to check your cover.",
+      "help": "You'll find it on your insurance card - we need it to check your cover.",
       "type": "text",
       "source": "customer",
       "short": "Policy number"
@@ -104,7 +104,7 @@
       "vertical": "motor",
       "section": "people",
       "label": "Was anyone hurt?",
-      "help": "If so, a person — not a form — will be in touch.",
+      "help": "If so, a person - not a form - will be in touch.",
       "type": "tri_state",
       "field": "injury_reported",
       "mapping": {
@@ -135,7 +135,7 @@
       "vertical": "motor",
       "section": "damage",
       "label": "Could the high-voltage battery be affected?",
-      "help": "A best guess is fine — say so if you're not sure.",
+      "help": "A best guess is fine - say so if you're not sure.",
       "type": "tri_state",
       "field": "repair_type",
       "mapping": "repair_type",
@@ -199,7 +199,7 @@
       "vertical": "motor",
       "section": "documents",
       "label": "Do you have a police or incident report?",
-      "help": "We need an incident report to process your claim — add it now if you have it.",
+      "help": "We need an incident report to process your claim - add it now if you have it.",
       "type": "tri_state",
       "options": [
         {

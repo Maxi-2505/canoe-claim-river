@@ -4,9 +4,9 @@ import { ReviewPage } from "@/components/review/ReviewPage";
 export const Route = createFileRoute("/review/")({
   head: () => ({
     meta: [
-      { title: "Review — Canoe" },
+      { title: "Review - Canoe" },
       { name: "description", content: "Internal reviewer queue: cases that need a person." },
-      { property: "og:title", content: "Review — Canoe" },
+      { property: "og:title", content: "Review - Canoe" },
       { property: "og:description", content: "Internal reviewer queue for Canoe claims." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

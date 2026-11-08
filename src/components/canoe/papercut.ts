@@ -1,4 +1,4 @@
-// Tunable constants for the papercut sea. Decorative only — no claim state here.
+// Tunable constants for the papercut sea. Decorative only - no claim state here.
 export const layerCount = 14;
 export const waveAmplitude = 13; // px, front layer bob
 export const rockAngle = 6; // degrees
@@ -9,7 +9,7 @@ export type Spot = { x: number; y: number; scale: number };
 /** Resting spots as fractions of the scene: x = canoe centre, y = waterline. */
 export const positions: Spot[] = [{ x: 0.7, y: 0.72, scale: 1 }];
 
-/** Layer i (0 = back) — top edge as a fraction of scene height. */
+/** Layer i (0 = back) - top edge as a fraction of scene height. */
 export const layerTop = (i: number) => 0.12 + Math.pow(i / (layerCount - 1), 1.1) * 0.56;
 /** Index of the first layer drawn in front of the canoe. */
 export const frontFrom = layerCount - 3;

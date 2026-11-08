@@ -31,9 +31,9 @@ export const Route = createFileRoute("/continue/$caseId")({
   validateSearch: (s: Record<string, unknown>) => ({ missing: typeof s["missing"] === "string" ? (s["missing"] as string) : undefined }),
   head: ({ params }) => ({
     meta: [
-      { title: `Continue claim ${params.caseId} — Canoe` },
+      { title: `Continue claim ${params.caseId} - Canoe` },
       { name: "description", content: "Add the details still missing from your claim." },
-      { property: "og:title", content: "Continue your claim — Canoe" },
+      { property: "og:title", content: "Continue your claim - Canoe" },
       { property: "og:description", content: "A few details and your claim moves again." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/continue/$caseId")({
 });
 
 const CLAIM_TYPE: Record<string, string> = { motor_own_damage: "Damage to my car", theft: "Theft" };
-const present = (v: string) => (v === "True" ? "yes" : v === "False" ? "not yet" : "—");
+const present = (v: string) => (v === "True" ? "yes" : v === "False" ? "not yet" : "-");
 
 function ContinuePage() {
   const { caseId } = Route.useParams();
@@ -67,9 +67,9 @@ function ContinuePage() {
   if (!row) return null;
   const quote = row.quote_eur !== "" && Number.isFinite(Number(row.quote_eur)) ? Number(row.quote_eur) : undefined;
   const summary: [string, string][] = [
-    ["What happened", row.claim_summary || "—"],
-    ["Claim type", CLAIM_TYPE[row.claim_type] ?? (row.claim_type || "—")],
-    ["Repair quote", quote != null ? eur(quote) : "—"],
+    ["What happened", row.claim_summary || "-"],
+    ["Claim type", CLAIM_TYPE[row.claim_type] ?? (row.claim_type || "-")],
+    ["Repair quote", quote != null ? eur(quote) : "-"],
     ["Incident report", present(row.incident_report_present)],
     ["Itemized quote", present(row.itemized_quote_present)],
   ];

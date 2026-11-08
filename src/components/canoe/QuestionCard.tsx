@@ -55,7 +55,7 @@ export function QuestionCard({
   return (
     <div className="space-y-6">
       <div>
-        {optional && <p className="mb-2 text-xs uppercase tracking-wider text-stone">Optional — helps us prepare</p>}
+        {optional && <p className="mb-2 text-xs uppercase tracking-wider text-stone">Optional - helps us prepare</p>}
         <h1 className="question-title text-ink">{t(q.label)}</h1>
         <p className="mt-3 text-sm text-stone">{t(q.help)}</p>
       </div>
@@ -100,7 +100,7 @@ export function QuestionCard({
         showUpload ? (
           <DocumentPicker only={q.upload_on_yes} confirmedIds={confirmedDocIds} onConfirm={onDocument} quoteTotal={quoteTotal} />
         ) : (
-          <button onClick={() => setShowUpload(true)} className="text-sm underline underline-offset-4">Add it now — we'll read it for you</button>
+          <button onClick={() => setShowUpload(true)} className="text-sm underline underline-offset-4">Add it now - we'll read it for you</button>
         )
       )}
 
@@ -108,7 +108,7 @@ export function QuestionCard({
         showUpload ? (
           <DocumentPicker only={q.extractable_from} confirmedIds={confirmedDocIds} onConfirm={onDocument} quoteTotal={quoteTotal} />
         ) : (
-          <button onClick={() => setShowUpload(true)} className="text-sm underline underline-offset-4">Or add the quote — we'll read it for you</button>
+          <button onClick={() => setShowUpload(true)} className="text-sm underline underline-offset-4">Or add the quote - we'll read it for you</button>
         )
       )}
 
