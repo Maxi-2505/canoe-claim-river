@@ -113,7 +113,7 @@ export function LandingPage() {
       </Section>
 
       {/* 5. FOR WHOM */}
-      <Section>
+      <Section className="!pt-0 md:!pt-4">
         <div className="grid gap-5 md:grid-cols-3">
           {[
             ["Reviewers", "Understand and decide in under a minute."],
