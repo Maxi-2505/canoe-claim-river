@@ -23,7 +23,7 @@ function Step({ n, title, children, aside }: { n: number; title: ReactNode; chil
   return (
     <section className="border-t border-stone/25 pt-8">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h2 className="flex items-baseline gap-4">{n !== 1 && <span className="font-mono text-sm text-stone">{two(n)}</span>}<span className="font-display text-3xl">{title}</span></h2>
+        <h2 className="flex items-baseline gap-4">{n !== 1 && <span className="font-mono text-sm text-stone">{n === 2 || n === 3 ? "\n" : two(n)}</span>}<span className="font-display text-3xl">{title}</span></h2>
         {aside}
       </div>
       <div className="mt-6">{children}</div>
