@@ -16,11 +16,10 @@
 .today-slide[data-visible="true"] .today-row-2 .today-index { animation-delay: 1940ms; }
 .today-slide[data-visible="true"] .today-row-2 .today-statement { animation-delay: 2020ms; }
 .today-slide[data-visible="true"] .today-footnote { animation: today-footnote 500ms ease-out 2520ms both; }
-.today-slide .today-text { transition: transform 200ms ease-out; }
-.today-slide .today-index { font-weight: 400; transition: font-weight 200ms ease-out; }
+.today-slide .today-text { transform-origin: left center; transition: transform 250ms ease-out; }
+.today-slide .today-index { font-weight: 400; }
 @media (hover: hover) {
-  .today-slide .today-row:hover .today-text { transform: translateX(6px); }
-  .today-slide .today-row:hover .today-index { font-weight: 600; }
+  .today-slide .today-row:hover .today-text { transform: scale(1.06); }
 }
 @keyframes today-intro { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes today-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
