@@ -50,7 +50,7 @@ export function TodaySlide() {
       <div className="mx-auto max-w-[1186px] px-5 py-20 md:px-8 md:py-28">
         <div className="today-intro">
           <p className="font-mono text-sm uppercase tracking-[0.14em] text-stone md:text-xl">TODAY</p>
-          <h2 id="today-heading" aria-label="Every claim is handled by hand." className="today-headline mt-8 font-display text-[32px] font-bold leading-[1.12] tracking-normal md:text-[56px]">
+          <h2 id="today-heading" data-waves-start="" aria-label="Every claim is handled by hand." className="today-headline mt-8 font-display text-[32px] font-bold leading-[1.12] tracking-normal md:text-[56px]">
             <span aria-hidden="true"><span className="today-word today-word-0">Every</span>{" "}<span className="today-word today-word-1">claim</span>{" "}<span className="today-word today-word-2">is</span>{" "}<span className="today-word today-word-3">handled</span>{" "}<span className="today-hand-phrase"><span className="today-word today-word-4">by</span>{" "}<span className="today-word today-word-5">hand<span className="today-hand-period">.<span className="today-hand"><PencilHand filterId={pencilFilterId} /></span></span></span><svg className="today-hand-underline" viewBox="0 0 200 10" preserveAspectRatio="none" fill="none"><path pathLength="1" d="M2 6 Q18 2 34 6 T66 6 T98 6 T130 6 T162 6 T198 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span></span>
           </h2>
         </div>
