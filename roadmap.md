@@ -41,6 +41,6 @@
 - [x] Finish one-time entrance, hover and reduced-motion verification on desktop/phone; build clean.
 
 # Business Case visualizations
-- [ ] Review existing formulas and add the specified business-case scenario formulas with tests, without changing published reporting or decisions.
-- [ ] Add animated KPIs, claim mix, cost/volume/policy comparisons, risk ratio and turnaround visuals only to Business Case.
-- [ ] Verify sliders, calculations, animations, reduced motion and desktop/phone layout.
+- [x] Review existing formulas and add the specified business-case scenario formulas with tests, without changing published reporting or decisions.
+- [x] Add animated KPIs, claim mix, cost/volume/policy comparisons, risk ratio and turnaround visuals only to Business Case. Supplied risk, mix, fees and turnaround stay labelled scenario assumptions.
+- [x] Verify volume 150k/250k (€118,750/€197,917 net; 2.5/1.5 month payback), live policy outcomes and three closed records unchanged, desktop/phone and reduced motion. All 155 tests pass; build clean. Existing assumptions/export and Ask Canoe unchanged.
