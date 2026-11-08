@@ -5,6 +5,7 @@ import { Accent, Wordmark } from "@/components/canoe/brand";
 import { RecommendationLabel } from "@/components/canoe/RecommendationLabel";
 import { LocksScene } from "./LocksScene";
 import { CaseReplay } from "./CaseReplay";
+import { PolicyDocumentUpload } from "./PolicyDocumentUpload";
 import { getPolicyApi, type Draft, type PolicyDoc, type PolicyVersion, type Preview, type PublishResult, type Rule, type Cond } from "@/lib/policy/api";
 import { demoDraft, DEMO_TITLE, toDraft, withLimit } from "@/lib/policy/mock";
 import { defaultCond, describeDiff, OP_WORDS, opsFor, quoteLimitOf, SELECT_OPTIONS, valueText } from "@/lib/policy/text";
@@ -105,6 +106,7 @@ export function PolicyPage() {
 
       <div className="mt-12 space-y-14">
         <Step n={1} title="Change">
+          <PolicyDocumentUpload onDraft={(parsed) => { setDraft(parsed); setResult(null); }} />
           <RuleEditor draft={draft} live={live} fields={doc.fields} setDraft={setDraft} version={draftV} liveVersion={doc.latest} mock={api.mode === "mock"} />
         </Step>
 
