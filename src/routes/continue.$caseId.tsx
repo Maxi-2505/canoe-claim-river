@@ -8,6 +8,8 @@ import { IntakeFlow } from "@/components/canoe/IntakeFlow";
 import { getCustomerClaim } from "@/lib/customer/customer.functions";
 import { useSiteTools } from "@/components/site-tools/SiteTools";
 import { eur } from "@/components/canoe/samples";
+import { CustomerReminders } from "@/components/customer/CustomerReminders";
+import { DemoMenu } from "@/components/canoe/DemoMenu";
 
 const claimQuery = (caseId: string) => queryOptions({
   queryKey: ["claim", caseId],
@@ -59,7 +61,8 @@ function ContinuePage() {
   const initial = useMemo(() => openMissing(data?.log.length ? stateFromLog(data.log) : stateFromStoredRow(row ?? { claim_type: "motor_own_damage" }), motorConfig, missing), [data, row, missing]);
   if (live) {
     if (live.case_status === "closed" || !missing.length) return <div className="mx-auto max-w-xl p-8"><p>{t("No information is requested right now.")}</p></div>;
-    return <IntakeFlow mode={{ kind: "missing", missing }} initialState={initial} caseId={caseId} header={<p className="mb-6 font-mono text-sm">{caseId}</p>} />;
+    const request = live.info_requests.filter((r) => r.status === "open").at(-1);
+    return <><IntakeFlow mode={{ kind: "missing", missing }} initialState={initial} caseId={caseId} header={<div className="mb-6"><p className="mb-3 font-mono text-sm">{caseId}</p>{request && <CustomerReminders createdAt={request.created_at} />}</div>} /><DemoMenu clockOnly onPick={() => {}} /></>;
   }
   if (!row) return null;
   const quote = row.quote_eur !== "" && Number.isFinite(Number(row.quote_eur)) ? Number(row.quote_eur) : undefined;
