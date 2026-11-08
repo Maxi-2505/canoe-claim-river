@@ -150,9 +150,9 @@ export function LandingPage() {
       <Section className="!pt-10 md:!pt-12">
         <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
           {["Rules decide. AI only assists.", "Blank stays blank.", "Closed stays closed.", "Every decision carries its version."].map((t, i) => (
-            <div key={t} className="flex items-baseline gap-5 border-t border-border pt-5">
+            <div key={t} className="landing-principle flex items-baseline gap-5 border-t border-border pt-5">
               <span className="font-mono text-xs text-cedar">0{i + 1}</span>
-              <p className="font-display text-2xl">{t}</p>
+              <p className="landing-principle-text min-w-0 font-display text-2xl">{t}</p>
             </div>
           ))}
         </div>
