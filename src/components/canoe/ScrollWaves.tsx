@@ -75,7 +75,9 @@ export function ScrollWaves() {
       if (last) time += Math.min(now - last, 50);
       last = now;
       const reduced = motion.matches;
-      const target = Math.max(0, Math.min(length, scrollY + innerHeight * 0.5 - startY));
+      // Sail with screen centre; once the end headline is on screen, glide to the end so "water" is reached.
+      const endVisible = endY - scrollY < innerHeight * 0.9;
+      const target = Math.max(0, Math.min(length, endVisible ? length : scrollY + innerHeight * 0.5 - startY));
       current = reduced || current < 0 ? target : current + (target - current) * 0.12;
       const phase = reduced ? 0 : time / 25000 * Math.PI * 2;
       const y = current;
