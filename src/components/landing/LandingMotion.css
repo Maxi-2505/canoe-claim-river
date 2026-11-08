@@ -8,6 +8,11 @@
 @media (hover: hover) {
   .landing-role-card:hover { transform: scale(1.04); }
 }
+/* Principle rows lift like the TODAY rows: statement text scales in place, no layout shift. */
+.landing-principle-text { transform-origin: left center; transition: transform 250ms ease-out; }
+@media (hover: hover) {
+  .landing-principle:hover .landing-principle-text { transform: scale(1.06); }
+}
 .landing-steps { position: relative; }
 .landing-step { position: relative; }
 .landing-step-copy { opacity: 1; }
