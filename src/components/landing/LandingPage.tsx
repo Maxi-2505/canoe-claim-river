@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { Accent, Wordmark } from "@/components/canoe/brand";
 import { useSiteTools } from "@/components/site-tools/SiteTools";
@@ -49,6 +49,21 @@ export function LandingPage() {
   const { session } = useDemoSession();
   const [canoeEntered, setCanoeEntered] = useState(false);
   const onCanoeEntered = useCallback(() => setCanoeEntered(true), []);
+  const movesRef = useRef<HTMLSpanElement>(null);
+  const [movesVisible, setMovesVisible] = useState(false);
+  useEffect(() => {
+    const element = movesRef.current;
+    if (!element) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+      setMovesVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) { setMovesVisible(true); observer.disconnect(); }
+    }, { threshold: 0.8 });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   const entries: [DemoRole, string][] = [["reviewer", "I'M A CLAIMS REVIEWER →"], ["policy_owner", "I'M A POLICY OWNER →"], ["operations", "I'M A OPERATIONS LEAD →"]];
   return (
     <div className="relative isolate overflow-hidden">
@@ -99,7 +114,7 @@ export function LandingPage() {
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
           <div>
             <p className="eyebrow mb-4">Policy v1 → v2</p>
-            <H2>See what <Accent>moves</Accent> before it goes live.</H2>
+            <H2>See what <span ref={movesRef} className="landing-hold landing-moves" data-entered={movesVisible}><span className="relative inline-block not-italic">moves<svg viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true" className="absolute -bottom-[0.14em] left-0 h-[0.14em] w-full text-cedar/60"><path pathLength="1" d="M2 6 Q26 1 50 6 T100 6 T150 6 T198 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" /></svg></span></span> before it goes live.</H2>
             <p className="mt-6 leading-relaxed text-ink/80">Lower the review limit from €1,500 to €1,200 and send EV battery work to review. Canoe re-runs every open claim, shows exactly which ones change and leaves closed decisions as they were.</p>
             <p className="mt-5 font-mono text-xs uppercase tracking-[0.08em] text-stone">24 open claims re-run · 6 change · 2 closed, untouched</p>
             <Link to="/policy" className={`${btnMain} mt-8`}>Try it</Link>
@@ -116,7 +131,7 @@ export function LandingPage() {
             ["Policy owners", "Change rules safely, with an approver."],
             ["Operations", "See quality, workload and every decision’s history."],
           ].map(([h, t]) => (
-            <div key={h} className="card-calm p-6">
+            <div key={h} className="landing-role-card card-calm p-6">
               <h3 className="font-display text-2xl">{h}</h3>
               <p className="mt-3 text-ink/80">{t}</p>
             </div>
