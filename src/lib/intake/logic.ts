@@ -158,6 +158,18 @@ export function buildRow(caseId: string, state: IntakeState, config: FormConfig)
   };
 }
 
+/** Live insurer service owns system facts; preserve the existing customer mapping. */
+export function buildApiPayload(state: IntakeState, config: FormConfig) {
+  const { case_id: _id, case_status: _status, ...row } = buildRow("", state, config);
+  const quote = state.facts["quote_amount"];
+  return { ...row, policy_active_on_incident: "", duplicate_flag: "", evidence_conflict: "",
+    policy_number: String(knownValue(state, "policy_number") ?? ""),
+    incident_date: String(knownValue(state, "incident_date") ?? ""),
+    stated_quote_eur: quote?.source === "customer" && quote.status === "known" ? String(quote.value ?? "") : "",
+    document_quote_eur: state.uploads.quote?.amount == null ? "" : String(state.uploads.quote.amount),
+  };
+}
+
 function csvCell(v: string) {
   return /[",\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
 }

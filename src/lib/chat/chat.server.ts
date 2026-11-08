@@ -5,6 +5,7 @@ import motor from "@/config/motor.json";
 import { agentInstructions } from "./agent-config.server";
 import { askReference, explainStatus, extractCaseId, isPublicDemoId, privacyReply, trackingIntent, unknownReply } from "./logic";
 import type { AgentRole, ChatLocale, ChatReply, ChatTurn, TrackingStatus } from "./types";
+import { getCustomerStatus } from "@/lib/customer/status";
 
 const rec = z.enum(["routine_processing", "human_review", "request_information"]);
 const liveStatus = z.object({
@@ -66,6 +67,14 @@ export async function respond(input: { locale: ChatLocale; role: AgentRole; mess
   if (trackingIntent(current, history)) {
     const id = extractCaseId(current);
     if (!id) return { text: askReference(locale), awaitingId: true };
+    if (isPublicDemoId(id) || /^CLM-\d{4,8}$/.test(id)) {
+      try {
+        const { readCustomerClaim } = await import("@/lib/customer/read.server");
+        const claim = await readCustomerClaim(id, process.env['CUSTOMER_TRACKING_SECRET'], process.env['CANOE_API_URL'] || import.meta.env['VITE_API_URL'], process.env['CANOE_API_TOKEN']);
+        const customerStatus = getCustomerStatus(claim, Date.now());
+        return { text: locale === "de" ? "Den aktuellen Stand und den nächsten Schritt finden Sie auf Ihrer Tracking-Seite." : `${customerStatus.headline} ${customerStatus.next}`, customerStatus };
+      } catch { return { text: /^CLM-/.test(id) ? privacyReply(locale) : unknownReply(locale) }; }
+    }
     if (!isPublicDemoId(id)) return { text: /^FORM-/.test(id) ? privacyReply(locale) : unknownReply(locale) };
     try {
       const status = await lookupDemo(id);

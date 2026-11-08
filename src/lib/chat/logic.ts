@@ -1,7 +1,7 @@
 import type { ChatLocale, ChatTurn, TrackingStatus } from "./types";
 
 export function extractCaseId(text: string): string | null {
-  const m = text.match(/\b(DEV|PRA|FORM)\s*-?\s*(\d{3,8})\b/i);
+  const m = text.match(/\b(DEV|PRA|FORM|CLM)\s*-?\s*(\d{3,8})\b/i);
   return m ? `${m[1]?.toUpperCase()}-${m[2]}` : null;
 }
 /** Fixed synthetic dataset, not a prefix permission for future customer IDs. */

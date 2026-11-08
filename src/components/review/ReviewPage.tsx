@@ -9,6 +9,7 @@ import { getReviewApi, ApiError, type ClaimDetail, type ClaimListItem, type Fiel
 import { FIELD_GROUPS, REASON, REC_LABEL, REC_SHORT, RULE_FIELD, euro, formatValue, inTab, isOpen, sortQueue, type Tab } from "@/lib/review/labels";
 import { cn } from "@/lib/utils";
 import { RecommendationLabel } from "@/components/canoe/RecommendationLabel";
+import { ReviewReminders, QueueReminder } from "@/components/customer/ReviewReminders";
 
 const RECS: Rec[] = ["routine_processing", "request_information", "human_review"];
 const CATEGORIES = ["Evidence contradicts data", "Fact captured wrong", "Rule doesn't fit this case", "New information received", "Other"];
@@ -200,6 +201,7 @@ function QueueRow({ r, active, onOpen }: { r: ClaimListItem; active: boolean; on
           {!closed && r.effective_source !== "system" && <Tag>decided, not closed</Tag>}
           {r.recheck_pending && <Tag>re-evaluated</Tag>}
           {r.settled_decision && <Tag>{r.settled_decision === "approve" ? "approved" : "declined"}</Tag>}
+          {!closed && r.effective_recommendation === "request_information" && <QueueReminder caseId={r.case_id} />}
         </div>
       </button>
     </motion.div>
@@ -467,6 +469,7 @@ function Rail({ c, ui, setUi, reviewer, override, settle, outcome }: {
                 try { await navigator.clipboard.writeText(link); setCopied(true); } catch { setCopied(true); }
               }}>{copied ? "Link copied" : "Copy customer link"}</button>
               {copied && <p className="mt-2 select-all break-all font-mono text-[10px] text-stone">{`${typeof window === "undefined" ? "" : window.location.origin}/continue/${c.case_id}`}</p>}
+              {req?.status === "open" && <ReviewReminders createdAt={req.created_at} />}
             </div>
           ) : changed && eff === "routine_processing" ? (
             <div className="flex"><SettleBtn d="approve" label="Close with this decision" primary /></div>

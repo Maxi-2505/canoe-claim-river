@@ -7,4 +7,4 @@ export interface TrackingStatus {
   request_status: string | null; updated_at: string | null; policy_version: string | null;
   recheck_pending: boolean; source: "live engine + claim record" | "claim record";
 }
-export interface ChatReply { text: string; status?: TrackingStatus; awaitingId?: boolean; error?: boolean }
+export interface ChatReply { text: string; status?: TrackingStatus; customerStatus?: ReturnType<typeof import("@/lib/customer/status").getCustomerStatus>; awaitingId?: boolean; error?: boolean }
