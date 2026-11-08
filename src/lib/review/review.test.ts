@@ -48,15 +48,15 @@ describe("queue tabs", () => {
   const items = () => s.list().claims;
   const ids = (t: Parameters<typeof inTab>[1]) => items().filter((c) => inTab(c, t)).map((c) => c.case_id);
   it("splits by tab", () => {
-    expect(ids("needs")).toEqual(["B", "C"]);
+    expect(ids("needs")).toEqual(["C"]);
     expect(ids("waiting")).toEqual(["B"]);
     expect(ids("ready")).toEqual(["A"]);
     expect(ids("closed")).toEqual(["D"]);
   });
-  it("a reviewer-changed routine case stays in Needs you", () => {
+  it("a reviewer-changed routine case moves to Ready", () => {
     s.override("A", { corrected_recommendation: "routine_processing", reason: "ok", reviewer: "Jury" });
-    expect(ids("needs")).toContain("A");
-    expect(ids("ready")).not.toContain("A");
+    expect(ids("needs")).not.toContain("A");
+    expect(ids("ready")).toContain("A");
   });
   it("re-evaluated first, then oldest", () => {
     const base = toListItem(s.get("C"));
