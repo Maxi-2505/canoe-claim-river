@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { buildApiPayload, patchMissingColumns, stateFromStoredRow } from "@/lib/intake/logic";
+import { buildApiPayload, patchMissingColumns } from "@/lib/intake/logic";
 import { motorConfig } from "@/lib/intake/config";
 import { isPublicDemoId } from "@/lib/chat/logic";
 import type { CustomerClaim } from "./status";
