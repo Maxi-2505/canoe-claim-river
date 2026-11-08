@@ -11,16 +11,12 @@ import { defaultCond, describeDiff, OP_WORDS, opsFor, quoteLimitOf, SELECT_OPTIO
 import { cn } from "@/lib/utils";
 import { isNewDraft } from "@/lib/business/logic";
 import { Button } from "@/components/ui/button";
+import { SessionHeader, useDemoSession } from "@/components/demo-role/DemoSession";
 
 const key = (d: Draft) => JSON.stringify(d);
 const two = (n: number) => String(n).padStart(2, "0");
 const nextV = (v: string) => `v${Number(v.slice(1)) + 1}`;
 
-function useAuthor(): [string, (s: string) => void] {
-  const [name, setName] = useState("Jury");
-  useEffect(() => { try { const s = localStorage.getItem("canoe.reviewer"); if (s) setName(s); } catch { /* storage off */ } }, []);
-  return [name, (s) => { setName(s); try { localStorage.setItem("canoe.reviewer", s); } catch { /* storage off */ } }];
-}
 
 function Step({ n, title, children, aside }: { n: number; title: ReactNode; children: ReactNode; aside?: ReactNode }) {
   return (
@@ -170,7 +166,7 @@ export function PolicyPage() {
 function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen pb-32">
-      <header className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-5 pt-5 md:px-8">
+      <header className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-4 px-5 pt-5 md:px-8">
         <div className="flex items-center gap-4">
           <Wordmark />
           <nav className="hidden gap-4 font-mono text-[11px] uppercase tracking-[0.14em] text-stone sm:flex">
@@ -179,6 +175,7 @@ function Shell({ children }: { children: ReactNode }) {
             <Link to="/business" className="hover:text-ink">Business</Link>
           </nav>
         </div>
+        <SessionHeader />
       </header>
       <main className="mx-auto max-w-[1280px] px-5 md:px-8">{children}</main>
     </div>
@@ -332,7 +329,8 @@ function Release({ draft, version, fresh, drafting, preview, result, onPublish }
   draft: Draft; version: string; fresh: boolean; drafting: boolean; preview: Preview | null; result: PublishResult | null;
   onPublish: (b: { published_by: string; approved_by: string; note: string }) => Promise<PublishResult>;
 }) {
-  const [author, setAuthor] = useAuthor();
+  const { session } = useDemoSession();
+  const author = session?.name ?? "";
   const [approver, setApprover] = useState("");
   const [note, setNote] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -364,7 +362,7 @@ function Release({ draft, version, fresh, drafting, preview, result, onPublish }
           try { await onPublish({ published_by: author.trim(), approved_by: approver.trim(), note: note.trim() }); } catch (x) { setErr((x as Error).message); } finally { setBusy(false); }
         }}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block"><span className="eyebrow">Author</span><input value={author} onChange={(e) => setAuthor(e.target.value)} className="field-input mt-1 w-full px-3 py-2" /></label>
+            <label className="block"><span className="eyebrow">Author</span><input value={author} readOnly className="field-input mt-1 w-full px-3 py-2" /></label>
             <label className="block"><span className="eyebrow">Approver</span><input value={approver} onChange={(e) => setApprover(e.target.value)} className="field-input mt-1 w-full px-3 py-2" placeholder="Someone else" />
               {same && <span className="mt-1 block text-sm text-cedar">The approver must be someone other than the author.</span>}</label>
           </div>

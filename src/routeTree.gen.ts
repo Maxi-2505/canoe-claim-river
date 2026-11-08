@@ -14,6 +14,7 @@ import { Route as BusinessRouteImport } from './routes/business'
 import { Route as ClaimRouteImport } from './routes/claim'
 import { Route as PolicyRouteImport } from './routes/policy'
 import { Route as ReviewRouteImport } from './routes/review'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ContinueCaseIdRouteImport } from './routes/continue.$caseId'
 import { Route as ReviewIndexRouteImport } from './routes/review.index'
 import { Route as ReviewCaseIdRouteImport } from './routes/review.$caseId'
@@ -43,6 +44,11 @@ const PolicyRoute = PolicyRouteImport.update({
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContinueCaseIdRoute = ContinueCaseIdRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
+  '/sign-in': typeof SignInRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
   '/track/$caseId': typeof TrackCaseIdRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/business': typeof BusinessRoute
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
+  '/sign-in': typeof SignInRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
   '/track/$caseId': typeof TrackCaseIdRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/claim': typeof ClaimRoute
   '/policy': typeof PolicyRoute
   '/review': typeof ReviewRouteWithChildren
+  '/sign-in': typeof SignInRoute
   '/continue/$caseId': typeof ContinueCaseIdRoute
   '/review/$caseId': typeof ReviewCaseIdRoute
   '/track/$caseId': typeof TrackCaseIdRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/claim'
     | '/policy'
     | '/review'
+    | '/sign-in'
     | '/continue/$caseId'
     | '/review/$caseId'
     | '/track/$caseId'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/business'
     | '/claim'
     | '/policy'
+    | '/sign-in'
     | '/continue/$caseId'
     | '/review/$caseId'
     | '/track/$caseId'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/claim'
     | '/policy'
     | '/review'
+    | '/sign-in'
     | '/continue/$caseId'
     | '/review/$caseId'
     | '/track/$caseId'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   ClaimRoute: typeof ClaimRoute
   PolicyRoute: typeof PolicyRoute
   ReviewRoute: typeof ReviewRouteWithChildren
+  SignInRoute: typeof SignInRoute
   ContinueCaseIdRoute: typeof ContinueCaseIdRoute
   TrackCaseIdRoute: typeof TrackCaseIdRoute
   TrackIndexRoute: typeof TrackIndexRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/continue/$caseId': {
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClaimRoute: ClaimRoute,
   PolicyRoute: PolicyRoute,
   ReviewRoute: ReviewRouteWithChildren,
+  SignInRoute: SignInRoute,
   ContinueCaseIdRoute: ContinueCaseIdRoute,
   TrackCaseIdRoute: TrackCaseIdRoute,
   TrackIndexRoute: TrackIndexRoute,
