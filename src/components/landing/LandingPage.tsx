@@ -142,18 +142,22 @@ export function LandingPage() {
         <p className="mt-8 text-sm text-stone">14 labelled cases are a starting point, not a risk rate.</p>
       </Section>
 
-      {/* 7. BUSINESS VALUE - placeholders until the model is ready. */}
+      {/* 7. BUSINESS VALUE - figures from the business case (assumptions, base case 200K claims). */}
       <Section>
         <H2>What it is <CanoeAccent>worth</CanoeAccent>.</H2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {["Annual triage cost today vs. with Canoe", "Payback", "Cost of a policy change"].map((l) => (
-            <div key={l} className="card-calm p-6">
-              <p className="font-display text-5xl text-stone">-</p>
-              <p className="mt-3 text-sm text-ink/80">{l}</p>
+          {[
+            { value: "€158K", label: "Net per year - 200K claims, base case" },
+            { value: "1.9", label: "Months to pay back" },
+            { value: "1-10 min", label: "Per rule change, instead of weeks" },
+          ].map(({ value, label }) => (
+            <div key={label} className="card-calm p-6">
+              <p className="font-display text-5xl">{value}</p>
+              <p className="mt-3 text-sm text-ink/80">{label}</p>
             </div>
           ))}
         </div>
-        <p className="mt-5 text-sm text-stone">Model in progress - assumptions are shown on the business page.</p>
+        <p className="mt-5 text-sm text-stone">Assumed figures - the full model and its sources are on the business page.</p>
       </Section>
 
       {/* 8. PRINCIPLES */}
