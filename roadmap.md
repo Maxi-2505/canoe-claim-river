@@ -22,3 +22,9 @@
 - [x] Reviewer simulated reminders and queue tags.
 - [x] Live easy/incomplete flows, desktop/phone, tests and build verification.
 - [x] Finish existing implementation: continuation reminders, safe status projection, and fresh live November-date verification without bypassing duplicate checks.
+
+# Landing role entry and demo sign-in
+- [ ] Editorial hero role buttons and customer primary/link.
+- [ ] Demo sign-in, session, internal gates, role switch/sign-out and jury shortcut.
+- [ ] Read-only role controls and signed-in write identity; preserve second approver.
+- [ ] Role-matrix tests and laptop/phone/public-route checks; leave Ask Canoe unchanged.
