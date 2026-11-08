@@ -46,7 +46,7 @@ export function DemoMenu({ onPick, clockOnly = false }: { onPick: (p: Preset | "
   const { t } = useSiteTools();
   const presets: [string, () => IntakeState][] = [["Easy claim", easy], ["Incomplete claim", incomplete], ["Electric car", electric]];
   return (
-    <div className="fixed bottom-4 left-4 z-30 text-xs">
+    <div className="fixed bottom-16 left-4 z-30 text-xs">
       {open && (
         <div className="card-calm mb-2 flex w-44 flex-col p-1.5">
           {!clockOnly && presets.map(([name, fn]) => (
