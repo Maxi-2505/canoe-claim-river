@@ -22,10 +22,20 @@ export function ScrollWaves() {
     const paths = Array.from(svg.querySelectorAll<SVGPathElement>(".scroll-wave-path"));
     let startY = 0, endY = 0, length = 0, current = -1, frame = 0, last = 0, time = 0;
     let active = false, measureNeeded = true;
+    let accents: { element: HTMLElement; y: number }[] = [];
+    const revealAccents = (boatY: number) => {
+      for (const accent of accents) {
+        if (motion.matches || boatY >= accent.y) accent.element.dataset["entered"] = "true";
+      }
+    };
     const measure = () => {
       measureNeeded = false;
       const start = document.querySelector<HTMLElement>("[data-waves-start]");
       const end = document.getElementById("waves-end");
+      accents = Array.from(document.querySelectorAll<HTMLElement>("[data-canoe-accent]")).map(element => {
+        const rect = element.getBoundingClientRect();
+        return { element, y: scrollY + rect.top + rect.height / 2 };
+      });
       active = !!start && !!end && innerWidth >= 1100;
       element.dataset["visible"] = String(active);
       if (!active || !start || !end) return;
@@ -56,7 +66,12 @@ export function ScrollWaves() {
       frame = 0;
       if (document.hidden) { last = 0; return; }
       if (measureNeeded) measure();
-      if (!active || !length) { last = 0; return; }
+      if (!active || !length) {
+        // Without a visible gutter canoe, use its screen-centre crossing instead.
+        revealAccents(scrollY + innerHeight * 0.5);
+        last = 0;
+        return;
+      }
       if (last) time += Math.min(now - last, 50);
       last = now;
       const reduced = motion.matches;
@@ -64,6 +79,8 @@ export function ScrollWaves() {
       current = reduced || current < 0 ? target : current + (target - current) * 0.12;
       const phase = reduced ? 0 : time / 25000 * Math.PI * 2;
       const y = current;
+      // Use the rendered (smoothed) canoe position, not viewport entry timing.
+      revealAccents(startY + y);
       const x = sample(1, y, phase, y);
       const fade = Math.max(0, Math.min(1, y / FADE, (length - y) / FADE));
       mark.style.opacity = fade.toFixed(3);
