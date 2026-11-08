@@ -6,6 +6,7 @@ import { useSiteTools } from "@/components/site-tools/SiteTools";
 import { useDemoSession } from "@/components/demo-role/DemoSession";
 import { ROLE_PAGE, type DemoRole } from "@/lib/demo-role/logic";
 import { Button } from "@/components/ui/button";
+import { WiringDiagram } from "./WiringDiagram";
 
 // Static landing mockup. No logic here; links only.
 const navLink = "font-mono text-[11px] uppercase tracking-[0.14em] text-stone hover:text-ink";
@@ -30,52 +31,6 @@ function MainButtons() {
       <Link to="/claim" className={btnMain}>Report a claim</Link>
       <Link to="/policy" className={btnGhost}>See a policy change</Link>
     </div>
-  );
-}
-
-/** Simplified, static take on the /policy wiring scene. */
-function WiringSketch() {
-  const gates = [
-    { x: 70, id: "R1.injury", label: "Injury" },
-    { x: 190, id: "R1.quote", label: "Quote > €1,200", changed: true },
-    { x: 310, id: "R1.ev_battery", label: "EV battery", fresh: true },
-  ];
-  const wires = [0, 1, 2, 3, 4, 5, 6];
-  return (
-    <svg viewBox="0 0 520 300" className="w-full" role="img" aria-label="Simplified diagram: open claims flow through rule gates to Routine, Review and Info needed. One claim is re-routed to Review.">
-      <defs>
-        <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
-          <path d="M24 0H0V24" fill="none" stroke="var(--stone)" strokeOpacity="0.12" strokeWidth="1" />
-        </pattern>
-      </defs>
-      <rect width="520" height="300" fill="url(#grid)" />
-      {wires.map((w) => (
-        <path key={w} d={`M10 ${80 + w * 2.5} H440`} stroke="var(--ink)" strokeOpacity="0.45" fill="none" />
-      ))}
-      <path d="M10 70 H246 Q260 70 260 84 V186 Q260 200 274 200 H440" stroke="var(--cedar)" strokeWidth="1.6" fill="none" />
-      <path d="M10 70 H440" stroke="var(--cedar)" strokeOpacity="0.3" strokeDasharray="4 4" fill="none" />
-      <path d="M110 92 V186 Q110 200 124 200 H440" stroke="var(--ink)" strokeOpacity="0.45" fill="none" />
-      <path d="M50 94 V256 Q50 270 64 270 H440" stroke="var(--ink)" strokeOpacity="0.45" fill="none" />
-      {gates.map((g) => (
-        <g key={g.id} transform={`translate(${g.x} 52)`}>
-          <rect width="100" height="52" rx="6" fill="var(--paper)" stroke={g.fresh ? "var(--cedar)" : "var(--ink)"} strokeDasharray={g.fresh ? "4 3" : undefined} />
-          <text x="8" y="17" fontFamily="var(--font-mono)" fontSize="8.5" fill="var(--stone)">{g.id}</text>
-          <text x="8" y="33" fontFamily="var(--font-sans)" fontSize="11" fill={g.changed ? "var(--cedar)" : "var(--ink)"}>{g.label}</text>
-          {g.fresh && <text x="8" y="46" fontFamily="var(--font-mono)" fontSize="8" fill="var(--cedar)" textDecoration="underline">new</text>}
-        </g>
-      ))}
-      {[
-        { y: 86, label: "ROUTINE", n: "3", d: "−5" },
-        { y: 204, label: "REVIEW", n: "17", d: "+6" },
-        { y: 274, label: "INFO NEEDED", n: "4", d: "−1" },
-      ].map((t) => (
-        <g key={t.label} transform={`translate(448 ${t.y})`}>
-          <text fontFamily="var(--font-mono)" fontSize="9" letterSpacing="1" fill="var(--stone)" y="-10">{t.label}</text>
-          <text fontFamily="var(--font-display)" fontWeight="600" fontSize="22" fill="var(--ink)" y="12">{t.n}</text>
-          <text fontFamily="var(--font-mono)" fontSize="10" fill="var(--cedar)" x="30" y="12">{t.d}</text>
-        </g>
-      ))}
-    </svg>
   );
 }
 
@@ -170,7 +125,7 @@ export function LandingPage() {
             <p className="mt-5 font-mono text-xs uppercase tracking-[0.08em] text-stone">24 open claims re-run · 6 change · 2 closed, untouched</p>
             <Link to="/policy" className={`${btnMain} mt-8`}>Try it</Link>
           </div>
-          <div className="card-calm p-4 md:p-6"><WiringSketch /></div>
+          <WiringDiagram />
         </div>
       </Section>
 

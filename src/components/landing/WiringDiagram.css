@@ -1,0 +1,22 @@
+.landing-wiring .wiring-flow {
+  stroke-dasharray: 10 7;
+  animation: wiring-dash 1.7s linear infinite;
+}
+.landing-wiring .wiring-ghost { stroke-dasharray: 9 8; }
+.landing-wiring .wiring-gate {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wiring-pulse 7.2s ease-in-out infinite;
+}
+.landing-wiring .wiring-gate-quote { animation-delay: 1.2s; }
+.landing-wiring .wiring-gate-ev { animation-delay: 2.4s; }
+@keyframes wiring-dash { to { stroke-dashoffset: -34; } }
+@keyframes wiring-pulse {
+  0%, 7%, 23%, 100% { transform: scale(1); }
+  15% { transform: scale(1.04); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-wiring .wiring-flow, .landing-wiring .wiring-gate {
+    animation: none;
+  }
+}
