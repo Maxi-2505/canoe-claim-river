@@ -1,7 +1,10 @@
-.scroll-waves { position: fixed; right: 16px; top: 0; width: 120px; height: 100vh; pointer-events: none; z-index: 10; color: var(--ink); visibility: hidden; }
-.scroll-waves[data-visible="true"] { visibility: visible; }
-.scroll-waves-track { display: block; width: 100%; height: 100%; overflow: visible; }
-.scroll-waves-logo { position: absolute; left: 0; top: 0; width: 40px; height: 40px; transform-origin: center; }
+.scroll-waves { position: absolute; right: 24px; top: 0; width: 100px; height: 0; pointer-events: none; z-index: 10; color: #111; display: none; }
+.scroll-waves[data-visible="true"] { display: block; }
+.scroll-waves-track { display: block; width: 100%; height: 100%; overflow: visible;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 160px, #000 calc(100% - 160px), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 160px, #000 calc(100% - 160px), transparent); }
+.scroll-waves-logo { position: absolute; left: 0; top: 0; width: 40px; height: 40px; transform-origin: center; opacity: 0; }
 .scroll-waves-logo svg { color: var(--ink); }
-.scroll-waves-copy { opacity: 0.35; }
-@media (max-width: 1099px) { .scroll-waves { display: none; } }
+.scroll-waves-copy { opacity: 0.4; }
+:root.dark .scroll-waves, .dark .scroll-waves { color: var(--ink); }
+@media (max-width: 1099px) { .scroll-waves { display: none !important; } }

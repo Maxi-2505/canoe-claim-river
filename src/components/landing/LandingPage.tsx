@@ -200,7 +200,7 @@ export function LandingPage() {
       <div className="relative min-h-[620px]">
         <PencilBackdrop contained />
         <Section className="text-left">
-          <p className="max-w-[760px] font-display text-[40px] leading-[1.05] tracking-[-0.02em] md:text-[60px]">Steady through changing <Accent>water</Accent>.</p>
+          <p id="waves-end" className="max-w-[760px] font-display text-[40px] leading-[1.05] tracking-[-0.02em] md:text-[60px]">Steady through changing <Accent>water</Accent>.</p>
           <div className="mt-8"><MainButtons /></div>
         </Section>
       </div>
