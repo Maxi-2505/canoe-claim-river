@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { PencilBackdrop } from "@/components/canoe/PencilBackdrop";
 import { Accent, Wordmark } from "@/components/canoe/brand";
 import { useSiteTools } from "@/components/site-tools/SiteTools";
@@ -8,6 +8,8 @@ import { ROLE_PAGE, type DemoRole } from "@/lib/demo-role/logic";
 import { Button } from "@/components/ui/button";
 import { WiringDiagram } from "./WiringDiagram";
 import { TodaySlide } from "./TodaySlide";
+import { LandingSteps } from "./LandingSteps";
+import "./LandingMotion.css";
 
 // Static landing mockup. No logic here; links only.
 const navLink = "font-mono text-[11px] uppercase tracking-[0.14em] text-stone hover:text-ink";
@@ -45,13 +47,15 @@ const team = [
 export function LandingPage() {
   const { t } = useSiteTools();
   const { session } = useDemoSession();
+  const [canoeEntered, setCanoeEntered] = useState(false);
+  const onCanoeEntered = useCallback(() => setCanoeEntered(true), []);
   const entries: [DemoRole, string][] = [["reviewer", "I'M A CLAIMS REVIEWER →"], ["policy_owner", "I'M A POLICY OWNER →"], ["operations", "I'M A OPERATIONS LEAD →"]];
   return (
     <div className="relative isolate overflow-hidden">
       {/* 1. HERO */}
       <div className="relative min-h-screen pb-[34vh] md:pb-0">
         {/* TODO(hero-boat): hero boat animation - swap in the redrawn canoe asset and its entrance here. */}
-        <PencilBackdrop contained />
+        <PencilBackdrop contained onCanoeEntered={onCanoeEntered} />
         <nav className="relative z-10 mx-auto flex max-w-[1120px] items-center justify-between gap-4 px-5 pt-6 md:px-8">
           <Wordmark />
           <div className="hidden items-center gap-6 md:flex">
@@ -67,7 +71,7 @@ export function LandingPage() {
         <Section className="!pt-12 md:!pt-14">
           <p className="eyebrow mb-5">Canoe / claims triage</p>
           <h1 className="max-w-[760px] font-display text-[44px] leading-[1.05] tracking-[-0.02em] md:text-[68px]">
-            Decisions that <Accent>hold</Accent> when the rules change.
+            Decisions that <span className="landing-hold" data-entered={canoeEntered}><span className="relative inline-block not-italic">hold<svg viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true" className="absolute -bottom-[0.14em] left-0 h-[0.14em] w-full text-cedar/60"><path pathLength="1" d="M2 6 Q26 1 50 6 T100 6 T150 6 T198 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" /></svg></span></span> when the rules change.
           </h1>
           <p className="mt-6 max-w-[580px] text-[17px] leading-relaxed text-ink/80">
             Canoe reads a motor claim, applies your written policy and tells your team the next step - with the facts, the rule and the policy version behind every answer. When the policy changes, you see what moves before it goes live.
@@ -87,21 +91,7 @@ export function LandingPage() {
       {/* 3. HOW IT WORKS */}
       <Section id="how-it-works">
         <H2>Collect. <Accent>Decide</Accent>. Review.</H2>
-        {/* TODO(flow-line): a single line travelling through the three steps. */}
-        <div className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
-          <div aria-hidden="true" className="absolute left-0 right-0 top-[7px] hidden h-px bg-ink/30 md:block" />
-          {[
-            ["Collect", "The claim form only asks what the policy needs. “I’m not sure” stays blank - we never guess a fact."],
-            ["Decide", "Written rules decide, in order. Every recommendation carries its rule and policy version. AI may help read documents; it never decides."],
-            ["Review", "People handle the exceptions. Every correction is stored with the reviewer, the reason and the policy version."],
-          ].map(([h, t]) => (
-            <div key={h} className="relative">
-              <span aria-hidden="true" className="relative block h-[15px] w-px bg-ink" />
-              <p className="eyebrow mt-4 text-ink">{h}</p>
-              <p className="mt-3 leading-relaxed text-ink/80">{t}</p>
-            </div>
-          ))}
-        </div>
+        <LandingSteps />
       </Section>
 
       {/* 4. CHANGE MOMENT */}

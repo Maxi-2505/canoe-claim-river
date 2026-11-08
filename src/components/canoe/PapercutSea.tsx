@@ -43,7 +43,7 @@ function Layer({ i, setRef }: { i: number; setRef: (el: HTMLDivElement | null) =
   );
 }
 
-export function PapercutSea({ contained = false }: { contained?: boolean }) {
+export function PapercutSea({ contained = false, onCanoeEntered }: { contained?: boolean; onCanoeEntered?: () => void }) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const canoeRef = useRef<HTMLDivElement>(null);
@@ -62,6 +62,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
     const snips = Array.from({ length: SNIPPETS }, () => ({ born: -1e9, vx: 0, vy: 0 }));
     let lastPitch = 0, sprayed = !animateEntry;
     let disposed = false, ready = false, visible = false;
+    let entryNotified = false;
     let unsubscribe: (() => void) | undefined;
     let w = scene.clientWidth, h = scene.clientHeight;
 
@@ -70,6 +71,10 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
       if (previous && !document.hidden) activeTime += Math.min(now - previous, 50);
       previous = now;
       const t = animateEntry && !reduce ? activeTime : entryDuration + 1;
+      if (t >= 2200 && !entryNotified && ready) {
+        entryNotified = true;
+        onCanoeEntered?.();
+      }
       const s = reduce ? 0 : now / 1000;
 
       layers.forEach((i) => {
@@ -80,10 +85,11 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
         const p1 = 4 + (i * 0.83) % 5, p2 = 6 + (i * 1.37) % 3;
         const dy = reduce ? 0 : Math.sin((s * 2 * Math.PI) / p1 + i) * amp + Math.sin((s * 2 * Math.PI) / p2 + i * 2.1) * amp * 0.4;
         const dx = reduce ? 0 : Math.sin((s * 2 * Math.PI) / p2 + i) * amp * 1.6;
-        const land = easeOutBack((t - i * 90) / 600);
+        // The final foreground layer lands without upward overshoot or a hull-covering swell.
+        const land = i === layerCount - 1 ? easeOut((t - i * 90) / 600) : easeOutBack((t - i * 90) / 600);
         const rise = (1 - land) * h * 0.8;
         const k = clamp((t - 800) / 1400);
-        const heave = i >= layerCount - 3 && k > 0 && k < 1 ? -Math.sin(k * Math.PI) * (6 + (i - layerCount + 3) * 4) : 0;
+        const heave = i >= layerCount - 3 && i < layerCount - 1 && k > 0 && k < 1 ? -Math.sin(k * Math.PI) * (6 + (i - layerCount + 3) * 4) : 0;
         el.style.transform = `translate3d(${dx}px, ${dy + rise + heave}px, 0)`;
         el.style.opacity = '1';
       });
@@ -184,7 +190,7 @@ export function PapercutSea({ contained = false }: { contained?: boolean }) {
       if (idle) window.cancelIdleCallback(idle);
       motion.removeEventListener('change', onMotion); document.removeEventListener('visibilitychange', update);
     };
-  }, [contained]);
+  }, [contained, onCanoeEntered]);
 
   return (
     <div ref={sceneRef} className={contained ? "papercut-sea papercut-sea--contained" : "papercut-sea"} aria-hidden="true">

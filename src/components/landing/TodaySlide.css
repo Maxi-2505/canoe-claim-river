@@ -30,9 +30,9 @@
 .today-slide[data-visible="true"] .today-word-3 { animation-delay: 910ms; }
 .today-slide[data-visible="true"] .today-word-4 { animation-delay: 1130ms; }
 .today-slide[data-visible="true"] .today-word-5 { animation-delay: 1350ms; }
-.today-hand { position: absolute; left: calc(100% + 8px); bottom: -16px; width: 88px; height: 88px; color: var(--today-hand-ink); opacity: 0; pointer-events: none; }
+.today-hand { position: absolute; left: calc(100% + 8px); bottom: -16px; width: 88px; height: 88px; color: var(--ink); opacity: 0; pointer-events: none; }
 .today-hand svg { display: block; overflow: visible; }
-.today-pencil > g { opacity: 0.85; }
+.today-pencil > g { opacity: 1; }
 .today-pencil-copy { opacity: 0.3; }
 .today-pencil-stroke { stroke-dasharray: 1; stroke-dashoffset: 0; }
 .today-hand-underline { position: absolute; left: 0; bottom: -7px; width: calc(100% - 0.25em); height: 10px; color: var(--today-hand-red); pointer-events: none; overflow: visible; opacity: 0; }
