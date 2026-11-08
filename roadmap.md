@@ -39,6 +39,10 @@
 
 # Today slide
 - [x] Finish one-time entrance, hover and reduced-motion verification on desktop/phone; build clean.
+- [ ] Replace the waving headline hand with the specified sequential, still graphite double-stroke sketch; verify hover/touch and reduced motion.
+
+# Punctuation
+- [ ] Replace app-wide em dashes with hyphens and verify the affected tests and pages.
 
 # Business Case visualizations
 - [x] Review existing formulas and add the specified business-case scenario formulas with tests, without changing published reporting or decisions.
