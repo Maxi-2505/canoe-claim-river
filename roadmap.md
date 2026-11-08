@@ -34,5 +34,5 @@
 - [x] Test raw CSV transport, optional save=1 request (intercepted; no live register write), exact response display/download, errors, and desktop/phone flow. Live unsaved batch verified; 127 tests and build pass.
 
 # Policy document upload
-- [ ] Add file-only upload and raw-byte backend parsing with line feedback; reuse the existing draft without local rule conversion.
-- [ ] Test transport, failed-parse draft protection and unchanged returned rules; verify Policy upload on desktop/phone and the live parser.
+- [x] Add file-only upload and raw-byte backend parsing with line feedback; reuse the existing draft without local rule conversion.
+- [x] Test transport, failed-parse draft protection and unchanged returned rules; verify live template/error uploads and simulation, desktop/current viewport/phone. All 145 tests pass; build clean. No publication performed.
