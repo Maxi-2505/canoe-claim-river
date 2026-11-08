@@ -146,7 +146,7 @@ export function ReviewPage({ caseId }: { caseId?: string }) {
                 </AnimatePresence>
               )}
           </div>
-          <p className="mt-4 font-mono text-[10px] text-stone" title="J/K next/previous · A approve · D decline · C change recommendation · E edit first fact · Esc cancel">Shortcuts: J K · A D · C · E · Esc</p>
+          <p className="mt-4 font-mono text-[10px] text-stone" title="J/K next/previous · A approve · D decline · C change recommendation · E edit first fact · Esc cancel">{"\n"}</p>
         </aside>
 
         <main className="min-w-0 flex-1">
