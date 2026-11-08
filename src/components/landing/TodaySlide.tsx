@@ -3,7 +3,7 @@ import { Icon, type IconNode } from "lucide-react";
 import "./TodaySlide.css";
 
 const statements = [
-  "2–3 minutes per simple claim, 8–10 per escalation.",
+  "3 minutes per simple claim, 9 per escalation.",
   "0% of claims pass without a person.",
   "A rule change takes weeks to months to reach production.",
 ];
