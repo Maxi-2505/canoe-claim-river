@@ -17,7 +17,7 @@ const pencilStrokes = [
   "M18 8a2 2 0 1 1 4 0v6",
   "M6.01 19.66l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15",
 ];
-const pencilNodes: IconNode = pencilStrokes.map((d, i) => ["path", { d, key: `stroke-${i}`, pathLength: 1, vectorEffect: "non-scaling-stroke", className: `today-pencil-stroke today-pencil-stroke-${i}` }]);
+const pencilNodes: IconNode = pencilStrokes.map((d, i) => ["path", { d, key: `stroke-${i}`, pathLength: "1", vectorEffect: "non-scaling-stroke", className: `today-pencil-stroke today-pencil-stroke-${i}` }]);
 
 function PencilHand({ filterId }: { filterId: string }) {
   return <Icon iconNode={pencilNodes} size={64} strokeWidth={0.75} fill="none" className="today-pencil" filter={`url(#${filterId})`}>
