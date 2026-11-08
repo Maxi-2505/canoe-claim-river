@@ -36,6 +36,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .landing-role-card { transform: none !important; transition: none; }
+  .landing-principle-text { transform: none !important; transition: none; }
   .landing-hold > span { color: var(--cedar); transition: none; }
   .landing-hold svg { opacity: 1; }
   .landing-hold path { stroke-dashoffset: 0; animation: none !important; }
