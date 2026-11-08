@@ -8,6 +8,7 @@ import type { AgentRole, ChatTurn, TrackingStatus } from "@/lib/chat/types";
 import { ClaimStatusCard } from "./ClaimStatusCard";
 import { ChatBoatMark } from "./ChatBoatMark";
 import { Link } from "@tanstack/react-router";
+import type { getCustomerStatus } from "@/lib/customer/status";
 
 export type Locale = "en" | "de";
 export type Theme = "light" | "dark";
@@ -88,7 +89,7 @@ export function SiteTools() {
   const { locale, setLocale, theme, setTheme, text } = useSiteTools();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState<(ChatTurn & { status?: TrackingStatus; error?: boolean })[]>([]);
+  const [messages, setMessages] = useState<(ChatTurn & { status?: TrackingStatus; customerStatus?: ReturnType<typeof getCustomerStatus>; error?: boolean })[]>([]);
   const [role, setRole] = useState<AgentRole>("policy");
   const [loading, setLoading] = useState(false);
   const busy = useRef(false);
@@ -109,7 +110,7 @@ export function SiteTools() {
     setQuestion("");
     try {
       const reply = await sendChat({ data: parsed.data });
-      setMessages((items) => [...items, { role: "assistant", content: reply.text, ...(reply.status ? { status: reply.status } : {}), ...(reply.error ? { error: true } : {}) }]);
+      setMessages((items) => [...items, { role: "assistant", content: reply.text, ...(reply.status ? { status: reply.status } : {}), ...(reply.customerStatus ? { customerStatus: reply.customerStatus } : {}), ...(reply.error ? { error: true } : {}) }]);
     } catch { setMessages((items) => [...items, { role: "assistant", content: text.error, error: true }]); }
     finally { busy.current = false; setLoading(false); }
   };
@@ -129,6 +130,7 @@ export function SiteTools() {
         <p className="canoe-chat-bubble canoe-chat-reply">{text.hello}</p>
         {messages.map((message, index) => <div key={index} className={`canoe-chat-bubble ${message.role === "user" ? "canoe-chat-user" : "canoe-chat-reply"}`}>
           {message.status && <ClaimStatusCard status={message.status} locale={locale} />}
+          {message.customerStatus && <section className="canoe-chat-status"><strong>{message.customerStatus.caseId}</strong><p>{useCustomerText(message.customerStatus.headline, locale)}</p><p>{useCustomerText(message.customerStatus.next, locale)}</p><Link to="/track/$caseId" params={{ caseId: message.customerStatus.caseId }} className="underline underline-offset-4">{locale === "de" ? "Schaden verfolgen" : "Track your claim"} →</Link></section>}
           {message.role === "assistant" ? <ReactMarkdown>{message.content}</ReactMarkdown> : message.content}
           {message.error && index === messages.length - 1 && <Button variant="link" className="canoe-chat-retry" disabled={loading} onClick={() => send(messages[index - 1]?.content ?? "", true)}>{text.retry}</Button>}
         </div>)}
