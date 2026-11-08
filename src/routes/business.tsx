@@ -7,7 +7,7 @@ interface BusinessSearch { tab?: 'impact' | 'quality' | 'case' | 'history'; filt
 export const Route = createFileRoute('/business')({
   validateSearch: (s: Record<string, unknown>): BusinessSearch => ({ tab: s['tab'] === 'quality' || s['tab'] === 'case' || s['tab'] === 'history' ? s['tab'] : 'impact', filter: s['filter'] === 'open' || s['filter'] === 'closed' ? s['filter'] : 'all', q: typeof s['q'] === 'string' ? s['q'] : '' }),
   loader: async ({ context }) => { await context.queryClient.ensureQueryData(businessQuery); },
-  head: () => ({ meta: [{ title: 'Business — Canoe' }, { name: 'description', content: 'Published policy impact, measured quality and the Canoe business case.' }, { property: 'og:title', content: 'Business — Canoe' }, { property: 'og:description', content: 'See what a policy change did, measure quality and model its business value.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' }, { name: 'robots', content: 'noindex' }] }),
+  head: () => ({ meta: [{ title: 'Business - Canoe' }, { name: 'description', content: 'Published policy impact, measured quality and the Canoe business case.' }, { property: 'og:title', content: 'Business - Canoe' }, { property: 'og:description', content: 'See what a policy change did, measure quality and model its business value.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' }, { name: 'robots', content: 'noindex' }] }),
   component: BusinessPage,
   pendingComponent: () => <BusinessShell><p className="mt-10 font-mono text-xs text-stone">Loading Business…</p></BusinessShell>,
   errorComponent: BusinessError,

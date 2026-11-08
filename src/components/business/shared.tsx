@@ -11,9 +11,9 @@ export function Section({ title, children }: { title: string; children: ReactNod
 export function Stat({ label, value, accent = false }: { label: string; value: ReactNode; accent?: boolean }) {
   return <div className="card-calm p-5"><p className="eyebrow">{label}</p><p className={`mt-2 font-display text-4xl ${accent ? 'text-cedar' : 'text-ink'}`}>{value}</p></div>;
 }
-export const percent = (n: number | null | undefined) => n == null ? '—' : `${(n * 100).toFixed(1)}%`;
-export const money = (n: number | null) => n === null ? '—' : new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-export const when = (s: string | null) => s ? new Date(s).toLocaleString('en-GB') : '—';
+export const percent = (n: number | null | undefined) => n == null ? '-' : `${(n * 100).toFixed(1)}%`;
+export const money = (n: number | null) => n === null ? '-' : new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+export const when = (s: string | null) => s ? new Date(s).toLocaleString('en-GB') : '-';
 export function downloadCsv(name: string, text: string) {
   const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
   const a = document.createElement('a'); a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);

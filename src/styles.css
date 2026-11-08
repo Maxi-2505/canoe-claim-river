@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Canoe — "Steady through changing water". Six colours only: paper, ink, cedar, reed, stone, mist. */
+/* Canoe - "Steady through changing water". Six colours only: paper, ink, cedar, reed, stone, mist. */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 8px);
@@ -53,7 +53,7 @@
   --stone: oklch(0.52 0.015 60);
   --mist: oklch(0.982 0.007 84);
   --today-paper: #F3EFE8;
-  --today-hand-ink: #1A1814;
+  --today-hand-ink: #3A3630;
   --today-hand-red: #A3261A;
   --business-grid: color-mix(in oklab, var(--stone) 6%, transparent);
   /* Internal review pages only: request-information text. */

@@ -20,16 +20,23 @@
 .today-slide .today-index { font-weight: 400; }
 .today-hand-phrase, .today-hand-period { position: relative; }
 .today-hand-phrase { white-space: nowrap; }
-.today-hand { position: absolute; left: calc(100% + 8px); bottom: 0; width: 56px; height: 56px; color: var(--today-hand-ink); opacity: 0; pointer-events: none; transition: opacity 200ms ease-out; }
-.today-hand svg { display: block; transform-origin: bottom center; }
-.today-hand svg path { stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset 500ms ease-out; }
-.today-hand-underline { position: absolute; left: 0; bottom: -7px; width: calc(100% - 0.25em); height: 10px; color: var(--today-hand-red); pointer-events: none; overflow: visible; }
-.today-hand-underline path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 300ms ease-out; }
-.today-headline[data-active="true"] .today-hand { opacity: 1; }
-.today-headline[data-active="true"] .today-hand svg path { stroke-dashoffset: 0; }
-.today-headline[data-active="true"] .today-hand svg { animation: today-hand-wave 900ms ease-in-out 500ms both; }
-.today-headline[data-active="true"] .today-hand-underline path { stroke-dashoffset: 0; transition-duration: 600ms; }
-@keyframes today-hand-wave { 0%, 100% { transform: rotate(0); } 12.5%, 62.5% { transform: rotate(-10deg); } 37.5%, 87.5% { transform: rotate(10deg); } 50% { transform: rotate(0); } }
+.today-hand { position: absolute; left: calc(100% + 8px); bottom: 0; width: 64px; height: 64px; color: var(--today-hand-ink); opacity: 0; pointer-events: none; transition: opacity 250ms ease-out; }
+.today-hand svg { display: block; overflow: visible; }
+.today-pencil > path { opacity: 0.85; }
+.today-pencil-copy { opacity: 0.45; }
+.today-pencil-stroke { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.today-hand-underline { position: absolute; left: 0; bottom: -7px; width: calc(100% - 0.25em); height: 10px; color: var(--today-hand-red); pointer-events: none; overflow: visible; opacity: 0; transition: opacity 250ms ease-out; }
+.today-hand-underline path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.today-headline[data-active="true"] :is(.today-hand, .today-hand-underline) { opacity: 1; transition-duration: 0ms; }
+.today-headline[data-active="true"] .today-pencil-stroke { animation: today-pencil-draw 200ms ease-in-out both; }
+.today-headline[data-active="true"] .today-pencil-stroke-0 { animation-duration: 400ms; }
+.today-headline[data-active="true"] .today-pencil-stroke-1 { animation-delay: 400ms; }
+.today-headline[data-active="true"] .today-pencil-stroke-2 { animation-delay: 600ms; }
+.today-headline[data-active="true"] .today-pencil-stroke-3 { animation-delay: 800ms; }
+.today-headline[data-active="true"] .today-pencil-stroke-4 { animation-delay: 1000ms; }
+.today-headline[data-active="true"] .today-pencil-stroke-5 { animation-delay: 1200ms; }
+.today-headline[data-active="true"] .today-hand-underline path { animation: today-pencil-draw 600ms ease-in-out both; }
+@keyframes today-pencil-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @media (hover: hover) {
   .today-slide .today-row:hover .today-text { transform: scale(1.06); }
 }
@@ -38,7 +45,7 @@
 @keyframes today-row { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes today-footnote { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .today-slide :is(.today-hand, .today-hand svg, .today-hand svg path, .today-hand-underline path) { animation: none !important; transition: none !important; }
+  .today-slide :is(.today-hand, .today-hand svg, .today-pencil-stroke, .today-hand-underline, .today-hand-underline path) { animation: none !important; transition: none !important; }
   .today-slide :is(.today-intro, .today-divider, .today-index, .today-statement, .today-footnote, .today-text) {
     animation: none !important; opacity: 1 !important; transform: none !important; transition: none !important;
   }

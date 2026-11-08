@@ -1,11 +1,10 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useContext, useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Wordmark } from "@/components/canoe/brand";
 import { Button } from "@/components/ui/button";
 import { canView, DEMO_NAME, ROLE_LABEL, pageRole, parseSession, type DemoRole, type DemoSession } from "@/lib/demo-role/logic";
+import { DemoSessionContext as Context } from "./session-context";
 const KEY = "canoe-demo-session";
-type SessionContext = { session: DemoSession | null; ready: boolean; signIn: (role: DemoRole, name?: string) => void; signOut: () => void };
-const Context = createContext<SessionContext | null>(null);
 export function DemoSessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<DemoSession | null>(null);
   const [ready, setReady] = useState(false);
@@ -42,5 +41,5 @@ export function DemoGate({ children }: { children: ReactNode }) {
   if (!ready || shortcut) return <div className="mx-auto max-w-xl px-5 py-8"><Wordmark /><p className="mt-10 text-sm text-stone">Opening the demo workspace…</p></div>;
   if (canView(session?.role, location.pathname)) return children;
   const audience = role === "policy_owner" ? "policy owners" : role === "reviewer" ? "claims reviewers" : "operations";
-  return <div className="mx-auto max-w-xl px-5 py-8"><Wordmark /><section className="card-calm mt-12 space-y-5 p-6"><p className="eyebrow">Workspace</p><h1 className="font-display text-3xl">This area is for {audience}</h1><Button className="h-auto whitespace-normal py-3" onClick={() => signIn(role)}>Continue as demo {ROLE_LABEL[role].toLowerCase()} — no password</Button><p><Link to="/sign-in" search={{ role, next: location.pathname }} className="text-sm underline underline-offset-4">Sign in</Link></p><p className="text-xs text-stone">Demo sign-in. No real accounts or passwords — this prototype has no authentication.</p></section></div>;
+  return <div className="mx-auto max-w-xl px-5 py-8"><Wordmark /><section className="card-calm mt-12 space-y-5 p-6"><p className="eyebrow">Workspace</p><h1 className="font-display text-3xl">This area is for {audience}</h1><Button className="h-auto whitespace-normal py-3" onClick={() => signIn(role)}>Continue as demo {ROLE_LABEL[role].toLowerCase()} - no password</Button><p><Link to="/sign-in" search={{ role, next: location.pathname }} className="text-sm underline underline-offset-4">Sign in</Link></p><p className="text-xs text-stone">Demo sign-in. No real accounts or passwords - this prototype has no authentication.</p></section></div>;
 }

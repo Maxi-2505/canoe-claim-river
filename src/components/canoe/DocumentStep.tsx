@@ -121,7 +121,7 @@ export function DocumentPicker({ only, confirmedIds, onConfirm, quoteTotal }: { 
         <p className="text-sm">Drop a file here, or <span className="underline underline-offset-4">choose one</span></p>
         <input ref={fileRef} type="file" className="hidden" onChange={(e) => onFiles(e.target.files)} />
       </div>
-      {unreadable && <p className="text-sm text-stone">We couldn't read this one — we'll ask you instead. <span className="opacity-70">({unreadable})</span></p>}
+      {unreadable && <p className="text-sm text-stone">We couldn't read this one - we'll ask you instead. <span className="opacity-70">({unreadable})</span></p>}
       <div>
         <p className="mb-2 text-xs uppercase tracking-wider text-stone">Use a sample</p>
         <div className="grid gap-2">
@@ -130,7 +130,7 @@ export function DocumentPicker({ only, confirmedIds, onConfirm, quoteTotal }: { 
             return (
               <button key={s.id} disabled={done} onClick={() => { setUnreadable(null); setActive(s); }} className="answer-btn flex items-center gap-3 px-4 py-3 text-left text-sm disabled:opacity-60">
                 <FileText className="size-4 shrink-0 text-stone" />
-                <span className="flex-1">{s.kind === "quote" ? (s.itemized === false ? "Workshop quote — total only, no line items" : `Workshop quote — itemized, total ${eur(s.total)}`) : "Police / incident report"}</span>
+                <span className="flex-1">{s.kind === "quote" ? (s.itemized === false ? "Workshop quote - total only, no line items" : `Workshop quote - itemized, total ${eur(s.total)}`) : "Police / incident report"}</span>
                 {done && <Check className="size-4 text-reed" />}
               </button>
             );

@@ -50,7 +50,7 @@ export function LandingPage() {
     <div className="relative isolate overflow-hidden">
       {/* 1. HERO */}
       <div className="relative min-h-screen pb-[34vh] md:pb-0">
-        {/* TODO(hero-boat): hero boat animation — swap in the redrawn canoe asset and its entrance here. */}
+        {/* TODO(hero-boat): hero boat animation - swap in the redrawn canoe asset and its entrance here. */}
         <PencilBackdrop contained />
         <nav className="relative z-10 mx-auto flex max-w-[1120px] items-center justify-between gap-4 px-5 pt-6 md:px-8">
           <Wordmark />
@@ -70,7 +70,7 @@ export function LandingPage() {
             Decisions that <Accent>hold</Accent> when the rules change.
           </h1>
           <p className="mt-6 max-w-[580px] text-[17px] leading-relaxed text-ink/80">
-            Canoe reads a motor claim, applies your written policy and tells your team the next step — with the facts, the rule and the policy version behind every answer. When the policy changes, you see what moves before it goes live.
+            Canoe reads a motor claim, applies your written policy and tells your team the next step - with the facts, the rule and the policy version behind every answer. When the policy changes, you see what moves before it goes live.
           </p>
           <div className="mt-6 space-y-4">
             <div className="flex flex-wrap items-center gap-5"><Button asChild><Link to="/claim">Report a claim</Link></Button><Button asChild variant="outline"><Link to="/batch">Batch version</Link></Button><Link to="/track" className="text-sm text-stone underline underline-offset-4 hover:text-ink">{t("Track a claim")}</Link></div>
@@ -91,7 +91,7 @@ export function LandingPage() {
         <div className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
           <div aria-hidden="true" className="absolute left-0 right-0 top-[7px] hidden h-px bg-ink/30 md:block" />
           {[
-            ["Collect", "The claim form only asks what the policy needs. “I’m not sure” stays blank — we never guess a fact."],
+            ["Collect", "The claim form only asks what the policy needs. “I’m not sure” stays blank - we never guess a fact."],
             ["Decide", "Written rules decide, in order. Every recommendation carries its rule and policy version. AI may help read documents; it never decides."],
             ["Review", "People handle the exceptions. Every correction is stored with the reviewer, the reason and the policy version."],
           ].map(([h, t]) => (
@@ -148,18 +148,18 @@ export function LandingPage() {
         <p className="mt-8 text-sm text-stone">14 labelled cases are a starting point, not a risk rate.</p>
       </Section>
 
-      {/* 7. BUSINESS VALUE — placeholders until the model is ready. */}
+      {/* 7. BUSINESS VALUE - placeholders until the model is ready. */}
       <Section>
         <H2>What it is worth.</H2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {["Annual triage cost today vs. with Canoe", "Payback", "Cost of a policy change"].map((l) => (
             <div key={l} className="card-calm p-6">
-              <p className="font-display text-5xl text-stone">—</p>
+              <p className="font-display text-5xl text-stone">-</p>
               <p className="mt-3 text-sm text-ink/80">{l}</p>
             </div>
           ))}
         </div>
-        <p className="mt-5 text-sm text-stone">Model in progress — assumptions are shown on the business page.</p>
+        <p className="mt-5 text-sm text-stone">Model in progress - assumptions are shown on the business page.</p>
       </Section>
 
       {/* 8. PRINCIPLES */}

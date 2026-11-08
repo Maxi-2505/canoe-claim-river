@@ -9,7 +9,7 @@ export const REASON: Record<string, string> = {
   "R1.quote_over_limit": "Quote over the routine limit", "R2.incident_report_missing": "Incident report missing",
   "R2.itemized_quote_missing": "No itemized quote", "R0.absent_fact": "Missing information", "R3.routine": "All checks passed",
 };
-/** Field each rule reads — used only to highlight the triggered fact. */
+/** Field each rule reads - used only to highlight the triggered fact. */
 export const RULE_FIELD: Record<string, string> = Object.fromEntries(RULE_ORDER);
 export const FIELD_GROUPS: [string, string[]][] = [
   ["Cover", ["policy_active_on_incident", "claim_type"]],
@@ -35,4 +35,4 @@ export function formatValue(field: string, v: FieldValue): string {
   if (field === "quote_eur" && typeof v === "number") return `€${v.toLocaleString("en-IE")}`;
   return String(v).replace(/_/g, " ");
 }
-export const euro = (n: number | null) => (n == null ? "—" : `€${n.toLocaleString("en-IE")}`);
+export const euro = (n: number | null) => (n == null ? "-" : `€${n.toLocaleString("en-IE")}`);

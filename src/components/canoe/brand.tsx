@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
-/** Accent word: oxblood, upright, with a thin hand-drawn wavy underline — a quiet nod to the river. */
+/** Accent word: oxblood, upright, with a thin hand-drawn wavy underline - a quiet nod to the river. */
 export function Accent({ children }: { children: ReactNode }) {
   return (
     <span className="relative inline-block not-italic text-cedar">
@@ -41,7 +41,7 @@ export function Wordmark({ size = 26, className }: { size?: number; className?: 
   return (
     <Link
       to="/"
-      aria-label="Canoe — go to the main page"
+      aria-label="Canoe - go to the main page"
       className={cn("inline-flex items-center gap-2 transition-opacity hover:opacity-70", className)}
     >
       <CanoeMark size={size} />

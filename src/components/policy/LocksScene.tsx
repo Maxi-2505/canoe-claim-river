@@ -233,7 +233,7 @@ export function LocksScene(p: LocksSceneProps) {
                 <rect x={TERM_X} y={y - 22} width={W - TERM_X - 6} height={44} fill="transparent" />
                 <line x1={TERM_X} x2={TERM_X} y1={y - 14} y2={y + 14} className="stroke-ink" strokeWidth={2} />
                 <text x={TERM_X + 10} y={y - 6} fontSize={10} letterSpacing="0.08em" className={`font-mono ${cls}`} textDecoration={term === rec ? "underline" : undefined}>{label}</text>
-                <text x={TERM_X + 10} y={y + 16} fontSize={24} fontWeight={600} className="font-display fill-ink">{ran ? count : "—"}</text>
+                <text x={TERM_X + 10} y={y + 16} fontSize={24} fontWeight={600} className="font-display fill-ink">{ran ? count : "-"}</text>
                 {ran && view === "v2" && <text x={TERM_X + 52} y={y + 14} fontSize={11} className={`font-mono ${delta ? "fill-cedar" : "fill-stone"}`}>{delta > 0 ? `+${delta}` : delta < 0 ? `−${-delta}` : "±0"}</text>}
               </g>
             );
@@ -249,7 +249,7 @@ export function LocksScene(p: LocksSceneProps) {
             <g className="stroke-stone" fill="none" strokeWidth={1}>
               <rect x={X0 + 64} y={478} width={10} height={8} rx={1} />
               <path d={`M${X0 + 66} 478 V474 a3 3 0 0 1 6 0 V478`} />
-              <text x={X0 + 84} y={486} fontSize={11} className="fill-stone stroke-none font-mono">{closed.map((r) => r.case_id).join(" · ")} — closed, not re-run, kept as decided.</text>
+              <text x={X0 + 84} y={486} fontSize={11} className="fill-stone stroke-none font-mono">{closed.map((r) => r.case_id).join(" · ")} - closed, not re-run, kept as decided.</text>
             </g>
           )}
           <text x={W - 20} y={H - 14} textAnchor="end" fontSize={10} className="fill-stone font-mono">{ran ? `showing ${view}` : ""}</text>

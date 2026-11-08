@@ -196,11 +196,11 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
               <motion.section key="docs" {...advance} className="space-y-6">
                 <div>
                   <h1 className="question-title">{t("Have your repair quote or police report?")}</h1>
-                  <p className="mt-3 text-sm text-stone">{t("Add them and we'll fill in what we can — fewer questions for you.")}</p>
+                  <p className="mt-3 text-sm text-stone">{t("Add them and we'll fill in what we can - fewer questions for you.")}</p>
                 </div>
                 <DocumentPicker confirmedIds={confirmedDocIds} onConfirm={onDocument} />
                 <div className="flex flex-wrap items-center gap-4">
-                  <button onClick={() => setScreen("question")} className="btn-cedar px-6 py-2.5 text-sm">{confirmedDocIds.length ? t("Continue") : t("Skip — I'll answer the questions")}</button>
+                  <button onClick={() => setScreen("question")} className="btn-cedar px-6 py-2.5 text-sm">{confirmedDocIds.length ? t("Continue") : t("Skip - I'll answer the questions")}</button>
                   <button onClick={() => setScreen("start")} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> {t("Back")}</button>
                 </div>
               </motion.section>
@@ -230,7 +230,7 @@ export function IntakeFlow({ mode = { kind: "intake" }, initialState, caseId, he
               <motion.section key="review" {...advance} className="space-y-6">
                 <div>
                   <h1 className="question-title">{t("Check your claim")}</h1>
-                  <p className="mt-3 text-sm text-stone">{t("Tap any line to change it. Blank is fine — we'll ask later if we need it.")}</p>
+                  <p className="mt-3 text-sm text-stone">{t("Tap any line to change it. Blank is fine - we'll ask later if we need it.")}</p>
                 </div>
                 <button onClick={goBack} className="inline-flex items-center gap-1 text-sm text-stone hover:text-ink"><ArrowLeft className="size-3.5" /> {t("Back")}</button>
                 <ReviewList state={state} onEdit={(id) => { setEditing({ id, toReview: true }); setScreen("question"); }} />
@@ -346,7 +346,7 @@ function PreviewFlow({ line, onExit }: { line: "home" | "health"; onExit: () => 
         </motion.div>
       ) : (
         <motion.div key="end" {...advance} className="space-y-5">
-          <h1 className="question-title">This line isn't open yet — a specialist will handle your request personally.</h1>
+          <h1 className="question-title">This line isn't open yet - a specialist will handle your request personally.</h1>
           <p className="text-stone">Thank you for your patience. Someone from our team will get in touch.</p>
           <button onClick={onExit} className="btn-quiet px-5 py-2 text-sm">Back to start</button>
         </motion.div>
