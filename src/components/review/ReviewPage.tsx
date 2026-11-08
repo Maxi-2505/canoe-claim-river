@@ -435,7 +435,7 @@ function Rail({ c, ui, setUi, reviewer, override, settle, outcome, writable }: {
       {ui.armed === d ? "Click again to close for good" : label}
     </button>
   );
-  const footer = <p className="mt-5 border-t border-stone/20 pt-3 text-xs text-stone">Recorded as <b className="text-ink">{reviewer || "-"}</b> · policy <b className="text-ink">{pv}</b> · with time.</p>;
+  const footer = <p className="mt-5 border-t border-stone/20 pt-3 text-xs text-stone">{"\n"}</p>;
 
   if (!isOpen(c)) {
     const s = c.settlement;
