@@ -37,7 +37,7 @@ export function getCustomerStatus(claim: CustomerClaim, now: number | Date) {
     if (r) {
       const reminder = getReminders(r.created_at, now);
       needInfo = { fields: r.ask_fields, labels: r.ask_fields.map(label), reminder };
-      reminder.sentAt.slice(1).forEach((at, i) => events.push({ at, text: i === 0 ? "Reminder sent (simulated)" : "Final reminder + SMS sent (simulated)" }));
+      reminder.sentAt.slice(1).forEach((at, i) => events.push({ at, text: `Reminder ${i + 2} sent (simulated)${i === 1 ? " · SMS" : ""}` }));
       if (reminder.overdue) events.push({ at: reminder.handoverAt, text: "Reviewer call handover due (simulated)" });
     }
   } else if (claim.effective_recommendation === "human_review") {
