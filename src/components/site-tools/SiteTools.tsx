@@ -91,11 +91,12 @@ export function SiteTools() {
     if (!parsed.success) return;
     busy.current = true;
     setLoading(true);
-    setMessages([...prior, { role: "user", content: clean }].slice(-40));
+    const userTurn: ChatTurn = { role: "user", content: clean };
+    setMessages([...prior, userTurn].slice(-40));
     setQuestion("");
     try {
       const reply = await sendChat({ data: parsed.data });
-      setMessages((items) => [...items, { role: "assistant", content: reply.text, status: reply.status, error: reply.error }]);
+      setMessages((items) => [...items, { role: "assistant", content: reply.text, ...(reply.status ? { status: reply.status } : {}), ...(reply.error ? { error: true } : {}) }]);
     } catch { setMessages((items) => [...items, { role: "assistant", content: text.error, error: true }]); }
     finally { busy.current = false; setLoading(false); }
   };
