@@ -144,7 +144,7 @@ export function LandingPage() {
 
       {/* 7. BUSINESS VALUE - placeholders until the model is ready. */}
       <Section>
-        <H2>What it is worth.</H2>
+        <H2>What it is <CanoeAccent>worth</CanoeAccent>.</H2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {["Annual triage cost today vs. with Canoe", "Payback", "Cost of a policy change"].map((l) => (
             <div key={l} className="card-calm p-6">

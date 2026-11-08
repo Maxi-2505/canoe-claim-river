@@ -23,13 +23,7 @@
 .today-headline { padding-right: 96px; }
 .today-word { opacity: 1; }
 .today-slide[data-ready="true"]:not([data-visible="true"]) .today-word { opacity: 0; }
-.today-slide[data-visible="true"] .today-word { animation: today-footnote 220ms ease-out both; }
-.today-slide[data-visible="true"] .today-word-0 { animation-delay: 250ms; }
-.today-slide[data-visible="true"] .today-word-1 { animation-delay: 470ms; }
-.today-slide[data-visible="true"] .today-word-2 { animation-delay: 690ms; }
-.today-slide[data-visible="true"] .today-word-3 { animation-delay: 910ms; }
-.today-slide[data-visible="true"] .today-word-4 { animation-delay: 1130ms; }
-.today-slide[data-visible="true"] .today-word-5 { animation-delay: 1350ms; }
+.today-slide[data-visible="true"] .today-word { animation: today-footnote 400ms ease-out 250ms both; }
 .today-hand { position: absolute; left: calc(100% + 8px); bottom: -16px; width: 88px; height: 88px; color: var(--ink); opacity: 0; pointer-events: none; }
 .today-hand svg { display: block; overflow: visible; }
 .today-pencil > g { opacity: 1; }
